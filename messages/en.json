@@ -1,0 +1,53 @@
+{
+    "metadata": {
+        "title": "Manabi | Smart Learning Platform",
+        "description": "Manabi learning platform helps you create roadmaps, practice, and track progress effectively."
+    },
+    "common": {
+        "welcome": "Welcome to Manabi",
+        "getStarted": "Get Started",
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "search": "Search"
+    },
+    "nav": {
+        "home": "Home",
+        "courses": "Courses",
+        "community": "Community",
+        "statistics": "Statistics",
+        "achievements": "Achievements",
+        "profile": "Profile"
+    },
+    "auth": {
+        "login": "Login",
+        "logout": "Logout",
+        "register": "Register",
+        "forgotPassword": "Forgot password?",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm password"
+    },
+    "learning": {
+        "myProgress": "My Progress",
+        "studyPlan": "Study Plan",
+        "studyGroup": "Study Group",
+        "createStudyPlan": "Create Study Plan",
+        "joinGroup": "Join Group",
+        "todayGoal": "Today's Goal",
+        "weeklyGoal": "Weekly Goal",
+        "monthlyGoal": "Monthly Goal"
+    },
+    "statistics": {
+        "overview": "Overview",
+        "totalStudyTime": "Total Study Time",
+        "completedLessons": "Completed Lessons",
+        "streak": "Learning Streak",
+        "rank": "Rank",
+        "performance": "Performance"
+    }
+}

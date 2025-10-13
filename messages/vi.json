@@ -1,0 +1,53 @@
+{
+    "metadata": {
+        "title": "Manabi | Học tập thông minh",
+        "description": "Nền tảng học tập Manabi giúp bạn lên lộ trình, luyện tập và theo dõi tiến độ hiệu quả."
+    },
+    "common": {
+        "welcome": "Chào mừng đến với Manabi",
+        "getStarted": "Bắt đầu học",
+        "loading": "Đang tải...",
+        "error": "Đã xảy ra lỗi",
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "edit": "Chỉnh sửa",
+        "create": "Tạo mới",
+        "search": "Tìm kiếm"
+    },
+    "nav": {
+        "home": "Trang chủ",
+        "courses": "Khóa học",
+        "community": "Cộng đồng",
+        "statistics": "Thống kê",
+        "achievements": "Thành tựu",
+        "profile": "Hồ sơ"
+    },
+    "auth": {
+        "login": "Đăng nhập",
+        "logout": "Đăng xuất",
+        "register": "Đăng ký",
+        "forgotPassword": "Quên mật khẩu?",
+        "email": "Email",
+        "password": "Mật khẩu",
+        "confirmPassword": "Xác nhận mật khẩu"
+    },
+    "learning": {
+        "myProgress": "Tiến độ của tôi",
+        "studyPlan": "Kế hoạch học tập",
+        "studyGroup": "Nhóm học tập",
+        "createStudyPlan": "Tạo kế hoạch học tập",
+        "joinGroup": "Tham gia nhóm",
+        "todayGoal": "Mục tiêu hôm nay",
+        "weeklyGoal": "Mục tiêu tuần",
+        "monthlyGoal": "Mục tiêu tháng"
+    },
+    "statistics": {
+        "overview": "Tổng quan",
+        "totalStudyTime": "Tổng thời gian học",
+        "completedLessons": "Bài học hoàn thành",
+        "streak": "Chuỗi ngày học liên tục",
+        "rank": "Xếp hạng",
+        "performance": "Hiệu suất học tập"
+    }
+}

@@ -15,11 +15,11 @@ export default async function LocaleLayout({
   const { locale } = await params;
 
   // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale as any)) {
+  if (!locales.includes(locale as typeof locales[number])) {
     notFound();
   }
 
-  // Enable static rendering by providing the locale as an argument
+
   const messages = await getMessages({ locale });
 
   return (

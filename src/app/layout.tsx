@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
-const inter = Inter({
+const poppins = Poppins({
+  weight: ['300', '400', '500', '600', '700'],
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
-  title: "Manabi | Học tập thông minh",
+  title: "Manabi | Khôi phục ảnh cũ với AI",
   description:
-    "Nền tảng học tập Manabi giúp bạn lên lộ trình, luyện tập và theo dõi tiến độ hiệu quả.",
+    "Mang lại sức sống cho những bức ảnh cũ của bạn với công nghệ AI tiên tiến. Khôi phục, nâng cấp 4K, và tô màu tự động.",
 };
 
 export default function RootLayout({
@@ -21,8 +23,9 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body
-        className={`${inter.variable} bg-background font-sans text-foreground antialiased`}
+        className={`${poppins.className} bg-[#F9F6F2] text-[#39241A] antialiased`}
       >
+        <Analytics />
         {children}
       </body>
     </html>

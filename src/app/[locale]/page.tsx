@@ -1,11 +1,11 @@
 'use client';
 
 import { LofiHeader } from "@/components/lofi-header";
-import { LofiHero } from "@/components/lofi-hero";
+import { LofiHero } from "@/components/hero/lofi-hero";
 import { LofiBenefits } from "@/components/lofi-benefits";
 import { LofiPricing } from "@/components/lofi-pricing";
 import { LofiFAQ } from "@/components/lofi-faq";
-import { LofiFooter } from "@/components/lofi-footer";
+import { LofiFooter } from "@/components/footer/lofi-footer";
 
 export default function HomePage() {
     return (

@@ -13,12 +13,12 @@ export function Hero() {
       <div className="mt-16 flex flex-col items-center gap-6">
         <Pill>
 
-          <p className="text-muted-foreground px-2 text-xs font-medium sm:border-l-1 sm:text-sm">
+          <p className="px-2 font-medium text-muted-foreground text-xs sm:border-l-1 sm:text-sm">
             Join 10,000+ users boosting their productivity with Acme App
           </p>
         </Pill>
-        <h1 className="text-center text-4xl leading-[1.1] font-medium tracking-tight sm:text-7xl">
-          Meet the App<span className="text-muted-foreground block">That Does It All.</span>
+        <h1 className="text-center font-medium text-4xl leading-[1.1] tracking-tight sm:text-7xl">
+          Meet the App<span className="block text-muted-foreground">That Does It All.</span>
         </h1>
         <p className="max-w-lg text-center leading-6 tracking-tight sm:text-xl">
           Powerful, intuitive, and ready to make your life easier, start using Acme App today.

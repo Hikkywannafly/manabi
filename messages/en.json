@@ -16,6 +16,7 @@
     "pricing": "Pricing",
     "faq": "FAQ",
     "blog": "Blog",
+    "login": "Login",
     "getStartedFree": "Get Started Free",
     "languageSwitch": "Switch language",
     "themeToggle": "Toggle theme"
@@ -135,5 +136,12 @@
     "support": "Support",
     "allInclusive": "All plans include free updates and unlimited devices",
     "securePay": "Secure payment via Stripe • Cancel anytime • No hidden fees"
+  },
+  "login": {
+    "title": "Welcome Back",
+    "description": "Sign in with your account to continue learning",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGithub": "Continue with Github",
+    "privacyNotice": "By continuing, you agree to our Terms of Service and Privacy Policy"
   }
 }

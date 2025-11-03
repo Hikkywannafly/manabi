@@ -16,6 +16,7 @@
     "pricing": "Bảng giá",
     "faq": "FAQ",
     "blog": "Blog",
+    "login": "Đăng nhập",
     "getStartedFree": "Bắt đầu miễn phí",
     "languageSwitch": "Chuyển ngôn ngữ",
     "themeToggle": "Chuyển chế độ"
@@ -135,5 +136,12 @@
     "support": "Hỗ trợ",
     "allInclusive": "Tất cả gói đều bao gồm bản cập nhật miễn phí và không giới hạn thiết bị",
     "securePay": "Thanh toán an toàn qua Stripe • Hủy bất cứ lúc nào • Không phí ẩn"
+  },
+  "login": {
+    "title": "Chào mừng trở lại",
+    "description": "Đăng nhập để tiếp tục học tập",
+    "continueWithGoogle": "Tiếp tục với Google",
+    "continueWithGithub": "Tiếp tục với Github",
+    "privacyNotice": "Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi"
   }
 }

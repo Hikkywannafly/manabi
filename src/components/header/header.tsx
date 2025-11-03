@@ -1,10 +1,11 @@
 "use client";
 
-import { Camera, Headphones, Menu, Sparkles } from "lucide-react";
+import { Headphones, Menu, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -19,14 +20,7 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 transition-transform duration-300 group-hover:rotate-6">
-              <Camera className="h-5 w-5 text-primary" />
-            </div>
-            <span className="font-bold text-foreground text-xl transition-colors group-hover:text-primary">
-              Manabi
-            </span>
-          </Link>
+          <Logo size="sm" />
 
           {/* Desktop Navigation */}
           <nav className="hidden items-center gap-8 md:flex">
@@ -63,7 +57,7 @@ export function Header() {
               size="icon"
               variant="ghost"
               onClick={() => setIsPlaying(!isPlaying)}
-              className="group relative rounded-full hover:bg-primary/10"
+              className="group relative hover:bg-primary/10"
             >
               <Headphones
                 className={`h-5 w-5 transition-all duration-300 ${
@@ -87,9 +81,22 @@ export function Header() {
               <LanguageSwitcher />
             </div>
 
+            {/* Login Button */}
+            <Link href="/login" className="hidden md:inline-flex">
+              <Button
+                variant="outline"
+                className="rounded-xl border-primary/20 hover:border-primary hover:bg-primary/5"
+              >
+                {t("login")}
+              </Button>
+            </Link>
+
             {/* CTA Button */}
             <Link href="/get-started">
-              <Button className="hover:-translate-y-0.5 hidden rounded-xl bg-primary px-6 text-primary-foreground shadow-lg transition-all duration-300 hover:bg-primary/90 md:inline-flex">
+              <Button
+                variant="gradient"
+                className="hidden rounded-xl px-6 md:inline-flex"
+              >
                 <Sparkles className="mr-2 h-4 w-4" />
                 {t("getStartedFree")}
               </Button>
@@ -145,9 +152,19 @@ export function Header() {
             <div className="sm:hidden">
               <LanguageSwitcher />
             </div>
+            <Link href="/login" className="md:hidden">
+              <Button
+                variant="outline"
+                className="w-full rounded-xl border-primary/20 hover:border-primary hover:bg-primary/5"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t("login")}
+              </Button>
+            </Link>
             <Link href="/get-started">
               <Button
-                className="w-full rounded-xl bg-primary text-primary-foreground shadow-lg hover:bg-primary/90"
+                variant="gradient"
+                className="w-full rounded-xl"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Sparkles className="mr-2 h-4 w-4" />

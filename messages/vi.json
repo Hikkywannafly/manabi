@@ -1,53 +1,138 @@
 {
-    "metadata": {
-        "title": "Manabi | Học tập thông minh",
-        "description": "Nền tảng học tập Manabi giúp bạn lên lộ trình, luyện tập và theo dõi tiến độ hiệu quả."
-    },
-    "common": {
-        "welcome": "Chào mừng đến với Manabi",
-        "getStarted": "Bắt đầu học",
-        "loading": "Đang tải...",
-        "error": "Đã xảy ra lỗi",
-        "save": "Lưu",
-        "cancel": "Hủy",
-        "delete": "Xóa",
-        "edit": "Chỉnh sửa",
-        "create": "Tạo mới",
-        "search": "Tìm kiếm"
-    },
-    "nav": {
-        "home": "Trang chủ",
-        "courses": "Khóa học",
-        "community": "Cộng đồng",
-        "statistics": "Thống kê",
-        "achievements": "Thành tựu",
-        "profile": "Hồ sơ"
-    },
-    "auth": {
-        "login": "Đăng nhập",
-        "logout": "Đăng xuất",
-        "register": "Đăng ký",
-        "forgotPassword": "Quên mật khẩu?",
-        "email": "Email",
-        "password": "Mật khẩu",
-        "confirmPassword": "Xác nhận mật khẩu"
-    },
-    "learning": {
-        "myProgress": "Tiến độ của tôi",
-        "studyPlan": "Kế hoạch học tập",
-        "studyGroup": "Nhóm học tập",
-        "createStudyPlan": "Tạo kế hoạch học tập",
-        "joinGroup": "Tham gia nhóm",
-        "todayGoal": "Mục tiêu hôm nay",
-        "weeklyGoal": "Mục tiêu tuần",
-        "monthlyGoal": "Mục tiêu tháng"
-    },
-    "statistics": {
-        "overview": "Tổng quan",
-        "totalStudyTime": "Tổng thời gian học",
-        "completedLessons": "Bài học hoàn thành",
-        "streak": "Chuỗi ngày học liên tục",
-        "rank": "Xếp hạng",
-        "performance": "Hiệu suất học tập"
-    }
+  "common": {
+    "welcome": "Chào mừng đến với Manabi",
+    "getStarted": "Bắt đầu",
+    "loading": "Đang tải...",
+    "error": "Đã xảy ra lỗi",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "create": "Tạo mới",
+    "search": "Tìm kiếm"
+  },
+  "header": {
+    "features": "Tính năng",
+    "pricing": "Bảng giá",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "getStartedFree": "Bắt đầu miễn phí",
+    "languageSwitch": "Chuyển ngôn ngữ"
+  },
+  "hero": {
+    "badge": "Nền tảng học tập hỗ trợ AI",
+    "title": "Học tập thông minh cùng AI",
+    "subtitle": "Manabi cung cấp những công cụ học tập hỗ trợ AI để bạn chinh phục bất kỳ môn học nào. Tạo lộ trình học tập riêng, nhận giải thích tức thì, và theo dõi tiến độ real-time.",
+    "ctaPrimary": "Bắt đầu học miễn phí",
+    "ctaSecondary": "Xem demo",
+    "trustText": "Được tin dùng bởi 5,000+ sinh viên",
+    "stat1": "10,000+",
+    "stat1Text": "Sinh viên đang học",
+    "stat2": "500K+",
+    "stat2Text": "Phiên học",
+    "stat3": "4.9/5",
+    "stat3Text": "Đánh giá trung bình"
+  },
+  "benefits": {
+    "title": "Tại sao chọn Manabi?",
+    "subtitle": "Công cụ học tập mạnh mẽ",
+    "description": "Mọi thứ bạn cần để học tập thông minh hơn và đạt được mục tiêu",
+    "features": [
+      {
+        "title": "Ghi chú thông minh",
+        "description": "Biến bài giảng thành tài liệu học tập tương tác với khái niệm chính và tóm tắt."
+      },
+      {
+        "title": "Tạo bài trắc nghiệm",
+        "description": "Tạo bài trắc nghiệm cá nhân hóa từ bất kỳ văn bản hay chủ đề nào."
+      },
+      {
+        "title": "Thẻ ghi nhớ tương tác",
+        "description": "Tạo và sắp xếp thẻ ghi nhớ với lặp lại cách xa để ghi nhớ tối ưu."
+      },
+      {
+        "title": "Theo dõi tiến độ",
+        "description": "Giám sát hành trình học tập của bạn với phân tích chi tiết và insights."
+      },
+      {
+        "title": "Hỗ trợ nhiều môn học",
+        "description": "Học bất kỳ môn nào - từ khoa học đến ngôn ngữ - với hướng dẫn AI."
+      },
+      {
+        "title": "Học tập hợp tác",
+        "description": "Nhóm học và tài nguyên được chia sẻ để trải nghiệm học tập tốt hơn."
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Bảng giá đơn giản, minh bạch",
+    "subtitle": "Học tập với mức giá phải chăng",
+    "description": "Chọn gói phù hợp với bạn. Bắt đầu miễn phí, nâng cấp bất cứ lúc nào.",
+    "popular": "Phổ biến nhất",
+    "plans": [
+      {
+        "name": "Miễn phí",
+        "price": "0₫",
+        "period": "Mãi mãi",
+        "description": "Trải nghiệm Manabi miễn phí rủi ro",
+        "features": [
+          "5 phiên học/tháng",
+          "Ghi chú AI cơ bản",
+          "Thẻ ghi nhớ hạn chế",
+          "1 bài trắc nghiệm",
+          "Hỗ trợ qua email"
+        ],
+        "cta": "Bắt đầu miễn phí"
+      },
+      {
+        "name": "Pro",
+        "price": "149.000",
+        "period": "/tháng",
+        "description": "Cho những người học tập nghiêm túc",
+        "features": [
+          "Phiên học không giới hạn",
+          "Ghi chú AI nâng cao",
+          "Thẻ ghi nhớ không giới hạn",
+          "Bài trắc nghiệm không giới hạn",
+          "Phân tích tiến độ",
+          "Hỗ trợ 24/7"
+        ],
+        "cta": "Nâng cấp Pro"
+      },
+      {
+        "name": "Nhóm",
+        "price": "99.000",
+        "period": "/người/tháng",
+        "description": "Cho nhóm học tập",
+        "features": [
+          "Tất cả trong Pro",
+          "Hợp tác nhóm",
+          "Tài nguyên chia sẻ",
+          "Phân tích nhóm",
+          "Lộ trình học tập tùy chỉnh",
+          "Hỗ trợ chuyên dedicate"
+        ],
+        "cta": "Liên hệ sales"
+      }
+    ]
+  },
+  "faq": {
+    "title": "Câu hỏi thường gặp",
+    "subtitle": "Mọi thứ bạn cần biết"
+  },
+  "footer": {
+    "brand": "Manabi",
+    "tagline": "Nền tảng học tập hỗ trợ AI",
+    "description": "Chinh phục bất kỳ môn học nào với công cụ học tập AI",
+    "newsletter": "Đăng ký nhận tin tức",
+    "newsletterPlaceholder": "Nhập email của bạn",
+    "subscribe": "Đăng ký",
+    "copyright": "© 2024 Manabi. Tất cả quyền được bảo lưu.",
+    "product": "Sản phẩm",
+    "company": "Công ty",
+    "legal": "Pháp lý",
+    "support": "Hỗ trợ",
+    "allInclusive": "Tất cả gói đều bao gồm bản cập nhật miễn phí và không giới hạn thiết bị",
+    "securePay": "Thanh toán an toàn qua Stripe • Hủy bất cứ lúc nào • Không phí ẩn"
+  }
 }

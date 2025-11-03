@@ -11,7 +11,11 @@ type Props = {
   className?: string;
 };
 
-export function TestimonialMarquee({ testimonials, reverse, className }: Props) {
+export function TestimonialMarquee({
+  testimonials,
+  reverse,
+  className,
+}: Props) {
   return (
     <div className={cn("relative col-span-4 w-full", className)}>
       <div
@@ -21,7 +25,7 @@ export function TestimonialMarquee({ testimonials, reverse, className }: Props) 
           "md:bg-linear-[90deg,var(--background),transparent_25%,transparent_75%,var(--background)]",
           "xl:bg-linear-[90deg,var(--background),transparent,var(--background)]",
         )}
-      ></div>
+      />
       <InfiniteSlider speed={30} reverse={reverse}>
         {testimonials.map((testimonial, index) => (
           <TestimonialCard key={index} testimonial={testimonial} />

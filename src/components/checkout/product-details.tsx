@@ -1,9 +1,9 @@
 import type { CheckoutEventsData } from "@paddle/paddle-js/types/checkout/events";
 
-import { formatCurrency } from "@/lib/format-currency";
 import { OrderSummary } from "@/components/checkout/order-summary";
 import { ProductImage } from "@/components/checkout/product-image";
 import { formatBillingCycle } from "@/lib/format-billing-cycle";
+import { formatCurrency } from "@/lib/format-currency";
 import { formatTrialPeriod } from "@/lib/format-trial-period";
 
 type Props = {
@@ -14,8 +14,12 @@ type Props = {
 export function ProductDetails({ checkoutData, locale }: Props) {
   const currency = checkoutData.currency_code;
 
-  const trialPeriod = checkoutData.items?.find((item) => item.trial_period)?.trial_period;
-  const billingCycle = checkoutData.items?.find((item) => item.billing_cycle)?.billing_cycle;
+  const trialPeriod = checkoutData.items?.find(
+    (item) => item.trial_period,
+  )?.trial_period;
+  const billingCycle = checkoutData.items?.find(
+    (item) => item.billing_cycle,
+  )?.billing_cycle;
   const numberOfPrices = checkoutData.items?.length;
 
   return (
@@ -30,10 +34,14 @@ export function ProductDetails({ checkoutData, locale }: Props) {
             />
           )}
 
-          <h2 className="text-2xl leading-none font-semibold">{checkoutData.items[0].product.name}</h2>
+          <h2 className="font-semibold text-2xl leading-none">
+            {checkoutData.items[0].product.name}
+          </h2>
         </div>
         {numberOfPrices > 1 && (
-          <p className="text-muted-foreground pt-1 text-sm whitespace-nowrap">+{numberOfPrices - 1} more</p>
+          <p className="whitespace-nowrap pt-1 text-muted-foreground text-sm">
+            +{numberOfPrices - 1} more
+          </p>
         )}
       </div>
 
@@ -41,8 +49,10 @@ export function ProductDetails({ checkoutData, locale }: Props) {
         <div className="flex flex-col">
           <p>{formatCurrency(checkoutData.totals.total, currency)} now</p>
           {checkoutData.recurring_totals && billingCycle && (
-            <p className="text-muted-foreground mt-1 text-sm">
-              Then {formatCurrency(checkoutData.recurring_totals.total, currency)}/{formatBillingCycle(billingCycle)}
+            <p className="mt-1 text-muted-foreground text-sm">
+              Then{" "}
+              {formatCurrency(checkoutData.recurring_totals.total, currency)}/
+              {formatBillingCycle(billingCycle)}
               {trialPeriod && (
                 <>
                   <span> after </span>

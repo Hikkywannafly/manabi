@@ -1,30 +1,46 @@
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import TranslationsProvider from "@/components/TranslationsProvider";
+import { getResources } from "@/lib/i18n";
 import { notFound } from "next/navigation";
-import { locales } from "../../../i18n-config";
+import i18nConfig from "../../i18nConfig";
+
+const namespaces = [
+  "common",
+  "header",
+  "hero",
+  "benefits",
+  "pricing",
+  "faq",
+  "footer",
+];
 
 type Props = {
   children: React.ReactNode;
   params: { locale: string };
 };
 
-export default async function LocaleLayout({
-  children,
-  params
-}: Props) {
+export async function generateStaticParams() {
+  return i18nConfig.locales.map((locale) => ({ locale }));
+}
+
+export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
 
-  // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale as typeof locales[number])) {
+  if (
+    !i18nConfig.locales.includes(locale as (typeof i18nConfig.locales)[number])
+  ) {
     notFound();
   }
 
-
-  const messages = await getMessages({ locale });
+  const resources = await getResources(locale, namespaces);
 
   return (
-    <NextIntlClientProvider messages={messages}>
+    <TranslationsProvider
+      key={locale}
+      locale={locale}
+      namespaces={namespaces}
+      resources={resources}
+    >
       {children}
-    </NextIntlClientProvider>
+    </TranslationsProvider>
   );
 }

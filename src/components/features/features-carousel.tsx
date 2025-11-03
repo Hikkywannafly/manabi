@@ -1,8 +1,13 @@
 "use client";
 
-import type { Feature } from "@/components/features/features";
 import { FeatureCard } from "@/components/features/feature-card";
-import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import type { Feature } from "@/components/features/features";
+import {
+  Carousel,
+  type CarouselApi,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
@@ -28,7 +33,9 @@ export function FeaturesCarousel({ features, className }: Props) {
   }, [carouselApi]);
 
   return (
-    <div className={cn("w-[calc(100%+3rem)] md:w-[calc(100%+5rem)]", className)}>
+    <div
+      className={cn("w-[calc(100%+3rem)] md:w-[calc(100%+5rem)]", className)}
+    >
       <Carousel setApi={setCarouselApi}>
         <CarouselContent>
           {features.map((feature, index) => (

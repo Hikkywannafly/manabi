@@ -1,15 +1,17 @@
-'use client';
+"use client";
 
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Camera, Headphones, Menu, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { LanguageSwitcher } from "./language-switcher";
+import { useTranslation } from "react-i18next";
 
-export function LofiHeader() {
+export function Header() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation("header");
 
   return (
     <header className="sticky top-0 z-50 w-full border-[#E2B769]/20 border-b bg-[#F9F6F2]/80 backdrop-blur-lg">
@@ -31,25 +33,25 @@ export function LofiHeader() {
               href="/features"
               className="font-medium text-[#39241A]/70 transition-colors hover:text-[#B35832]"
             >
-              Tính năng
+              {t("features")}
             </Link>
             <Link
               href="/pricing"
               className="font-medium text-[#39241A]/70 transition-colors hover:text-[#B35832]"
             >
-              Bảng giá
+              {t("pricing")}
             </Link>
             <Link
               href="/faq"
               className="font-medium text-[#39241A]/70 transition-colors hover:text-[#B35832]"
             >
-              FAQ
+              {t("faq")}
             </Link>
             <Link
               href="/blog"
               className="font-medium text-[#39241A]/70 transition-colors hover:text-[#B35832]"
             >
-              Blog
+              {t("blog")}
             </Link>
           </nav>
 
@@ -63,10 +65,11 @@ export function LofiHeader() {
               className="group relative rounded-full hover:bg-[#B35832]/10"
             >
               <Headphones
-                className={`h-5 w-5 transition-all duration-300 ${isPlaying
-                  ? "animate-pulse text-[#B35832]"
-                  : 'text-[#39241A]/60 group-hover:text-[#B35832]'
-                  }`}
+                className={`h-5 w-5 transition-all duration-300 ${
+                  isPlaying
+                    ? "animate-pulse text-[#B35832]"
+                    : "text-[#39241A]/60 group-hover:text-[#B35832]"
+                }`}
               />
               {isPlaying && (
                 <span className="-top-1 -right-1 absolute h-2 w-2 animate-ping rounded-full bg-[#B35832]" />
@@ -80,11 +83,9 @@ export function LofiHeader() {
 
             {/* CTA Button */}
             <Link href="/get-started">
-              <Button
-                className="hover:-translate-y-0.5 hidden rounded-xl bg-[#B35832] px-6 text-white shadow-[0_4px_14px_rgba(179,88,50,0.3)] transition-all duration-300 hover:bg-[#9d4a2a] hover:shadow-[0_6px_20px_rgba(179,88,50,0.4)] md:inline-flex"
-              >
+              <Button className="hover:-translate-y-0.5 hidden rounded-xl bg-[#B35832] px-6 text-white shadow-[0_4px_14px_rgba(179,88,50,0.3)] transition-all duration-300 hover:bg-[#9d4a2a] hover:shadow-[0_6px_20px_rgba(179,88,50,0.4)] md:inline-flex">
                 <Sparkles className="mr-2 h-4 w-4" />
-                Dùng thử miễn phí
+                {t("getStartedFree")}
               </Button>
             </Link>
 
@@ -108,28 +109,28 @@ export function LofiHeader() {
               className="block py-2 font-medium text-[#39241A]/70 transition-colors hover:text-[#B35832]"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Tính năng
+              {t("features")}
             </Link>
             <Link
               href="/pricing"
               className="block py-2 font-medium text-[#39241A]/70 transition-colors hover:text-[#B35832]"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Bảng giá
+              {t("pricing")}
             </Link>
             <Link
               href="/faq"
               className="block py-2 font-medium text-[#39241A]/70 transition-colors hover:text-[#B35832]"
               onClick={() => setMobileMenuOpen(false)}
             >
-              FAQ
+              {t("faq")}
             </Link>
             <Link
               href="/blog"
               className="block py-2 font-medium text-[#39241A]/70 transition-colors hover:text-[#B35832]"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Blog
+              {t("blog")}
             </Link>
             <Separator className="bg-[#E2B769]/20" />
             <div className="sm:hidden">
@@ -141,7 +142,7 @@ export function LofiHeader() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Sparkles className="mr-2 h-4 w-4" />
-                Dùng thử miễn phí
+                {t("getStartedFree")}
               </Button>
             </Link>
           </div>

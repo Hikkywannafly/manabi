@@ -1,48 +1,57 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Cloud, ImageUp, Palette, Sparkles, Wand2, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-const features = [
-  {
-    icon: Wand2,
-    title: "Khôi phục một chạm",
-    description: "AI tự động phân tích và sửa chữa các khuyết điểm trong ảnh cũ chỉ với một cú nhấp chuột.",
-    color: "text-[#B35832]"
-  },
-  {
-    icon: ImageUp,
-    title: "Nâng cấp 4K",
-    description: "Tăng độ phân giải lên đến 4K, mang lại sự sắc nét hoàn hảo cho những bức ảnh mờ nhạt.",
-    color: "text-[#E2B769]"
-  },
-  {
-    icon: Palette,
-    title: "Phục hồi màu sắc",
-    description: "Tự động tô màu cho ảnh đen trắng hoặc phục hồi màu sắc bị phai mờ theo thời gian.",
-    color: "text-[#B35832]"
-  },
-  {
-    icon: Cloud,
-    title: "Lưu trữ đám mây",
-    description: "Bảo quản an toàn những kỷ niệm quý giá của bạn trên cloud với mã hóa cao cấp.",
-    color: "text-[#E2B769]"
-  },
-  {
-    icon: Sparkles,
-    title: "Xóa nhiễu & vết bẩn",
-    description: "Loại bỏ các vết xước, vết bẩn, và nhiễu hạt một cách tự nhiên và chính xác.",
-    color: "text-[#B35832]"
-  },
-  {
-    icon: Zap,
-    title: "Xử lý siêu nhanh",
-    description: "Công nghệ AI tối ưu giúp xử lý hàng loạt ảnh trong vài giây.",
-    color: "text-[#E2B769]"
-  }
-];
+export function Benefits() {
+  const { t } = useTranslation("benefits");
 
-export function LofiBenefits() {
+  const features = [
+    {
+      icon: Wand2,
+      titleKey: "features.0.title",
+      descriptionKey: "features.0.description",
+      color: "text-[#B35832]",
+    },
+    {
+      icon: ImageUp,
+      titleKey: "features.1.title",
+      descriptionKey: "features.1.description",
+      color: "text-[#E2B769]",
+    },
+    {
+      icon: Palette,
+      titleKey: "features.2.title",
+      descriptionKey: "features.2.description",
+      color: "text-[#B35832]",
+    },
+    {
+      icon: Cloud,
+      titleKey: "features.3.title",
+      descriptionKey: "features.3.description",
+      color: "text-[#E2B769]",
+    },
+    {
+      icon: Sparkles,
+      titleKey: "features.4.title",
+      descriptionKey: "features.4.description",
+      color: "text-[#B35832]",
+    },
+    {
+      icon: Zap,
+      titleKey: "features.5.title",
+      descriptionKey: "features.5.description",
+      color: "text-[#E2B769]",
+    },
+  ];
+
   return (
     <section className="relative w-full overflow-hidden bg-[#F9F6F2] py-24">
       {/* Background decoration */}
@@ -55,14 +64,14 @@ export function LofiBenefits() {
           <div className="inline-flex items-center gap-2 rounded-full border border-[#E2B769]/20 bg-[#F5EFE6] px-4 py-2 shadow-sm">
             <Sparkles className="h-4 w-4 text-[#B35832]" />
             <span className="font-medium text-[#39241A] text-sm">
-              Tính năng nổi bật
+              {t("subtitle")}
             </span>
           </div>
           <h2 className="font-bold text-4xl text-[#39241A] md:text-5xl">
-            Công nghệ AI đỉnh cao
+            {t("title")}
           </h2>
           <p className="mx-auto max-w-2xl text-[#39241A]/70 text-lg">
-            Mang đến những công cụ mạnh mẽ để bạn khôi phục và làm đẹp ảnh cũ một cách dễ dàng
+            {t("description")}
           </p>
         </div>
 
@@ -80,12 +89,12 @@ export function LofiBenefits() {
                     <Icon className={`h-7 w-7 ${feature.color}`} />
                   </div>
                   <CardTitle className="font-semibold text-[#39241A] text-xl">
-                    {feature.title}
+                    {t(`${feature.titleKey}`)}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-[#39241A]/70 leading-relaxed">
-                    {feature.description}
+                    {t(`${feature.descriptionKey}`)}
                   </CardDescription>
                 </CardContent>
 

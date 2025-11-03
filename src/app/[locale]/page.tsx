@@ -1,23 +1,20 @@
-'use client';
-
-import { LofiHeader } from "@/components/lofi-header";
-import { LofiHero } from "@/components/hero/lofi-hero";
-import { LofiBenefits } from "@/components/lofi-benefits";
-import { LofiPricing } from "@/components/lofi-pricing";
-import { LofiFAQ } from "@/components/lofi-faq";
-import { LofiFooter } from "@/components/footer/lofi-footer";
+"use client";
+import { Benefits } from "@/components/benefits";
+import { Footer } from "@/components/footer/footer";
+import { Header } from "@/components/header/header";
+import { Hero } from "@/components/hero/hero";
+import { Pricing } from "@/components/pricing/pricing";
 
 export default function HomePage() {
-    return (
-        <div className="min-h-screen bg-[#F9F6F2]">
-            <LofiHeader />
-            <main>
-                <LofiHero />
-                <LofiBenefits />
-                <LofiPricing />
-                <LofiFAQ />
-            </main>
-            <LofiFooter />
-        </div>
-    );
+  return (
+    <div className="min-h-screen bg-[#F9F6F2]">
+      <Header />
+      <main>
+        <Hero />
+        <Benefits />
+        <Pricing />
+      </main>
+      <Footer />
+    </div>
+  );
 }

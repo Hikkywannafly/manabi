@@ -1,7 +1,7 @@
-import { ReactNode, useCallback, useState } from 'react';
+import { type ReactNode, useCallback, useState } from "react";
 
 export default function useMultistepForm<TStep extends ReactNode>(
-  steps: readonly TStep[]
+  steps: readonly TStep[],
 ) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
@@ -25,6 +25,6 @@ export default function useMultistepForm<TStep extends ReactNode>(
     isLastStep: currentStepIndex === steps.length - 1,
     goTo,
     next,
-    back
+    back,
   };
 }

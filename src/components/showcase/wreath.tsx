@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React from "react";
+import type React from "react";
 
 type Props = {
   children?: React.ReactNode;
@@ -8,9 +8,20 @@ type Props = {
 
 export function Wreath({ children, className }: Props) {
   return (
-    <div className={"grid w-min grid-cols-[1fr_60px_1fr] md:grid-cols-[1fr_115px_1fr]"}>
+    <div
+      className={
+        "grid w-min grid-cols-[1fr_60px_1fr] md:grid-cols-[1fr_115px_1fr]"
+      }
+    >
       <Branch className="w-[19px] md:w-[43px]" />
-      <div className={cn("-mx-2.5 mt-1 flex flex-col items-center md:-mt-2.5", className)}>{children}</div>
+      <div
+        className={cn(
+          "-mx-2.5 md:-mt-2.5 mt-1 flex flex-col items-center",
+          className,
+        )}
+      >
+        {children}
+      </div>
       <Branch className="w-[19px] rotate-y-180 md:w-[43px]" />
     </div>
   );

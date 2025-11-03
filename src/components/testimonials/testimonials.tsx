@@ -1,5 +1,5 @@
-import { Badge } from "@/components/ui/badge";
 import { TestimonialMarquee } from "@/components/testimonials/testimonial-marquee";
+import { Badge } from "@/components/ui/badge";
 
 export type Testimonial = {
   name: string;
@@ -47,11 +47,13 @@ export function Testimonials() {
       <Badge variant="secondary" className="mb-2 uppercase">
         Testimonial
       </Badge>
-      <h2 className="text-center text-3xl leading-[1.1] font-medium tracking-tight sm:text-5xl">
-        Don&apos;t Take<div className="text-muted-foreground">Our Word for It</div>
+      <h2 className="text-center font-medium text-3xl leading-[1.1] tracking-tight sm:text-5xl">
+        Don&apos;t Take
+        <div className="text-muted-foreground">Our Word for It</div>
       </h2>
       <p className="mb-3 max-w-lg text-center leading-6 tracking-tight sm:text-xl lg:mb-8">
-        We&apos;ve built the ultimate white-label app platform so you can focus on growing your brand—not building tech
+        We&apos;ve built the ultimate white-label app platform so you can focus
+        on growing your brand—not building tech
       </p>
       <div className="relative w-[calc(100%+3rem)] overflow-x-hidden py-4 lg:w-full">
         <TestimonialMarquee testimonials={testimonials} className="mb-4" />

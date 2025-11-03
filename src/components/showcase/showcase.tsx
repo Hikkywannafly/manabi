@@ -1,5 +1,5 @@
+import { HalfStar, Star } from "@/components/showcase/star";
 import { Wreath } from "@/components/showcase/wreath";
-import { Star, HalfStar } from "@/components/showcase/star";
 
 export function Showcase() {
   return (
@@ -13,15 +13,17 @@ export function Showcase() {
           <Star />
           <HalfStar />
         </div>
-        <p className="text-xl font-bold md:mt-1.5 md:text-3xl">4.9</p>
+        <p className="font-bold text-xl md:mt-1.5 md:text-3xl">4.9</p>
       </Wreath>
       <Wreath>
         <p className="text-[0.625rem] md:text-base">Loved By</p>
-        <p className="mt-1.5 text-center text-xs font-bold md:text-2xl">60 million people</p>
+        <p className="mt-1.5 text-center font-bold text-xs md:text-2xl">
+          60 million people
+        </p>
       </Wreath>
       <Wreath>
         <p className="text-[0.625rem] md:text-base">Download By</p>
-        <p className="mt-1.5 text-center text-xs font-bold text-balance md:text-2xl">
+        <p className="mt-1.5 text-balance text-center font-bold text-xs md:text-2xl">
           100+
           <br />
           million

@@ -1,13 +1,13 @@
 "use client";
 
+import { ArrowRight, Mail, Sparkles } from "lucide-react";
+import Link from "next/link";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowRight, Mail, Sparkles } from "lucide-react";
-import Link from "next/link";
 
 const faqs = [
   {

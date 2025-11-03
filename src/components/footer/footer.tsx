@@ -1,10 +1,10 @@
 "use client";
 
+import { Camera, Globe, Instagram, Mail, Twitter } from "lucide-react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Camera, Globe, Instagram, Mail, Twitter } from "lucide-react";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
 
 export function Footer() {
   const t = useTranslations("footer");

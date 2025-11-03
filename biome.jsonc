@@ -1,14 +1,30 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.2/schema.json",
+  // Version control integration
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": false
   },
+  // File includes (dùng !pattern để loại trừ)
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["node_modules", ".next", "public/sw.js"]
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/.next",
+      "!**/.vercel",
+      "!**/.env",
+      "!**/.changeset",
+      "!**/.husky",
+      "!**/.turbo",
+      "!**/build",
+      "!**/public/sw.js",
+      "!**/src/app/globals.css",
+      "!src/lib/theme.ts"
+    ]
   },
+  // Formatter settings
   "formatter": {
     "enabled": true,
     "formatWithErrors": false,
@@ -16,31 +32,17 @@
     "indentWidth": 2,
     "lineWidth": 80,
     "lineEnding": "lf",
-    "attributePosition": "auto",
-    "ignore": [
-      ".next",
-      ".vercel",
-      ".env",
-      ".changeset",
-      ".husky",
-      ".turbo",
-      "node_modules",
-      "build"
-    ]
+    "attributePosition": "auto"
   },
-  "organizeImports": {
-    "enabled": true,
-    "ignore": [
-      ".next",
-      ".vercel",
-      ".env",
-      ".changeset",
-      ".husky",
-      ".turbo",
-      "node_modules",
-      "build"
-    ]
+  // Auto-assist features
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
+  // Linter configuration
   "linter": {
     "enabled": true,
     "rules": {
@@ -78,6 +80,7 @@
       }
     }
   },
+  // Language-specific formatters
   "javascript": {
     "formatter": {
       "quoteStyle": "double",

@@ -41,75 +41,114 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Lofi Theme Colors */
+  --color-lofi-bg-primary: var(--lofi-bg-primary);
+  --color-lofi-bg-secondary: var(--lofi-bg-secondary);
+  --color-lofi-bg-tertiary: var(--lofi-bg-tertiary);
+  --color-lofi-bg-elevated: var(--lofi-bg-elevated);
+  --color-lofi-text-primary: var(--lofi-text-primary);
+  --color-lofi-text-secondary: var(--lofi-text-secondary);
+  --color-lofi-text-muted: var(--lofi-text-muted);
+  --color-lofi-brand-primary: var(--lofi-brand-primary);
+  --color-lofi-brand-secondary: var(--lofi-brand-secondary);
+  --color-lofi-brand-hover: var(--lofi-brand-hover);
+  --color-lofi-border: var(--lofi-border);
+  --color-lofi-border-subtle: var(--lofi-border-subtle);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Map Lofi Colors to Shadcn Variables */
+  --background: #f9f6f2;
+  --foreground: #39241a;
+
+  --card: #ffffff;
+  --card-foreground: #39241a;
+
+  --popover: #ffffff;
+  --popover-foreground: #39241a;
+
+  --primary: #b35832;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f5efe6;
+  --secondary-foreground: #39241a;
+
+  --muted: #f5efe6;
+  --muted-foreground: rgba(57, 36, 26, 0.7);
+
+  --accent: #e2b769;
+  --accent-foreground: #39241a;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+
+  --border: rgba(226, 183, 105, 0.2);
+  --input: rgba(226, 183, 105, 0.2);
+  --ring: #e2b769;
+
+  --chart-1: #b35832;
+  --chart-2: #e2b769;
+  --chart-3: #9d4a2a;
+  --chart-4: #f0c77d;
+  --chart-5: #8a3d28;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #39241a;
+  --sidebar-primary: #b35832;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5efe6;
+  --sidebar-accent-foreground: #39241a;
+  --sidebar-border: rgba(226, 183, 105, 0.2);
+  --sidebar-ring: #e2b769;
 }
 
 .dark {
-  --background: oklch(0.18 0.02 30);
-  --foreground: oklch(0.97 0.01 60);
-  --card: oklch(0.22 0.02 30);
-  --card-foreground: oklch(0.97 0.01 60);
-  --popover: oklch(0.22 0.02 30);
-  --popover-foreground: oklch(0.97 0.01 60);
-  --primary: oklch(0.78 0.08 50);
-  --primary-foreground: oklch(0.18 0.02 30);
-  --secondary: oklch(0.28 0.02 30);
-  --secondary-foreground: oklch(0.97 0.01 60);
-  --muted: oklch(0.28 0.02 30);
-  --muted-foreground: oklch(0.65 0.02 40);
-  --accent: oklch(0.78 0.08 50);
-  --accent-foreground: oklch(0.18 0.02 30);
-  --destructive: oklch(0.65 0.18 25);
-  --border: oklch(0.35 0.02 30);
-  --input: oklch(0.35 0.02 30);
-  --ring: oklch(0.78 0.08 50);
-  --chart-1: oklch(0.68 0.15 35);
-  --chart-2: oklch(0.75 0.12 50);
-  --chart-3: oklch(0.72 0.1 45);
-  --chart-4: oklch(0.65 0.18 30);
-  --chart-5: oklch(0.7 0.14 40);
-  --sidebar: oklch(0.22 0.02 30);
-  --sidebar-foreground: oklch(0.97 0.01 60);
-  --sidebar-primary: oklch(0.78 0.08 50);
-  --sidebar-primary-foreground: oklch(0.18 0.02 30);
-  --sidebar-accent: oklch(0.28 0.02 30);
-  --sidebar-accent-foreground: oklch(0.97 0.01 60);
-  --sidebar-border: oklch(0.35 0.02 30);
-  --sidebar-ring: oklch(0.78 0.08 50);
+  /* Map Lofi Dark Colors to Shadcn Variables */
+  --background: #2a1810;
+  --foreground: #f9f6f2;
+
+  --card: #3d2818;
+  --card-foreground: #f9f6f2;
+
+  --popover: #3d2818;
+  --popover-foreground: #f9f6f2;
+
+  --primary: #e2b769;
+  --primary-foreground: #2a1810;
+
+  --secondary: #332016;
+  --secondary-foreground: #f9f6f2;
+
+  --muted: #332016;
+  --muted-foreground: rgba(249, 246, 242, 0.7);
+
+  --accent: #e2b769;
+  --accent-foreground: #2a1810;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: rgba(226, 183, 105, 0.1);
+  --input: rgba(226, 183, 105, 0.1);
+  --ring: #e2b769;
+
+  --chart-1: #e2b769;
+  --chart-2: #f0c77d;
+  --chart-3: #b35832;
+  --chart-4: #d4a25a;
+  --chart-5: #9d4a2a;
+
+  --sidebar: #3d2818;
+  --sidebar-foreground: #f9f6f2;
+  --sidebar-primary: #e2b769;
+  --sidebar-primary-foreground: #2a1810;
+  --sidebar-accent: #332016;
+  --sidebar-accent-foreground: #f9f6f2;
+  --sidebar-border: rgba(226, 183, 105, 0.1);
+  --sidebar-ring: #e2b769;
 }
 
 @layer base {

@@ -1,5 +1,8 @@
 "use client";
 
+import { ArrowRight, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,9 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowRight, Sparkles } from "lucide-react";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
 
 export function Pricing() {
   const t = useTranslations("pricing");

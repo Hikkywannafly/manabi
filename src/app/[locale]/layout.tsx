@@ -1,9 +1,9 @@
-import { ThemeProvider } from "@/contexts/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
 import { Nunito } from "next/font/google";
 import { notFound } from "next/navigation";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { ThemeProvider } from "@/contexts/theme-provider";
 import i18nConfig from "../../i18nConfig";
 import "../globals.css";
 

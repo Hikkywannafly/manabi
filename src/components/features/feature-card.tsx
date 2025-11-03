@@ -1,6 +1,6 @@
+import Image from "next/image";
 import { FeatureDetails } from "@/components/features/feature-details";
 import type { Feature } from "@/components/features/features";
-import Image from "next/image";
 
 type FeatureCardProps = {
   feature: Feature;

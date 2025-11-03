@@ -1,3 +1,4 @@
+import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
 import PageContainer from "@/components/layout/page-container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
 import { AreaGraph } from "./area-graph";
 import { BarGraph } from "./bar-graph";
 import { PieGraph } from "./pie-graph";

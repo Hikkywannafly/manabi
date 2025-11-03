@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  type ReactNode,
   createContext,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
@@ -14,6 +14,7 @@ const DEFAULT_THEME = "default";
 function setThemeCookie(theme: string) {
   if (typeof window === "undefined") return;
 
+  // biome-ignore lint/suspicious/noDocumentCookie: Cookie management is needed for theme persistence
   document.cookie = `${COOKIE_NAME}=${theme}; path=/; max-age=31536000; SameSite=Lax; ${window.location.protocol === "https:" ? "Secure;" : ""}`;
 }
 

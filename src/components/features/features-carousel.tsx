@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { FeatureCard } from "@/components/features/feature-card";
 import type { Feature } from "@/components/features/features";
 import {
@@ -9,7 +10,6 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
 
 type Props = {
   features: Feature[];

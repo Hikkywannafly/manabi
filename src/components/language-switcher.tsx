@@ -1,5 +1,7 @@
 "use client";
 
+import { Check, Globe } from "lucide-react";
+import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,8 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { usePathname, useRouter } from "@/i18n/routing";
-import { Check, Globe } from "lucide-react";
-import { useParams } from "next/navigation";
 
 interface LanguageOption {
   code: string;

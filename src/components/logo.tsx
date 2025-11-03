@@ -1,4 +1,4 @@
-import { Camera } from "lucide-react";
+import { Shell } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +37,7 @@ export function Logo({ size = "md", className, showText = true }: LogoProps) {
           currentSize.container,
         )}
       >
-        <Camera className={cn("text-primary", currentSize.icon)} />
+        <Shell className={cn("text-primary", currentSize.icon)} />
       </div>
       {showText && (
         <span

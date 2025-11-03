@@ -7,11 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [
-      "node_modules",
-      ".next",
-      "public/sw.js"
-    ]
+    "ignore": ["node_modules", ".next", "public/sw.js"]
   },
   "formatter": {
     "enabled": true,
@@ -63,10 +59,7 @@
         "noConsole": {
           "level": "warn",
           "options": {
-            "allow": [
-              "warn",
-              "error"
-            ]
+            "allow": ["warn", "error"]
           }
         }
       },
@@ -78,15 +71,8 @@
           "level": "warn",
           "fix": "safe",
           "options": {
-            "attributes": [
-              "classList"
-            ],
-            "functions": [
-              "clsx",
-              "cva",
-              "tw",
-              "cn"
-            ]
+            "attributes": ["classList"],
+            "functions": ["clsx", "cva", "tw", "cn"]
           }
         }
       }

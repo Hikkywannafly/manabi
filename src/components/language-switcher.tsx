@@ -7,11 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import i18nConfig from "@/i18nConfig";
+import { usePathname, useRouter } from "@/i18n/routing";
 import { Check, Globe } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
-import { useTranslation } from "react-i18next";
+import { useParams } from "next/navigation";
 
 interface LanguageOption {
   code: string;
@@ -25,52 +23,14 @@ const languages: LanguageOption[] = [
 ];
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation();
   const router = useRouter();
-  const currentPathname = usePathname();
-
-  // Extract locale from pathname
-  const pathSegments = currentPathname.split("/").filter(Boolean);
-  const currentLocale = i18nConfig.locales.includes(pathSegments[0])
-    ? pathSegments[0]
-    : i18nConfig.defaultLocale;
+  const pathname = usePathname();
+  const params = useParams();
+  const currentLocale = params.locale as string;
 
   const handleLanguageChange = (newLocale: string) => {
-    // Set cookie for next-i18n-router
-    const days = 30;
-    const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-    const expires = date.toUTCString();
-    document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`;
-
-    // Update i18n instance
-    i18n.changeLanguage(newLocale);
-
-    // Build new path
-    // Extract the path without locale prefix
-    // /en or /en/page → /page or /
-    const localePrefix = `/${currentLocale}`;
-    let pathWithoutLocale: string;
-
-    if (
-      currentPathname === localePrefix ||
-      currentPathname === `${localePrefix}/`
-    ) {
-      // Root page: /en or /en/
-      pathWithoutLocale = "/";
-    } else if (currentPathname.startsWith(`${localePrefix}/`)) {
-      // Sub page: /en/page → /page
-      pathWithoutLocale = currentPathname.substring(localePrefix.length);
-    } else {
-      // Fallback
-      pathWithoutLocale = "/";
-    }
-
-    // Build new path with new locale
-    const newPath = `/${newLocale}${pathWithoutLocale}`;
-
-    router.push(newPath);
-    router.refresh();
+    // Use next-intl's router which handles locale switching
+    router.replace(pathname, { locale: newLocale });
   };
 
   return (

@@ -9,11 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+
 export function Pricing() {
-  const { t } = useTranslation("pricing");
-  const { t: tFooter } = useTranslation("footer");
+  const t = useTranslations("pricing");
+  const tFooter = useTranslations("footer");
 
   const plans = [
     {

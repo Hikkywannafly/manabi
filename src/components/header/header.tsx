@@ -4,14 +4,14 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Camera, Headphones, Menu, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
 export function Header() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { t } = useTranslation("header");
+  const t = useTranslations("header");
 
   return (
     <header className="sticky top-0 z-50 w-full border-[#E2B769]/20 border-b bg-[#F9F6F2]/80 backdrop-blur-lg">

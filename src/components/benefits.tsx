@@ -8,10 +8,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Cloud, ImageUp, Palette, Sparkles, Wand2, Zap } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export function Benefits() {
-  const { t } = useTranslation("benefits");
+  const t = useTranslations("benefits");
 
   const features = [
     {

@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { BookOpen, Brain, Lightbulb, Play, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
 
 export function Hero() {
-  const { t } = useTranslation("hero");
+  const t = useTranslations("hero");
 
   return (
     <section className="relative flex min-h-[90vh] w-full items-center justify-center overflow-hidden">

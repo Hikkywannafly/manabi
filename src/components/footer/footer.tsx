@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Camera, Globe, Instagram, Mail, Twitter } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
 
 export function Footer() {
-  const { t } = useTranslation("footer");
+  const t = useTranslations("footer");
   return (
     <footer className="relative w-full overflow-hidden bg-[#EDE5DD]">
       {/* Top section divider */}

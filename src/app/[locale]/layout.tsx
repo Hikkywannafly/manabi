@@ -1,17 +1,7 @@
-import TranslationsProvider from "@/components/TranslationsProvider";
-import { getResources } from "@/lib/i18n";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import i18nConfig from "../../i18nConfig";
-
-const namespaces = [
-  "common",
-  "header",
-  "hero",
-  "benefits",
-  "pricing",
-  "faq",
-  "footer",
-];
 
 type Props = {
   children: React.ReactNode;
@@ -31,16 +21,11 @@ export default async function LocaleLayout({ children, params }: Props) {
     notFound();
   }
 
-  const resources = await getResources(locale, namespaces);
+  const messages = await getMessages();
 
   return (
-    <TranslationsProvider
-      key={locale}
-      locale={locale}
-      namespaces={namespaces}
-      resources={resources}
-    >
+    <NextIntlClientProvider messages={messages}>
       {children}
-    </TranslationsProvider>
+    </NextIntlClientProvider>
   );
 }

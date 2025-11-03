@@ -1,11 +1,16 @@
 import { getRequestConfig } from "next-intl/server";
 
-export default getRequestConfig(async ({ locale }) => {
-    // Provide fallback locale if undefined
-    const currentLocale = locale || 'vi';
+export default getRequestConfig(async ({ requestLocale }) => {
+  // This typically corresponds to the `[locale]` segment
+  let locale = await requestLocale;
 
-    return {
-        locale: currentLocale,
-        messages: (await import(`../../messages/${currentLocale}.json`)).default
-    };
+  // Validate locale and provide fallback
+  if (!(locale && ["en", "vi"].includes(locale))) {
+    locale = "vi"; // fallback to Vietnamese
+  }
+
+  return {
+    locale,
+    messages: (await import(`../../messages/${locale}.json`)).default,
+  };
 });

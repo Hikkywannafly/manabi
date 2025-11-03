@@ -1,13 +1,6 @@
-import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
-import "./globals.css";
 
-const poppins = Poppins({
-  weight: ["300", "400", "500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-poppins",
-});
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Manabi | Smart Learning Platform",
@@ -20,14 +13,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${poppins.className} bg-[#F9F6F2] text-[#39241A] antialiased`}
-      >
-        <Analytics />
-        {children}
-      </body>
-    </html>
-  );
+  return children;
 }

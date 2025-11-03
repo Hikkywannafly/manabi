@@ -57,7 +57,7 @@ export function Header() {
               size="icon"
               variant="ghost"
               onClick={() => setIsPlaying(!isPlaying)}
-              className="group relative hover:bg-primary/10"
+              className="group relative"
             >
               <Headphones
                 className={`h-5 w-5 transition-all duration-300 ${
@@ -83,30 +83,27 @@ export function Header() {
 
             {/* Login Button */}
             <Link href="/login" className="hidden md:inline-flex">
-              <Button
-                variant="outline"
-                className="rounded-xl border-primary/20 hover:border-primary hover:bg-primary/5"
-              >
+              <Button variant="outline" className="rounded-xl">
                 {t("login")}
               </Button>
             </Link>
 
             {/* CTA Button */}
-            <Link href="/get-started">
+            {/* <Link href="/get-started">
               <Button
-                variant="gradient"
+                variant="secondary"
                 className="hidden rounded-xl px-6 md:inline-flex"
               >
                 <Sparkles className="mr-2 h-4 w-4" />
                 {t("getStartedFree")}
               </Button>
-            </Link>
+            </Link> */}
 
             {/* Mobile menu button */}
             <Button
               size="icon"
               variant="ghost"
-              className="rounded-full hover:bg-primary/10 md:hidden"
+              className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <Menu className="h-5 w-5 text-foreground" />
@@ -155,7 +152,7 @@ export function Header() {
             <Link href="/login" className="md:hidden">
               <Button
                 variant="outline"
-                className="w-full rounded-xl border-primary/20 hover:border-primary hover:bg-primary/5"
+                className="w-full rounded-xl"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {t("login")}

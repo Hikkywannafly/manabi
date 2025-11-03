@@ -9,11 +9,7 @@ export default function LoginPage() {
     <div className="relative flex min-h-screen items-center justify-center bg-linear-to-br from-background via-background to-primary/5 px-4 py-12">
       {/* Back Button */}
       <Link href="/" className="absolute top-4 left-4 sm:top-8 sm:left-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="gap-2 hover:bg-background/80"
-        >
+        <Button variant="ghost" size="sm">
           <ArrowLeft className="h-4 w-4" />
           <span className="hidden sm:inline">Back to Home</span>
         </Button>

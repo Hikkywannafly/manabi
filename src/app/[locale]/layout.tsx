@@ -3,6 +3,7 @@ import { Nunito } from "next/font/google";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import NextTopLoader from "nextjs-toploader";
 import { ThemeProvider } from "@/contexts/theme-provider";
 import i18nConfig from "../../i18nConfig";
 import "../globals.css";
@@ -39,6 +40,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body
         className={`${nunito.variable} bg-[#F9F6F2] font-sans text-[#39241A] antialiased dark:bg-[#2A1810] dark:text-[#F9F6F2]`}
       >
+        <NextTopLoader />
         <Analytics />
         <ThemeProvider defaultTheme="light" storageKey="manabi-theme">
           <NextIntlClientProvider messages={messages}>

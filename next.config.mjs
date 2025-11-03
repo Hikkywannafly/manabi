@@ -10,7 +10,7 @@ const withSerwist = withSerwistInit({
   // use something else that works, such as "service-worker/index.ts".
   swSrc: "src/lib/sw.ts",
   swDest: "public/sw.js",
-  disable: !isProduction,
+  disable: process.env.NODE_ENV !== "production",
 });
 
 const baseConfig = {

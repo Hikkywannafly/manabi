@@ -1,9 +1,9 @@
 import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { LoginForm } from "@/components/auth/login-form";
 import { PageLayout } from "@/components/layouts";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/routing";
 
 export default function LoginPage() {
   return (

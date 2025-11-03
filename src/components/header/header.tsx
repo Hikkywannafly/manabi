@@ -1,7 +1,6 @@
 "use client";
 
 import { Headphones, Menu, Sparkles } from "lucide-react";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -9,6 +8,7 @@ import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Link } from "@/i18n/routing";
 
 export function Header() {
   const [isPlaying, setIsPlaying] = useState(false);

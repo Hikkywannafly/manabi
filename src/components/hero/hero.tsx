@@ -1,9 +1,9 @@
 "use client";
 
 import { BookOpen, Brain, Lightbulb, Play, Sparkles } from "lucide-react";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/routing";
 
 export function Hero() {
   const t = useTranslations("hero");

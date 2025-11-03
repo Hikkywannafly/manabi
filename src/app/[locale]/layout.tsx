@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/contexts/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -36,12 +37,14 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${nunito.variable} bg-[#F9F6F2] font-sans text-[#39241A] antialiased`}
+        className={`${nunito.variable} bg-[#F9F6F2] font-sans text-[#39241A] antialiased dark:bg-[#2A1810] dark:text-[#F9F6F2]`}
       >
         <Analytics />
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <ThemeProvider defaultTheme="light" storageKey="manabi-theme">
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

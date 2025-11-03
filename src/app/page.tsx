@@ -5,8 +5,8 @@ export default async function RootPage() {
   const headersList = await headers();
   const cookieStore = await cookies();
 
-  // Check for saved locale in cookie
-  const savedLocale = cookieStore.get("edumentum-locale")?.value;
+  // Check for saved locale in cookie (next-intl uses NEXT_LOCALE by default)
+  const savedLocale = cookieStore.get("NEXT_LOCALE")?.value;
 
   if (savedLocale === "en" || savedLocale === "vi") {
     redirect(`/${savedLocale}`);
@@ -14,9 +14,8 @@ export default async function RootPage() {
 
   // Fallback to accept-language header
   const acceptLanguage = headersList.get("accept-language") || "";
-  const prefersEnglish =
-    acceptLanguage.includes("en") && !acceptLanguage.includes("vi");
+  const prefersVietnamese = acceptLanguage.toLowerCase().includes("vi");
 
   // Redirect to preferred locale
-  redirect(prefersEnglish ? "/en" : "/vi");
+  redirect(prefersVietnamese ? "/vi" : "/en");
 }

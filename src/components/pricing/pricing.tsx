@@ -48,26 +48,26 @@ export function Pricing() {
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-[#F5EFE6] py-24"
+      className="relative w-full overflow-hidden bg-[#F5EFE6] py-24 dark:bg-[#332016]"
       id="pricing"
     >
       {/* Background decorations */}
-      <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-[#E2B769]/10 blur-3xl" />
-      <div className="absolute right-1/4 bottom-0 h-96 w-96 rounded-full bg-[#B35832]/10 blur-3xl" />
+      <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-[#E2B769]/10 blur-3xl dark:bg-[#E2B769]/5" />
+      <div className="absolute right-1/4 bottom-0 h-96 w-96 rounded-full bg-[#B35832]/10 blur-3xl dark:bg-[#B35832]/5" />
 
       <div className="container relative z-10 mx-auto px-4">
         {/* Section header */}
         <div className="mb-16 space-y-4 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E2B769]/20 bg-white px-4 py-2 shadow-sm">
-            <Sparkles className="h-4 w-4 text-[#B35832]" />
-            <span className="font-medium text-[#39241A] text-sm">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E2B769]/20 bg-white px-4 py-2 shadow-sm dark:border-[#E2B769]/10 dark:bg-[#3D2818]">
+            <Sparkles className="h-4 w-4 text-[#B35832] dark:text-[#E2B769]" />
+            <span className="font-medium text-[#39241A] text-sm dark:text-[#F9F6F2]">
               {t("subtitle")}
             </span>
           </div>
-          <h2 className="font-bold text-4xl text-[#39241A] md:text-5xl">
+          <h2 className="font-bold text-4xl text-[#39241A] md:text-5xl dark:text-[#F9F6F2]">
             {t("title")}
           </h2>
-          <p className="mx-auto max-w-2xl text-[#39241A]/70 text-lg">
+          <p className="mx-auto max-w-2xl text-[#39241A]/70 text-lg dark:text-[#F9F6F2]/70">
             {t("description")}
           </p>
         </div>
@@ -77,10 +77,10 @@ export function Pricing() {
           {plans.map((plan, index) => (
             <Card
               key={index}
-              className={`hover:-translate-y-2 relative overflow-hidden rounded-3xl border-2 bg-white/80 backdrop-blur-sm transition-all duration-500 ${
+              className={`hover:-translate-y-2 relative overflow-hidden rounded-3xl border-2 bg-white/80 backdrop-blur-sm transition-all duration-500 dark:bg-[#3D2818]/80 ${
                 plan.popular
-                  ? "scale-105 border-[#B35832] shadow-[0_0_40px_rgba(179,88,50,0.2)]"
-                  : "border-[#E2B769]/20 shadow-[0_0_20px_rgba(0,0,0,0.05)] hover:shadow-[0_0_30px_rgba(179,88,50,0.15)]"
+                  ? "scale-105 border-[#B35832] shadow-[0_0_40px_rgba(179,88,50,0.2)] dark:border-[#E2B769] dark:shadow-[0_0_40px_rgba(226,183,105,0.2)]"
+                  : "border-[#E2B769]/20 shadow-[0_0_20px_rgba(0,0,0,0.05)] hover:shadow-[0_0_30px_rgba(179,88,50,0.15)] dark:border-[#E2B769]/10 dark:shadow-[0_0_20px_rgba(0,0,0,0.3)]"
               }`}
             >
               {plan.popular && (
@@ -96,19 +96,19 @@ export function Pricing() {
                 className={`space-y-4 ${plan.popular ? "pt-16" : "pt-8"}`}
               >
                 <div className="space-y-2">
-                  <CardTitle className="text-2xl text-[#39241A]">
+                  <CardTitle className="text-2xl text-[#39241A] dark:text-[#F9F6F2]">
                     {t(`${plan.nameKey}`)}
                   </CardTitle>
-                  <CardDescription className="text-[#39241A]/70">
+                  <CardDescription className="text-[#39241A]/70 dark:text-[#F9F6F2]/70">
                     {t(`${plan.descriptionKey}`)}
                   </CardDescription>
                 </div>
 
                 <div className="flex items-end gap-1">
-                  <span className="font-bold text-5xl text-[#B35832]">
+                  <span className="font-bold text-5xl text-[#B35832] dark:text-[#E2B769]">
                     {t(`${plan.priceKey}`)}
                   </span>
-                  <span className="mb-2 text-[#39241A]/60">
+                  <span className="mb-2 text-[#39241A]/60 dark:text-[#F9F6F2]/60">
                     {t(`${plan.periodKey}`)}
                   </span>
                 </div>
@@ -129,7 +129,7 @@ export function Pricing() {
                     className={`w-full rounded-xl py-6 font-semibold text-base transition-all duration-300 ${
                       plan.popular
                         ? "hover:-translate-y-1 bg-[#B35832] text-white shadow-[0_6px_20px_rgba(179,88,50,0.3)] hover:bg-[#9d4a2a] hover:shadow-[0_8px_30px_rgba(179,88,50,0.4)]"
-                        : "border-2 border-[#E2B769] bg-[#F5EFE6] text-[#B35832] hover:bg-[#E2B769]/30"
+                        : "border-2 border-[#E2B769] bg-[#F5EFE6] text-[#B35832] hover:bg-[#E2B769]/30 dark:border-[#E2B769] dark:bg-[#4D3020] dark:text-[#E2B769] dark:hover:bg-[#E2B769]/20"
                     }`}
                   >
                     {t(`${plan.ctaKey}`)}

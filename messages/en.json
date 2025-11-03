@@ -17,7 +17,8 @@
     "faq": "FAQ",
     "blog": "Blog",
     "getStartedFree": "Get Started Free",
-    "languageSwitch": "Switch language"
+    "languageSwitch": "Switch language",
+    "themeToggle": "Toggle theme"
   },
   "hero": {
     "badge": "AI-Powered Learning Platform",

@@ -11,7 +11,7 @@ export function Hero() {
   return (
     <section className="relative flex min-h-[90vh] w-full items-center justify-center overflow-hidden">
       {/* Subtle vignette background */}
-      <div className="absolute inset-0 bg-gradient-radial from-[#F9F6F2] via-[#F5EFE6] to-[#EDE5DD] opacity-80" />
+      <div className="absolute inset-0 bg-gradient-radial from-[#F9F6F2] via-[#F5EFE6] to-[#EDE5DD] opacity-80 dark:from-[#2A1810] dark:via-[#332016] dark:to-[#3D2818]" />
 
       {/* Subtle background pattern */}
       <div
@@ -25,18 +25,18 @@ export function Hero() {
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Left content */}
           <div className="space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E2B769]/20 bg-[#F5EFE6] px-4 py-2 shadow-sm">
-              <Sparkles className="h-4 w-4 text-[#B35832]" />
-              <span className="font-medium text-[#39241A] text-sm">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E2B769]/20 bg-[#F5EFE6] px-4 py-2 shadow-sm dark:border-[#E2B769]/10 dark:bg-[#3D2818]">
+              <Sparkles className="h-4 w-4 text-[#B35832] dark:text-[#E2B769]" />
+              <span className="font-medium text-[#39241A] text-sm dark:text-[#F9F6F2]">
                 {t("badge")}
               </span>
             </div>
 
-            <h1 className="font-bold text-5xl text-[#39241A] leading-tight md:text-6xl lg:text-7xl">
+            <h1 className="font-bold text-5xl text-[#39241A] leading-tight md:text-6xl lg:text-7xl dark:text-[#F9F6F2]">
               {t("title")}
             </h1>
 
-            <p className="mx-auto max-w-xl text-[#39241A]/70 text-lg leading-relaxed md:text-xl lg:mx-0">
+            <p className="mx-auto max-w-xl text-[#39241A]/70 text-lg leading-relaxed md:text-xl lg:mx-0 dark:text-[#F9F6F2]/70">
               {t("subtitle")}
             </p>
 
@@ -54,7 +54,7 @@ export function Hero() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="rounded-2xl border-2 border-[#B35832] px-8 py-6 text-[#B35832] text-lg transition-all duration-300 hover:bg-[#B35832]/5"
+                  className="rounded-2xl border-2 border-[#B35832] px-8 py-6 text-[#B35832] text-lg transition-all duration-300 hover:bg-[#B35832]/5 dark:border-[#E2B769] dark:text-[#E2B769] dark:hover:bg-[#E2B769]/10"
                 >
                   <Play className="mr-2 h-5 w-5" />
                   {t("ctaSecondary")}
@@ -65,26 +65,26 @@ export function Hero() {
             {/* Stats */}
             <div className="flex flex-wrap justify-center gap-8 pt-8 lg:justify-start">
               <div className="text-center lg:text-left">
-                <div className="font-bold text-3xl text-[#B35832]">
+                <div className="font-bold text-3xl text-[#B35832] dark:text-[#E2B769]">
                   {t("stat1")}
                 </div>
-                <div className="text-[#39241A]/60 text-sm">
+                <div className="text-[#39241A]/60 text-sm dark:text-[#F9F6F2]/60">
                   {t("stat1Text")}
                 </div>
               </div>
               <div className="text-center lg:text-left">
-                <div className="font-bold text-3xl text-[#B35832]">
+                <div className="font-bold text-3xl text-[#B35832] dark:text-[#E2B769]">
                   {t("stat2")}
                 </div>
-                <div className="text-[#39241A]/60 text-sm">
+                <div className="text-[#39241A]/60 text-sm dark:text-[#F9F6F2]/60">
                   {t("stat2Text")}
                 </div>
               </div>
               <div className="text-center lg:text-left">
-                <div className="font-bold text-3xl text-[#B35832]">
+                <div className="font-bold text-3xl text-[#B35832] dark:text-[#E2B769]">
                   {t("stat3")}
                 </div>
-                <div className="text-[#39241A]/60 text-sm">
+                <div className="text-[#39241A]/60 text-sm dark:text-[#F9F6F2]/60">
                   {t("stat3Text")}
                 </div>
               </div>
@@ -97,38 +97,40 @@ export function Hero() {
               {/* Decorative card showcase */}
               <div className="absolute inset-0 space-y-4">
                 {/* Card 1 - AI Notes */}
-                <div className="absolute top-8 right-0 w-72 rotate-3 space-y-3 rounded-2xl bg-white p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-transform duration-500 hover:scale-105">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#B35832]/10">
-                    <Lightbulb className="h-6 w-6 text-[#B35832]" />
+                <div className="absolute top-8 right-0 w-72 rotate-3 space-y-3 rounded-2xl bg-white p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-transform duration-500 hover:scale-105 dark:bg-[#3D2818] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#B35832]/10 dark:bg-[#E2B769]/20">
+                    <Lightbulb className="h-6 w-6 text-[#B35832] dark:text-[#E2B769]" />
                   </div>
-                  <h3 className="font-semibold text-[#39241A]">AI Notes</h3>
-                  <p className="text-[#39241A]/60 text-sm">
+                  <h3 className="font-semibold text-[#39241A] dark:text-[#F9F6F2]">
+                    AI Notes
+                  </h3>
+                  <p className="text-[#39241A]/60 text-sm dark:text-[#F9F6F2]/60">
                     Transform lecture notes into interactive study materials
                   </p>
                 </div>
 
                 {/* Card 2 - Quiz Generator */}
-                <div className="-rotate-2 absolute top-48 left-8 w-72 space-y-3 rounded-2xl bg-white p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-transform duration-500 hover:scale-105">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E2B769]/10">
+                <div className="-rotate-2 absolute top-48 left-8 w-72 space-y-3 rounded-2xl bg-white p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-transform duration-500 hover:scale-105 dark:bg-[#3D2818] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E2B769]/10 dark:bg-[#E2B769]/20">
                     <BookOpen className="h-6 w-6 text-[#E2B769]" />
                   </div>
-                  <h3 className="font-semibold text-[#39241A]">
+                  <h3 className="font-semibold text-[#39241A] dark:text-[#F9F6F2]">
                     Quiz Generator
                   </h3>
-                  <p className="text-[#39241A]/60 text-sm">
+                  <p className="text-[#39241A]/60 text-sm dark:text-[#F9F6F2]/60">
                     Create personalized quizzes to test your understanding
                   </p>
                 </div>
 
                 {/* Card 3 - Smart Learning */}
-                <div className="absolute right-12 bottom-8 w-72 rotate-1 space-y-3 rounded-2xl bg-white p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-transform duration-500 hover:scale-105">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#B35832]/10">
-                    <Brain className="h-6 w-6 text-[#B35832]" />
+                <div className="absolute right-12 bottom-8 w-72 rotate-1 space-y-3 rounded-2xl bg-white p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-transform duration-500 hover:scale-105 dark:bg-[#3D2818] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#B35832]/10 dark:bg-[#E2B769]/20">
+                    <Brain className="h-6 w-6 text-[#B35832] dark:text-[#E2B769]" />
                   </div>
-                  <h3 className="font-semibold text-[#39241A]">
+                  <h3 className="font-semibold text-[#39241A] dark:text-[#F9F6F2]">
                     Smart Flashcards
                   </h3>
-                  <p className="text-[#39241A]/60 text-sm">
+                  <p className="text-[#39241A]/60 text-sm dark:text-[#F9F6F2]/60">
                     Spaced repetition for optimal memory retention
                   </p>
                 </div>
@@ -143,7 +145,7 @@ export function Hero() {
       </div>
 
       {/* Section divider */}
-      <div className="absolute right-0 bottom-0 left-0 h-16 bg-gradient-to-t from-[#F5EFE6] to-transparent" />
+      <div className="absolute right-0 bottom-0 left-0 h-16 bg-gradient-to-t from-[#F5EFE6] to-transparent dark:from-[#332016]" />
     </section>
   );
 }

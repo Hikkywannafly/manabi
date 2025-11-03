@@ -7,7 +7,7 @@ import { Pricing } from "@/components/pricing/pricing";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#F9F6F2]">
+    <div className="min-h-screen bg-[#F9F6F2] dark:bg-[#2A1810]">
       <Header />
       <main>
         <Hero />

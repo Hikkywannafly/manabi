@@ -10,8 +10,7 @@
   // ==== Biome integration ====
   "editor.defaultFormatter": "biomejs.biome",
   "editor.codeActionsOnSave": {
-    "biome.applyQuickFixes": "explicit",
-    "biome.organizeImports": "explicit"
+    "source.fixAll.biome": "explicit"
   },
 
   // ==== File handling ====

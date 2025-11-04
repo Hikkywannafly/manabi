@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import NextTopLoader from "nextjs-toploader";
+import { AuthProvider } from "@/contexts/auth-provider";
 import { ThemeProvider } from "@/contexts/theme-provider";
 import i18nConfig from "../../i18nConfig";
-import "../globals.css";
 
 const nunito = Nunito({
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -43,9 +43,11 @@ export default async function LocaleLayout({ children, params }: Props) {
         <NextTopLoader />
         <Analytics />
         <ThemeProvider defaultTheme="light" storageKey="manabi-theme">
-          <NextIntlClientProvider messages={messages}>
-            {children}
-          </NextIntlClientProvider>
+          <AuthProvider>
+            <NextIntlClientProvider messages={messages}>
+              {children}
+            </NextIntlClientProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

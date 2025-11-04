@@ -1,8 +1,9 @@
 "use client";
 
 import { Github, Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
+import { signInWithOAuth } from "@/app/api/auth/actions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,27 +15,27 @@ import {
 
 export function LoginForm() {
   const t = useTranslations("login");
-  const [isLoading, setIsLoading] = useState(false);
+  const locale = useLocale();
+  const [isPending, startTransition] = useTransition();
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleOAuthLogin = async (provider: "google" | "github") => {
-    setIsLoading(true);
     setLoadingProvider(provider);
+    setError(null);
 
-    // TODO: Integrate with Supabase OAuth
-    // const { data, error } = await supabase.auth.signInWithOAuth({
-    //   provider,
-    //   options: {
-    //     redirectTo: `${window.location.origin}/auth/callback`,
-    //   },
-    // });
+    startTransition(async () => {
+      const result = await signInWithOAuth(provider, locale);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setLoadingProvider(null);
-    }, 2000);
+      if (result?.error) {
+        setError(result.error);
+        setLoadingProvider(null);
+      }
+      // If successful, the user will be redirected by the server action
+    });
   };
+
+  const isLoading = isPending || loadingProvider !== null;
 
   return (
     <Card className="w-full max-w-md border-none bg-transparent shadow-none">
@@ -47,6 +48,13 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Error Message */}
+        {error && (
+          <div className="rounded-md bg-destructive/10 p-3 text-center text-destructive text-sm">
+            {error}
+          </div>
+        )}
+
         {/* OAuth Buttons */}
         <div className="space-y-3">
           <Button

@@ -8,28 +8,26 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const locale = requestUrl.searchParams.get("locale") || "en";
   const next = requestUrl.searchParams.get("next") || "/dashboard";
-  const origin = requestUrl.origin;
+
+  // Extract locale from referer or use default
+  const referer = request.headers.get("referer");
+  const locale = referer?.match(/\/([a-z]{2})(\/|$)/)?.[1] || "en";
 
   if (code) {
     const supabase = await createClient();
 
+    // Exchange the code for a session
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      const redirectPath = next.startsWith("/") ? next : `/${next}`;
-      const redirectUrl = redirectPath.startsWith(`/${locale}`)
-        ? `${origin}${redirectPath}`
-        : `${origin}/${locale}${redirectPath}`;
-      return NextResponse.redirect(redirectUrl);
+      return NextResponse.redirect(`${requestUrl.origin}/${locale}${next}`);
     }
 
     console.error("Auth callback error:", error);
     return NextResponse.redirect(
-      `${origin}/${locale}/login?error=${encodeURIComponent(error.message)}`,
+      `${requestUrl.origin}/${locale}/login?error=${encodeURIComponent(error.message)}`,
     );
   }
-
-  return NextResponse.redirect(`${origin}/${locale}/login`);
+  return NextResponse.redirect(`${requestUrl.origin}/${locale}/login`);
 }

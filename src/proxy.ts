@@ -6,10 +6,8 @@ import { routing } from "./i18n/routing";
 
 const handleI18nRouting = createMiddleware(routing);
 
-// Define protected routes that require authentication
 const protectedRoutes = ["/dashboard"];
 
-// Define public routes that should redirect to dashboard if authenticated
 const authRoutes = ["/login"];
 
 async function updateSession(request: NextRequest, response: NextResponse) {
@@ -33,36 +31,35 @@ async function updateSession(request: NextRequest, response: NextResponse) {
     },
   });
 
+  const pathname = request.nextUrl.pathname;
+
+  if (pathname.startsWith("/api/")) {
+    return response;
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
+  const locale = pathname.match(/^\/([a-z]{2})(\/|$)/)?.[1] || "en";
 
-  // Extract locale from pathname (e.g., /en/dashboard -> /dashboard)
   const pathnameWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, "/");
 
-  // Check if the current route is protected
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathnameWithoutLocale.startsWith(route),
   );
 
-  // Check if the current route is an auth route
   const isAuthRoute = authRoutes.some((route) =>
     pathnameWithoutLocale.startsWith(route),
   );
 
-  // Redirect to login if accessing protected route without authentication
   if (isProtectedRoute && !user) {
-    const locale = pathname.match(/^\/([a-z]{2})(\/|$)/)?.[1] || "en";
     const loginUrl = new URL(`/${locale}/login`, request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect to dashboard if accessing auth route while authenticated
   if (isAuthRoute && user) {
-    const locale = pathname.match(/^\/([a-z]{2})(\/|$)/)?.[1] || "en";
     return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
   }
 

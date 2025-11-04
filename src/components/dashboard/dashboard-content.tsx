@@ -2,7 +2,6 @@
 
 import { Loader2, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
 import { signOut } from "@/app/api/auth/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,12 +15,11 @@ import { useAuth } from "@/contexts/auth-provider";
 
 export function DashboardContent() {
   const { user, isLoading } = useAuth();
-  const locale = useLocale();
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut(locale);
-    router.push(`/${locale}`);
+    await signOut();
+    router.push("/");
   };
 
   if (isLoading) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Github, Loader2 } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { signInWithOAuth } from "@/app/api/auth/actions";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
 
 export function LoginForm() {
   const t = useTranslations("login");
-  const locale = useLocale();
   const [isPending, startTransition] = useTransition();
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +24,7 @@ export function LoginForm() {
     setError(null);
 
     startTransition(async () => {
-      const result = await signInWithOAuth(provider, locale);
+      const result = await signInWithOAuth(provider);
 
       if (result?.error) {
         setError(result.error);

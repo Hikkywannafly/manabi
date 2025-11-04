@@ -1,23 +1,20 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect as nextRedirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 /**
  * Sign in with OAuth provider (Google, GitHub, etc.)
  */
-export async function signInWithOAuth(
-  provider: "google" | "github",
-  locale: string = "en",
-) {
+export async function signInWithOAuth(provider: "google" | "github") {
   const supabase = await createClient();
   const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${origin}/api/auth/callback?locale=${locale}`,
+      redirectTo: `${origin}/api/auth/callback`,
     },
   });
 
@@ -27,7 +24,7 @@ export async function signInWithOAuth(
   }
 
   if (data.url) {
-    redirect(data.url);
+    nextRedirect(data.url);
   }
 
   return { error: "Failed to generate OAuth URL" };
@@ -36,11 +33,7 @@ export async function signInWithOAuth(
 /**
  * Sign in with email and password
  */
-export async function signInWithEmail(
-  email: string,
-  password: string,
-  locale: string = "en",
-) {
+export async function signInWithEmail(email: string, password: string) {
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -53,17 +46,13 @@ export async function signInWithEmail(
   }
 
   revalidatePath("/", "layout");
-  redirect(`/${locale}/dashboard`);
+  nextRedirect("/dashboard");
 }
 
 /**
  * Sign up with email and password
  */
-export async function signUp(
-  email: string,
-  password: string,
-  locale: string = "en",
-) {
+export async function signUp(email: string, password: string) {
   const supabase = await createClient();
   const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -71,7 +60,7 @@ export async function signUp(
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/api/auth/callback?locale=${locale}`,
+      emailRedirectTo: `${origin}/api/auth/callback`,
     },
   });
 
@@ -86,7 +75,7 @@ export async function signUp(
 /**
  * Sign out the current user
  */
-export async function signOut(locale: string = "en") {
+export async function signOut() {
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signOut();
@@ -96,18 +85,18 @@ export async function signOut(locale: string = "en") {
   }
 
   revalidatePath("/", "layout");
-  redirect(`/${locale}`);
+  nextRedirect("/");
 }
 
 /**
  * Reset password - send reset email
  */
-export async function resetPassword(email: string, locale: string = "en") {
+export async function resetPassword(email: string) {
   const supabase = await createClient();
   const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/api/auth/callback?locale=${locale}&next=/reset-password`,
+    redirectTo: `${origin}/api/auth/callback?next=/reset-password`,
   });
 
   if (error) {
@@ -120,7 +109,7 @@ export async function resetPassword(email: string, locale: string = "en") {
 /**
  * Update password (after reset)
  */
-export async function updatePassword(password: string, locale: string = "en") {
+export async function updatePassword(password: string) {
   const supabase = await createClient();
 
   const { error } = await supabase.auth.updateUser({
@@ -132,5 +121,5 @@ export async function updatePassword(password: string, locale: string = "en") {
   }
 
   revalidatePath("/", "layout");
-  redirect(`/${locale}/dashboard`);
+  nextRedirect("/dashboard");
 }

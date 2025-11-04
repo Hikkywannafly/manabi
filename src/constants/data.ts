@@ -60,6 +60,56 @@ export const navItems: NavItem[] = [
   },
 ];
 
+// Content Creation section items for the sidebar
+export const contentNavItems: NavItem[] = [
+  {
+    title: "Quizzes",
+    url: "/dashboard/quizzes",
+    icon: "post",
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Flashcards",
+    url: "/dashboard/flashcards",
+    icon: "page",
+    isActive: false,
+    items: [],
+  },
+];
+
+// Study Tools section items for the sidebar
+export const studyToolsNavItems: NavItem[] = [
+  {
+    title: "Notes",
+    url: "/dashboard/notes",
+    icon: "post",
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Mind Map",
+    url: "/dashboard/mind-map",
+    icon: "brain",
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Tutors",
+    url: "/dashboard/tutors",
+    icon: "user",
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Pomodoro",
+    url: "/dashboard/pomodoro",
+    icon: "clock",
+    isActive: false,
+    items: [],
+  },
+];
+
 export interface SaleUser {
   id: number;
   name: string;

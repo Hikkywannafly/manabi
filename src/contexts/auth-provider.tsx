@@ -119,3 +119,12 @@ export function useRequireAuth() {
 
   throw new Error("Authentication required");
 }
+
+/**
+ * Hook to access user data
+ * Returns the current user or null
+ */
+export function useUser() {
+  const { user } = useAuth();
+  return { user };
+}

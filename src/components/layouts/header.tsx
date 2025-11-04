@@ -8,12 +8,15 @@ import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useUser } from "@/contexts/auth-provider";
 import { Link } from "@/i18n/routing";
+import { UserDropdown } from "./user-dropdown";
 
 export function Header() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const t = useTranslations("header");
+  const { user } = useUser();
 
   return (
     <header className="sticky top-0 z-50 w-full border-border border-b bg-background/80 backdrop-blur-lg">
@@ -82,14 +85,16 @@ export function Header() {
             </div>
 
             {/* Login Button */}
-            <Link href="/login" className="hidden md:inline-flex">
-              <Button variant="outline" className="rounded-xl">
-                {t("login")}
-              </Button>
-            </Link>
+            {!user ? (
+              <>
+                <Link href="/login" className="hidden md:inline-flex">
+                  <Button variant="outline" className="rounded-xl">
+                    {t("login")}
+                  </Button>
+                </Link>
 
-            {/* CTA Button */}
-            {/* <Link href="/get-started">
+                {/* CTA Button */}
+                {/* <Link href="/get-started">
               <Button
                 variant="secondary"
                 className="hidden rounded-xl px-6 md:inline-flex"
@@ -98,6 +103,12 @@ export function Header() {
                 {t("getStartedFree")}
               </Button>
             </Link> */}
+              </>
+            ) : (
+              <div className="hidden md:block">
+                <UserDropdown />
+              </div>
+            )}
 
             {/* Mobile menu button */}
             <Button
@@ -149,25 +160,33 @@ export function Header() {
             <div className="sm:hidden">
               <LanguageSwitcher />
             </div>
-            <Link href="/login" className="md:hidden">
-              <Button
-                variant="outline"
-                className="w-full rounded-xl"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {t("login")}
-              </Button>
-            </Link>
-            <Link href="/get-started">
-              <Button
-                variant="gradient"
-                className="w-full rounded-xl"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Sparkles className="mr-2 h-4 w-4" />
-                {t("getStartedFree")}
-              </Button>
-            </Link>
+            {!user ? (
+              <>
+                <Link href="/login" className="md:hidden">
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-xl"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {t("login")}
+                  </Button>
+                </Link>
+                <Link href="/get-started">
+                  <Button
+                    variant="gradient"
+                    className="w-full rounded-xl"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    {t("getStartedFree")}
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <div className="md:hidden">
+                <UserDropdown />
+              </div>
+            )}
           </div>
         )}
       </div>

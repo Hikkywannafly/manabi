@@ -1,6 +1,6 @@
 import type React from "react";
-import { Footer } from "@/components/footer/footer";
-import { Header } from "@/components/header/header";
+import { Footer } from "@/components/layouts/footer";
+import { Header } from "@/components/layouts/header";
 import { cn } from "@/lib/utils";
 
 interface PageLayoutProps {

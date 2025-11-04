@@ -30,7 +30,6 @@ export function LoginForm() {
         setError(result.error);
         setLoadingProvider(null);
       }
-      // If successful, the user will be redirected by the server action
     });
   };
 

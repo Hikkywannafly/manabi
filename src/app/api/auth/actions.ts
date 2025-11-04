@@ -4,12 +4,33 @@ import { revalidatePath } from "next/cache";
 import { redirect as nextRedirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-/**
+function getSiteUrl() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+
+  if (process.env.VERCEL_URL) {
+    const vercelEnv = process.env.VERCEL_ENV;
+    const vercelUrl = process.env.VERCEL_URL;
+
+    if (vercelEnv === "production") {
+      return `https://${vercelUrl}`;
+    }
+
+    console.warn(
+      `Running on Vercel ${vercelEnv} deployment. ` +
+        `Set NEXT_PUBLIC_SITE_URL environment variable for OAuth to work correctly.`,
+    );
+  }
+
+  // Development fallback
+  return "http://localhost:3000";
+} /**
  * Sign in with OAuth provider (Google, GitHub, etc.)
  */
 export async function signInWithOAuth(provider: "google" | "github") {
   const supabase = await createClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const origin = getSiteUrl();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
@@ -54,7 +75,7 @@ export async function signInWithEmail(email: string, password: string) {
  */
 export async function signUp(email: string, password: string) {
   const supabase = await createClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const origin = getSiteUrl();
 
   const { error } = await supabase.auth.signUp({
     email,
@@ -93,7 +114,7 @@ export async function signOut() {
  */
 export async function resetPassword(email: string) {
   const supabase = await createClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const origin = getSiteUrl();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/api/auth/callback?next=/reset-password`,

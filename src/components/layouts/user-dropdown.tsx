@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { signOut } from "@/app/api/auth/actions";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +24,11 @@ import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { UserAvatarProfile } from "@/components/user-avatar-profile";
 import { useUser } from "@/contexts/auth-provider";
 
-export function UserDropdown() {
+interface UserDropdownProps {
+  variant?: "sidebar" | "header";
+}
+
+export function UserDropdown({ variant = "sidebar" }: UserDropdownProps) {
   const { user } = useUser();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -43,17 +48,27 @@ export function UserDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <SidebarMenuButton
-          size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-        >
-          <UserAvatarProfile
-            className="h-8 w-8 rounded-full"
-            showInfo
-            user={user}
-          />
-          <IconChevronsDown className="ml-auto size-4" />
-        </SidebarMenuButton>
+        {variant === "header" ? (
+          <Button size="icon" className="rounded-full">
+            <UserAvatarProfile
+              className="h-8 w-8 rounded-full"
+              showInfo={false}
+              user={user}
+            />
+          </Button>
+        ) : (
+          <SidebarMenuButton
+            size="lg"
+            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          >
+            <UserAvatarProfile
+              className="h-8 w-8 rounded-full"
+              showInfo
+              user={user}
+            />
+            <IconChevronsDown className="ml-auto size-4" />
+          </SidebarMenuButton>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"

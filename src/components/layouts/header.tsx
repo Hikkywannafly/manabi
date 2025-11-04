@@ -92,21 +92,20 @@ export function Header() {
                     {t("login")}
                   </Button>
                 </Link>
-
-                {/* CTA Button */}
-                {/* <Link href="/get-started">
-              <Button
-                variant="secondary"
-                className="hidden rounded-xl px-6 md:inline-flex"
-              >
-                <Sparkles className="mr-2 h-4 w-4" />
-                {t("getStartedFree")}
-              </Button>
-            </Link> */}
               </>
             ) : (
-              <div className="hidden md:block">
-                <UserDropdown />
+              <div className="hidden md:flex md:items-center md:gap-4">
+                <UserDropdown variant="header" />
+                <Link href="/dashboard">
+                  <Button
+                    variant="gradient"
+                    className="rounded-xl"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </Link>
               </div>
             )}
 
@@ -171,20 +170,20 @@ export function Header() {
                     {t("login")}
                   </Button>
                 </Link>
-                <Link href="/get-started">
+              </>
+            ) : (
+              <div className="md:hidden">
+                <UserDropdown variant="header" />
+                <Link href="/dashboard">
                   <Button
                     variant="gradient"
                     className="w-full rounded-xl"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Sparkles className="mr-2 h-4 w-4" />
-                    {t("getStartedFree")}
+                    Dashboard
                   </Button>
                 </Link>
-              </>
-            ) : (
-              <div className="md:hidden">
-                <UserDropdown />
               </div>
             )}
           </div>

@@ -4,28 +4,23 @@ import { revalidatePath } from "next/cache";
 import { redirect as nextRedirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+/**
+ * Get the site URL for OAuth callbacks
+ * Note: For internal redirects, use simple paths (middleware handles locale)
+ */
 function getSiteUrl() {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
+    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
   }
 
   if (process.env.VERCEL_URL) {
-    const vercelEnv = process.env.VERCEL_ENV;
-    const vercelUrl = process.env.VERCEL_URL;
-
-    if (vercelEnv === "production") {
-      return `https://${vercelUrl}`;
-    }
-
-    console.warn(
-      `Running on Vercel ${vercelEnv} deployment. ` +
-        `Set NEXT_PUBLIC_SITE_URL environment variable for OAuth to work correctly.`,
-    );
+    return `https://${process.env.VERCEL_URL}`;
   }
 
-  // Development fallback
   return "http://localhost:3000";
-} /**
+}
+
+/**
  * Sign in with OAuth provider (Google, GitHub, etc.)
  */
 export async function signInWithOAuth(provider: "google" | "github") {
@@ -40,7 +35,6 @@ export async function signInWithOAuth(provider: "google" | "github") {
   });
 
   if (error) {
-    console.error("OAuth sign in error:", error);
     return { error: error.message };
   }
 
@@ -53,6 +47,7 @@ export async function signInWithOAuth(provider: "google" | "github") {
 
 /**
  * Sign in with email and password
+ * Note: Middleware will automatically add locale to redirect path
  */
 export async function signInWithEmail(email: string, password: string) {
   const supabase = await createClient();
@@ -95,6 +90,7 @@ export async function signUp(email: string, password: string) {
 
 /**
  * Sign out the current user
+ * Note: Middleware will automatically add locale to redirect path
  */
 export async function signOut() {
   const supabase = await createClient();
@@ -129,6 +125,7 @@ export async function resetPassword(email: string) {
 
 /**
  * Update password (after reset)
+ * Note: Middleware will automatically add locale to redirect path
  */
 export async function updatePassword(password: string) {
   const supabase = await createClient();

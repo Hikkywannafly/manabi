@@ -23,9 +23,9 @@ export function PageLayout({
   const variants = {
     default: "min-h-screen bg-background",
     centered:
-      "relative flex min-h-screen items-center justify-center bg-background px-4 py-12",
+      "relative flex w-full min-h-screen items-center justify-center bg-background px-4 py-12",
     gradient:
-      "relative flex min-h-screen items-center justify-center bg-linear-to-br from-background via-background to-primary/5 px-4 py-12",
+      "relative flex w-full min-h-screen items-center justify-center bg-linear-to-br from-background via-background to-primary/5 px-4 py-12",
     full: "min-h-screen",
   };
 

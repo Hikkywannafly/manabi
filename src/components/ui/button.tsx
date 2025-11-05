@@ -31,10 +31,15 @@ const buttonVariants = cva(
         "icon-sm": "size-8",
         "icon-lg": "size-10",
       },
+      disableAnimations: {
+        true: "transition-none active:scale-100",
+        false: "",
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      disableAnimations: false,
     },
   },
 );
@@ -43,6 +48,7 @@ function Button({
   className,
   variant,
   size,
+  disableAnimations,
   asChild = false,
   ...props
 }: React.ComponentProps<"button"> &
@@ -54,7 +60,9 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, disableAnimations, className }),
+      )}
       {...props}
     />
   );

@@ -13,7 +13,7 @@ export default function LoginPage() {
         <Link href="/" className="absolute top-4 left-4 sm:top-8 sm:left-8">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Back to Home</span>
+            <span>Back to Home</span>
           </Button>
         </Link>
 

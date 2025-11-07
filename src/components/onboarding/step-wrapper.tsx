@@ -15,29 +15,35 @@ interface StepWrapperProps {
 export function StepWrapper({
   children,
   isVisible,
-  direction = "forward",
   isLoading = false,
+  direction = "forward",
 }: StepWrapperProps) {
-  const getInitialAnimation = () =>
-    direction === "backward" ? { opacity: 0, y: 10 } : { opacity: 0, y: 10 };
+  const getInitialAnimation = () => {
+    if (direction === "backward") {
+      return { opacity: 0, y: -10 };
+    }
+    return { opacity: 0, y: 10 };
+  };
 
   return (
     <AnimatePresence mode="wait">
       {isVisible && (
-        <div
-          className={`container mx-auto flex h-full items-center justify-center px-4 py-8 transition-all duration-300 ${isLoading ? "blur-sm" : ""}`}
+        <motion.div
+          key="step-content"
+          className="w-full"
+          exit={{ opacity: 0, y: direction === "backward" ? 10 : -10 }}
+          initial={getInitialAnimation()}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <motion.div
-            key="step"
-            exit={{ opacity: 0, y: direction === "backward" ? 10 : 10 }}
-            initial={getInitialAnimation()}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="w-full max-w-2xl"
+          <div
+            className={`container mx-auto flex min-h-screen items-center justify-center px-4 py-8 transition-all duration-300 ${isLoading ? "blur-sm" : ""}`}
           >
-            {children}
-          </motion.div>
-        </div>
+            <div className="w-full max-w-2xl">
+              <form className="w-full pb-24">{children}</form>
+            </div>
+          </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

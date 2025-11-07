@@ -66,7 +66,6 @@ export function OnboardingStepper({
 
   return (
     <PageLayout variant="gradient" showHeader={false} showFooter={false}>
-      {/* Header cố định */}
       <StepHeader currentStep={currentStep} totalSteps={5} />
 
       <Step1Welcome

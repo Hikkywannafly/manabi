@@ -20,8 +20,6 @@ export function Step5Discovery({
   answers,
   onAnswer,
   onBack,
-  onComplete,
-  onSkip,
   loading = false,
   direction = "forward",
 }: Step5DiscoveryProps) {

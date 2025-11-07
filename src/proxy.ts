@@ -7,8 +7,8 @@ import { routing } from "./i18n/routing";
 const handleI18nRouting = createMiddleware(routing);
 
 const protectedRoutes = ["/dashboard"];
-
 const authRoutes = ["/login"];
+const onboardingRoutes = ["/onboarding"];
 
 async function updateSession(request: NextRequest, response: NextResponse) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -42,7 +42,6 @@ async function updateSession(request: NextRequest, response: NextResponse) {
   } = await supabase.auth.getUser();
 
   const locale = pathname.match(/^\/([a-z]{2})(\/|$)/)?.[1] || "en";
-
   const pathnameWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, "/");
 
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -53,14 +52,59 @@ async function updateSession(request: NextRequest, response: NextResponse) {
     pathnameWithoutLocale.startsWith(route),
   );
 
-  if (isProtectedRoute && !user) {
+  const isOnboardingRoute = onboardingRoutes.some((route) =>
+    pathnameWithoutLocale.startsWith(route),
+  );
+
+  if ((isProtectedRoute || isOnboardingRoute) && !user) {
     const loginUrl = new URL(`/${locale}/login`, request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
+  if (isProtectedRoute && user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", user.id)
+      .single();
+
+    const onboardingCompleted = profile?.onboarding_completed === true;
+
+    if (!onboardingCompleted) {
+      return NextResponse.redirect(
+        new URL(`/${locale}/onboarding`, request.url),
+      );
+    }
+  }
+  if (isOnboardingRoute && user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", user.id)
+      .single();
+
+    const onboardingCompleted = profile?.onboarding_completed === true;
+
+    if (onboardingCompleted) {
+      return NextResponse.redirect(
+        new URL(`/${locale}/dashboard`, request.url),
+      );
+    }
+  }
+
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", user.id)
+      .single();
+
+    const onboardingCompleted = profile?.onboarding_completed === true;
+    const redirectUrl = onboardingCompleted ? "/dashboard" : "/onboarding";
+    return NextResponse.redirect(
+      new URL(`/${locale}${redirectUrl}`, request.url),
+    );
   }
 
   return response;

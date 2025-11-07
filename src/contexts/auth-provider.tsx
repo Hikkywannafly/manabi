@@ -9,12 +9,15 @@ import {
   useMemo,
   useState,
 } from "react";
+import type { Profile } from "@/db/profile";
 import { createClient } from "@/lib/supabase/client";
 
 type AuthContextType = {
   user: User | null;
   session: Session | null;
+  profile: Profile | null;
   isLoading: boolean;
+  isOnboardingCompleted: boolean;
   signOut: () => Promise<void>;
 };
 
@@ -27,6 +30,7 @@ type AuthProviderProps = {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const supabase = useMemo(() => createClient(), []);
@@ -41,6 +45,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
+
+        // Fetch profile if user exists
+        if (initialSession?.user) {
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select()
+            .eq("id", initialSession.user.id)
+            .single();
+
+          setProfile(profileData || null);
+        }
       } catch (error) {
         console.error("Error initializing auth:", error);
       } finally {
@@ -55,9 +70,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+    } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
+
+      // Fetch profile if user exists
+      if (currentSession?.user) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select()
+          .eq("id", currentSession.user.id)
+          .single();
+
+        setProfile(profileData || null);
+      } else {
+        setProfile(null);
+      }
+
       setIsLoading(false);
     });
 
@@ -73,20 +102,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       setUser(null);
       setSession(null);
+      setProfile(null);
     } catch (error) {
       console.error("Error signing out:", error);
       throw error;
     }
   }, [supabase]);
 
+  const isOnboardingCompleted = profile?.onboarding_completed === true;
+
   const value = useMemo(
     () => ({
       user,
       session,
+      profile,
       isLoading,
+      isOnboardingCompleted,
       signOut: handleSignOut,
     }),
-    [user, session, isLoading, handleSignOut],
+    [user, session, profile, isLoading, isOnboardingCompleted, handleSignOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -125,6 +159,6 @@ export function useRequireAuth() {
  * Returns the current user or null
  */
 export function useUser() {
-  const { user } = useAuth();
-  return { user };
+  const { user, profile } = useAuth();
+  return { user, profile };
 }

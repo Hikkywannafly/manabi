@@ -20,8 +20,6 @@ export function Step4Role({
   answers,
   onAnswer,
   onBack,
-  onNext,
-  onSkip,
   loading = false,
   direction = "forward",
 }: Step4RoleProps) {

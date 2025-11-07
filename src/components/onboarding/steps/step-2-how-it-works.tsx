@@ -22,8 +22,6 @@ export function Step2HowItWorks({
   answers,
   onAnswer,
   onBack,
-  onNext,
-  onSkip,
   loading = false,
   direction = "forward",
 }: Step2HowItWorksProps) {

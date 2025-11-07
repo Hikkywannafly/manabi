@@ -4,7 +4,7 @@ export interface NavItem {
   disabled?: boolean;
   external?: boolean;
   shortcut?: [string, string];
-  icon?: any;
+  icon?: React.ReactNode;
   label?: string;
   description?: string;
   isActive?: boolean;

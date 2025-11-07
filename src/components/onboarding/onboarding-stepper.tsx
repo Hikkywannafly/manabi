@@ -4,25 +4,24 @@ import { useCallback, useState } from "react";
 import { PageLayout } from "@/components/layouts";
 import { StepFooter } from "./step-footer";
 import { StepHeader } from "./step-header";
-import { Step1Welcome } from "./steps/step-1-welcome";
-import { Step2HowItWorks } from "./steps/step-2-how-it-works";
-import { Step3Goal } from "./steps/step-3-goal";
-import { Step4Role } from "./steps/step-4-role";
-import { Step5Discovery } from "./steps/step-5-discovery";
+import { Discovery, Goal, HowItWorks, Nickname, Role, Welcome } from "./steps";
 
 interface OnboardingStepperProps {
   onComplete?: (answers: Record<string, string>) => void | Promise<void>;
   onSkip?: () => void | Promise<void>;
+  googleName?: string;
 }
 
 export function OnboardingStepper({
   onComplete,
   onSkip,
+  googleName,
 }: OnboardingStepperProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [nickname, setNickname] = useState<string>("");
 
   const handleNext = useCallback(() => {
     setDirection("forward");
@@ -42,7 +41,8 @@ export function OnboardingStepper({
     setLoading(true);
     try {
       if (onComplete) {
-        await onComplete(answers);
+        const finalAnswers = { ...answers, nickname };
+        await onComplete(finalAnswers);
       }
     } catch (error) {
       console.error("Error completing onboarding:", error);
@@ -66,9 +66,9 @@ export function OnboardingStepper({
 
   return (
     <PageLayout variant="gradient" showHeader={false} showFooter={false}>
-      <StepHeader currentStep={currentStep} totalSteps={5} />
+      <StepHeader currentStep={currentStep} totalSteps={6} />
 
-      <Step1Welcome
+      <Welcome
         isVisible={currentStep === 1}
         onNext={handleNext}
         onSkip={handleSkip}
@@ -77,7 +77,7 @@ export function OnboardingStepper({
         direction={direction}
       />
 
-      <Step2HowItWorks
+      <HowItWorks
         isVisible={currentStep === 2}
         answers={answers}
         onAnswer={(value) => handleAnswer("settings", value)}
@@ -88,7 +88,7 @@ export function OnboardingStepper({
         direction={direction}
       />
 
-      <Step3Goal
+      <Goal
         isVisible={currentStep === 3}
         answers={answers}
         onAnswer={(value) => handleAnswer("goal", value)}
@@ -99,7 +99,7 @@ export function OnboardingStepper({
         direction={direction}
       />
 
-      <Step4Role
+      <Role
         isVisible={currentStep === 4}
         answers={answers}
         onAnswer={(value) => handleAnswer("role", value)}
@@ -110,8 +110,18 @@ export function OnboardingStepper({
         direction={direction}
       />
 
-      <Step5Discovery
+      <Nickname
         isVisible={currentStep === 5}
+        nickname={nickname}
+        googleName={googleName || ""}
+        onNicknameChange={setNickname}
+        onBack={handleBack}
+        loading={loading}
+        direction={direction}
+      />
+
+      <Discovery
+        isVisible={currentStep === 6}
         answers={answers}
         onAnswer={(value) => handleAnswer("source", value)}
         onBack={handleBack}
@@ -122,11 +132,11 @@ export function OnboardingStepper({
       />
       <StepFooter
         onBack={handleBack}
-        onNext={currentStep === 5 ? handleComplete : handleNext}
+        onNext={currentStep === 6 ? handleComplete : handleNext}
         onSkip={handleSkip}
         loading={loading}
         hasAnswer={true}
-        isLastStep={currentStep === 5}
+        isLastStep={currentStep === 6}
         showBack={currentStep > 1}
       />
     </PageLayout>

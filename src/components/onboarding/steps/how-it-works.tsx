@@ -6,7 +6,7 @@ import { CardOption } from "../card-option";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
-interface Step2HowItWorksProps {
+interface HowItWorksProps {
   isVisible: boolean;
   answers: Record<string, string>;
   onAnswer: (value: string) => void;
@@ -17,16 +17,14 @@ interface Step2HowItWorksProps {
   direction?: "forward" | "backward";
 }
 
-export function Step2HowItWorks({
+export function HowItWorks({
   isVisible,
   answers,
   onAnswer,
   onBack,
-  onNext,
-  onSkip,
   loading = false,
   direction = "forward",
-}: Step2HowItWorksProps) {
+}: HowItWorksProps) {
   const selectedSettings = answers["settings"] || "";
 
   return (
@@ -69,13 +67,11 @@ export function Step2HowItWorks({
               label="Flashcard Settings"
               isSelected={selectedSettings === "flashcard"}
               onClick={() => onAnswer("flashcard")}
-              icon="🎯"
             />
             <CardOption
               label="Quiz Settings"
               isSelected={selectedSettings === "quiz"}
               onClick={() => onAnswer("quiz")}
-              icon="📝"
             />
           </div>
         </div>

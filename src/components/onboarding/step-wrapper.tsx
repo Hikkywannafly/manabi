@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import type React from "react";
-import { Button } from "@/components/ui/button";
 
 interface StepWrapperProps {
   children: React.ReactNode;
@@ -16,8 +15,6 @@ interface StepWrapperProps {
 export function StepWrapper({
   children,
   isVisible,
-  onBack,
-  showBackButton = true,
   isLoading = false,
   direction = "forward",
 }: StepWrapperProps) {
@@ -43,36 +40,7 @@ export function StepWrapper({
             className={`container mx-auto flex min-h-screen items-center justify-center px-4 py-8 transition-all duration-300 ${isLoading ? "blur-sm" : ""}`}
           >
             <div className="w-full max-w-2xl">
-              <form className="w-full pb-24">
-                {showBackButton && onBack && (
-                  <div className="relative mb-16 flex items-center justify-between">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={onBack}
-                      className="rounded-full p-2 hover:bg-muted hover:text-foreground"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="size-5"
-                      >
-                        <path d="m15 18-6-6 6-6" />
-                      </svg>
-                    </Button>
-                  </div>
-                )}
-
-                {children}
-              </form>
+              <form className="w-full pb-24">{children}</form>
             </div>
           </div>
         </motion.div>

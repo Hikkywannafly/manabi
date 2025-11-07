@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { PageLayout } from "@/components/layouts";
 import { StepFooter } from "./step-footer";
+import { StepHeader } from "./step-header";
 import { Step1Welcome } from "./steps/step-1-welcome";
 import { Step2HowItWorks } from "./steps/step-2-how-it-works";
 import { Step3Goal } from "./steps/step-3-goal";
@@ -65,6 +66,8 @@ export function OnboardingStepper({
 
   return (
     <PageLayout variant="gradient" showHeader={false} showFooter={false}>
+      <StepHeader currentStep={currentStep} totalSteps={5} />
+
       <Step1Welcome
         isVisible={currentStep === 1}
         onNext={handleNext}
@@ -117,10 +120,9 @@ export function OnboardingStepper({
         loading={loading}
         direction={direction}
       />
-
       <StepFooter
         onBack={handleBack}
-        onNext={handleNext}
+        onNext={currentStep === 5 ? handleComplete : handleNext}
         onSkip={handleSkip}
         loading={loading}
         hasAnswer={true}

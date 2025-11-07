@@ -1,7 +1,6 @@
 "use client";
 
 import { CardOption } from "../card-option";
-import { StepFooter } from "../step-footer";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
@@ -62,15 +61,6 @@ export function Step4Role({
             />
           ))}
         </div>
-
-        <StepFooter
-          onBack={onBack}
-          onNext={onNext}
-          onSkip={onSkip}
-          loading={loading}
-          hasAnswer={!!selectedRole}
-          showBack={true}
-        />
       </StepLayout>
     </StepWrapper>
   );

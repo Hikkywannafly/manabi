@@ -1,7 +1,6 @@
 "use client";
 
 import { CardOption } from "../card-option";
-import { StepFooter } from "../step-footer";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
@@ -62,16 +61,6 @@ export function Step5Discovery({
             />
           ))}
         </div>
-
-        <StepFooter
-          onBack={onBack}
-          onNext={onComplete}
-          onSkip={onSkip}
-          loading={loading}
-          hasAnswer={!!selectedSource}
-          showBack={true}
-          isLastStep={true}
-        />
       </StepLayout>
     </StepWrapper>
   );

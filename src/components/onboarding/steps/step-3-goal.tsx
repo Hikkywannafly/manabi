@@ -1,7 +1,6 @@
 "use client";
 
 import { CardOption } from "../card-option";
-import { StepFooter } from "../step-footer";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
@@ -21,8 +20,6 @@ export function Step3Goal({
   answers,
   onAnswer,
   onBack,
-  onNext,
-  onSkip,
   loading = false,
   direction = "forward",
 }: Step3GoalProps) {
@@ -61,15 +58,6 @@ export function Step3Goal({
             />
           ))}
         </div>
-
-        <StepFooter
-          onBack={onBack}
-          onNext={onNext}
-          onSkip={onSkip}
-          loading={loading}
-          hasAnswer={!!selectedGoal}
-          showBack={true}
-        />
       </StepLayout>
     </StepWrapper>
   );

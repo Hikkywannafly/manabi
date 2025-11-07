@@ -3,7 +3,6 @@
 import { Upload } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { CardOption } from "../card-option";
-import { StepFooter } from "../step-footer";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
@@ -79,15 +78,6 @@ export function Step2HowItWorks({
               icon="📝"
             />
           </div>
-
-          <StepFooter
-            onBack={onBack}
-            onNext={onNext}
-            onSkip={onSkip}
-            loading={loading}
-            hasAnswer={!!selectedSettings}
-            showBack={true}
-          />
         </div>
       </StepLayout>
     </StepWrapper>

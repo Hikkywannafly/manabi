@@ -16,23 +16,13 @@ export function StepIndicator({ totalSteps, currentStep }: StepIndicatorProps) {
           key={index}
           className={cn(
             "h-2 rounded-full transition-all duration-300",
-            index < currentStep
+            index + 1 < currentStep
               ? "w-8 bg-primary"
-              : index === currentStep
+              : index + 1 === currentStep
                 ? "w-8 bg-primary"
                 : "w-2 bg-muted-foreground/30",
           )}
           initial={false}
-          // animate={{
-          //   width: index < currentStep ? 32 : index === currentStep ? 32 : 8,
-          //   backgroundColor:
-          //     index < currentStep
-          //       ? "hsl(217, 91%, 60%)"
-          //       : index === currentStep
-          //         ? "hsl(217, 91%, 60%)"
-          //         : "hsla(0, 0%, 0%, 0.3)",
-          // }}
-          // transition={{ duration: 0.3 }}
         />
       ))}
     </div>

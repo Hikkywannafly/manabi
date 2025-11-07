@@ -3,7 +3,6 @@
 import { BookOpen, Brain, CheckSquare, Clock, Trophy, Zap } from "lucide-react";
 
 import { FeatureGrid } from "../feature-grid";
-import { StepFooter } from "../step-footer";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
@@ -18,8 +17,6 @@ interface Step1WelcomeProps {
 
 export function Step1Welcome({
   isVisible,
-  onNext,
-  onSkip,
   onBack,
   loading = false,
   direction = "forward",
@@ -83,15 +80,6 @@ export function Step1Welcome({
         </p>
 
         <FeatureGrid features={features} />
-
-        <StepFooter
-          onBack={onBack}
-          onNext={onNext}
-          onSkip={onSkip}
-          loading={loading}
-          hasAnswer={true}
-          showBack={false}
-        />
       </StepLayout>
     </StepWrapper>
   );

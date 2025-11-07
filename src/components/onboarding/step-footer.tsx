@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface StepFooterProps {
@@ -31,22 +32,9 @@ export function StepFooter({
               variant="ghost"
               onClick={onBack}
               disabled={loading}
-              className="gap-2 text-muted-foreground hover:text-foreground"
+              className="gap-2 text-foreground hover:text-foreground"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4"
-              >
-                <path d="m15 18-6-6 6-6" />
-              </svg>
+              <ChevronLeft />
               Back
             </Button>
           ) : (
@@ -72,7 +60,7 @@ export function StepFooter({
           variant="ghost"
           onClick={onSkip}
           disabled={loading}
-          className="text-muted-foreground text-xs hover:text-foreground"
+          className="text-foreground text-xs hover:text-foreground"
         >
           Skip intro
         </Button>

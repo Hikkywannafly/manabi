@@ -37,10 +37,10 @@ export function StepWrapper({
           transition={{ delay: 0.1, duration: 0.4 }}
         >
           <div
-            className={`container mx-auto flex min-h-screen items-center justify-center px-4 py-8 transition-all duration-300 ${isLoading ? "blur-sm" : ""}`}
+            className={`container mx-auto flex min-h-screen items-start justify-center px-4 py-44 transition-all duration-300 ${isLoading ? "blur-sm" : ""}`}
           >
             <div className="w-full max-w-2xl">
-              <form className="w-full pb-24">{children}</form>
+              <form className="w-full">{children}</form>
             </div>
           </div>
         </motion.div>

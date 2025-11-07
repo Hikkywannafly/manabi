@@ -6,7 +6,7 @@ import { FeatureGrid } from "../feature-grid";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
-interface Step1WelcomeProps {
+interface WelcomeProps {
   isVisible: boolean;
   onNext: () => void;
   onSkip: () => void;
@@ -15,12 +15,12 @@ interface Step1WelcomeProps {
   direction?: "forward" | "backward";
 }
 
-export function Step1Welcome({
+export function Welcome({
   isVisible,
   onBack,
   loading = false,
   direction = "forward",
-}: Step1WelcomeProps) {
+}: WelcomeProps) {
   const features = [
     {
       id: "flashcards",

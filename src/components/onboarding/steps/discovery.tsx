@@ -4,7 +4,7 @@ import { CardOption } from "../card-option";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
-interface Step5DiscoveryProps {
+interface DiscoveryProps {
   isVisible: boolean;
   answers: Record<string, string>;
   onAnswer: (value: string) => void;
@@ -15,23 +15,23 @@ interface Step5DiscoveryProps {
   direction?: "forward" | "backward";
 }
 
-export function Step5Discovery({
+export function Discovery({
   isVisible,
   answers,
   onAnswer,
   onBack,
   loading = false,
   direction = "forward",
-}: Step5DiscoveryProps) {
+}: DiscoveryProps) {
   const selectedSource = answers["source"] || "";
 
   const sources = [
-    { label: "Google", icon: "🔍" },
-    { label: "YouTube", icon: "▶️" },
-    { label: "TikTok", icon: "🎵" },
-    { label: "ChatGPT", icon: "🤖" },
-    { label: "Friend", icon: "👥" },
-    { label: "Other", icon: "✨" },
+    { label: "Google" },
+    { label: "YouTube" },
+    { label: "TikTok" },
+    { label: "ChatGPT" },
+    { label: "Friend" },
+    { label: "Other" },
   ];
 
   return (
@@ -53,7 +53,7 @@ export function Step5Discovery({
             <CardOption
               key={source.label}
               label={source.label}
-              icon={source.icon}
+              // icon={source.icon}
               isSelected={selectedSource === source.label}
               onClick={() => onAnswer(source.label)}
             />

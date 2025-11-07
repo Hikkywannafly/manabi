@@ -4,7 +4,7 @@ import { CardOption } from "../card-option";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
-interface Step4RoleProps {
+interface GoalProps {
   isVisible: boolean;
   answers: Record<string, string>;
   onAnswer: (value: string) => void;
@@ -15,23 +15,22 @@ interface Step4RoleProps {
   direction?: "forward" | "backward";
 }
 
-export function Step4Role({
+export function Goal({
   isVisible,
   answers,
   onAnswer,
   onBack,
   loading = false,
   direction = "forward",
-}: Step4RoleProps) {
-  const selectedRole = answers["role"] || "";
+}: GoalProps) {
+  const selectedGoal = answers["goal"] || "";
 
-  const roles = [
-    { label: "Student", icon: "🎓" },
-    { label: "Teacher", icon: "👨‍🏫" },
-    { label: "Tutor", icon: "📖" },
-    { label: "Researcher", icon: "🔬" },
-    { label: "Institution", icon: "🏫" },
-    { label: "Mentor", icon: "🤝" },
+  const goals = [
+    { label: "Exam Prep" },
+    { label: "Daily Study" },
+    { label: "Language Learning" },
+    { label: "Knowledge Review" },
+    { label: "Skill Improvement" },
   ];
 
   return (
@@ -43,19 +42,19 @@ export function Step4Role({
       isLoading={loading}
     >
       <StepLayout
-        title="Who Are You?"
-        subtitle="This helps us tailor Manabi to your needs."
-        currentStep={4}
+        title="What's Your Main Goal?"
+        subtitle="Help us personalize your learning experience."
+        currentStep={3}
         totalSteps={5}
       >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {roles.map((role) => (
+          {goals.map((goal) => (
             <CardOption
-              key={role.label}
-              label={role.label}
-              icon={role.icon}
-              isSelected={selectedRole === role.label}
-              onClick={() => onAnswer(role.label)}
+              key={goal.label}
+              label={goal.label}
+              // icon={goal.icon}
+              isSelected={selectedGoal === goal.label}
+              onClick={() => onAnswer(goal.label)}
             />
           ))}
         </div>

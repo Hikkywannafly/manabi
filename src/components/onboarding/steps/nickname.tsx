@@ -4,7 +4,7 @@ import { Input } from "../../ui/input";
 import { StepLayout } from "../step-layout";
 import { StepWrapper } from "../step-wrapper";
 
-interface Step0NicknameProps {
+interface NicknameProps {
   isVisible: boolean;
   nickname: string;
   googleName: string;
@@ -14,7 +14,7 @@ interface Step0NicknameProps {
   direction?: "forward" | "backward";
 }
 
-export function Step0Nickname({
+export function Nickname({
   isVisible,
   nickname,
   googleName,
@@ -22,7 +22,7 @@ export function Step0Nickname({
   onBack,
   loading = false,
   direction = "forward",
-}: Step0NicknameProps) {
+}: NicknameProps) {
   return (
     <StepWrapper
       isVisible={isVisible}

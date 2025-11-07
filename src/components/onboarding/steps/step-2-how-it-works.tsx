@@ -89,7 +89,6 @@ export function Step2HowItWorks({
             showBack={true}
           />
         </div>
-        {/* </motion.div> */}
       </StepLayout>
     </StepWrapper>
   );

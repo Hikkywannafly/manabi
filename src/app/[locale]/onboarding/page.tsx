@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 import { toast } from "sonner";
 import {
   completeOnboarding,
@@ -16,57 +17,58 @@ export default function GettingStartedPage() {
   const googleName =
     user?.user_metadata?.name || user?.email?.split("@")[0] || "";
 
-  const handleComplete = async (answers: Record<string, string>) => {
-    try {
-      const result = await completeOnboarding({
-        nickname: answers.nickname?.trim() || "",
-        full_name: user?.user_metadata?.full_name,
-        answers,
-      });
+  const handleNavigate = useCallback(
+    (message: string) => {
+      toast.success(message);
+      router.push("/dashboard");
+    },
+    [router],
+  );
 
-      if (result.error) {
-        toast.error(result.error);
-        return;
+  const handleError = useCallback((error: string, title: string) => {
+    toast.error(title, {
+      description: error || "Please try again later.",
+    });
+  }, []);
+
+  const handleComplete = useCallback(
+    async (answers: Record<string, string>) => {
+      try {
+        const result = await completeOnboarding({
+          nickname: answers.nickname?.trim() || "",
+          full_name: user?.user_metadata?.full_name,
+          answers,
+        });
+
+        if (result.error) {
+          handleError(result.error, "Oops!");
+          return;
+        }
+
+        handleNavigate("Welcome to Manabi! Let's get started.");
+      } catch (error) {
+        console.error("Error completing onboarding:", error);
+        handleError("", "Something went wrong");
       }
+    },
+    [user?.user_metadata?.full_name, handleError, handleNavigate],
+  );
 
-      toast.success("Welcome to Manabi! Let's get started.", {
-        description: "Redirecting to your dashboard...",
-      });
-
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1000);
-    } catch (error) {
-      console.error("Error completing onboarding:", error);
-      toast.error("Something went wrong", {
-        description: "Please try again later.",
-      });
-    }
-  };
-
-  const handleSkip = async () => {
+  const handleSkip = useCallback(async () => {
     try {
       const result = await skipOnboarding();
 
       if (result.error) {
-        toast.error(result.error);
+        handleError(result.error, "Oops!");
         return;
       }
 
-      toast.success("Skipping onboarding...", {
-        description: "Redirecting to your dashboard...",
-      });
-
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1000);
+      handleNavigate("Skipping onboarding...");
     } catch (error) {
       console.error("Error skipping onboarding:", error);
-      toast.error("Something went wrong", {
-        description: "Please try again later.",
-      });
+      handleError("", "Something went wrong");
     }
-  };
+  }, [handleError, handleNavigate]);
 
   return (
     <OnboardingStepper

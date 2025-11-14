@@ -46,15 +46,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
 
-        // Fetch profile if user exists
+        // Only fetch profile fields we need (skip full select)
         if (initialSession?.user) {
           const { data: profileData } = await supabase
             .from("profiles")
-            .select()
+            .select("id, nickname, avatar_url, onboarding_completed, status")
             .eq("id", initialSession.user.id)
             .single();
 
-          setProfile(profileData || null);
+          setProfile((profileData as Profile) || null);
         }
       } catch (error) {
         console.error("Error initializing auth:", error);
@@ -78,11 +78,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (currentSession?.user) {
         const { data: profileData } = await supabase
           .from("profiles")
-          .select()
+          .select("id, nickname, avatar_url, onboarding_completed, status")
           .eq("id", currentSession.user.id)
           .single();
 
-        setProfile(profileData || null);
+        setProfile((profileData as Profile) || null);
       } else {
         setProfile(null);
       }

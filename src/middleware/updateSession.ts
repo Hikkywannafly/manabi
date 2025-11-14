@@ -1,0 +1,78 @@
+import type { NextRequest, NextResponse } from "next/server";
+import { AUTH_ROUTES, ONBOARDING_ROUTES, PROTECTED_ROUTES } from "./constants";
+import {
+  redirectToDashboard,
+  redirectToLogin,
+  redirectToOnboarding,
+} from "./redirects";
+import { getProfile, initSupabase } from "./supabase";
+import { checkRouteType, extractLocale, removeLocaleFromPath } from "./utils";
+
+export async function updateSession(
+  request: NextRequest,
+  response: NextResponse,
+) {
+  const supabase = await initSupabase(request, response);
+  if (!supabase) return response;
+
+  const pathname = request.nextUrl.pathname;
+
+  if (pathname.startsWith("/api/")) {
+    return response;
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const locale = extractLocale(pathname);
+  const pathnameWithoutLocale = removeLocaleFromPath(pathname);
+
+  const isProtectedRoute = checkRouteType(
+    pathnameWithoutLocale,
+    PROTECTED_ROUTES,
+  );
+  const isAuthRoute = checkRouteType(pathnameWithoutLocale, AUTH_ROUTES);
+  const isOnboardingRoute = checkRouteType(
+    pathnameWithoutLocale,
+    ONBOARDING_ROUTES,
+  );
+
+  // Not authenticated - redirect to login
+  if ((isProtectedRoute || isOnboardingRoute) && !user) {
+    return redirectToLogin(locale, pathname, request);
+  }
+
+  // User authenticated - handle route logic
+  if (user && (isProtectedRoute || isOnboardingRoute || isAuthRoute)) {
+    try {
+      const { data: profile, error } = await getProfile(supabase, user.id);
+
+      if (error) {
+        if (error.code === "PGRST116" && isOnboardingRoute) {
+          return response;
+        }
+        console.error("Profile fetch error:", error);
+        return response;
+      }
+
+      const onboardingCompleted = profile?.onboarding_completed === true;
+
+      if (isProtectedRoute && !onboardingCompleted) {
+        return redirectToOnboarding(locale, request);
+      }
+
+      if (isOnboardingRoute && onboardingCompleted) {
+        return redirectToDashboard(locale, request);
+      }
+
+      if (isAuthRoute && onboardingCompleted) {
+        return redirectToDashboard(locale, request);
+      }
+    } catch (err) {
+      console.error("Middleware error:", err);
+    }
+  }
+
+  return response;
+}

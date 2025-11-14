@@ -9,8 +9,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { Profile } from "@/db/profile";
 import { createClient } from "@/lib/supabase/client";
+import type { Profile } from "@/types/db/profile";
 
 type AuthContextType = {
   user: User | null;

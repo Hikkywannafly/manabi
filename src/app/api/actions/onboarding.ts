@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import type { Profile } from "@/db/profile";
 import { createClient } from "@/lib/supabase/server";
+import type { Profile } from "@/types/db/profile";
 
 export interface OnboardingData {
   nickname: string;

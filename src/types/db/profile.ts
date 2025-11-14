@@ -1,6 +1,26 @@
-export type AccountType = "free" | "pro" | "premium";
-export type ProfileStatus = "active" | "inactive" | "suspended" | "deleted";
-export type Theme = "light" | "dark" | "auto";
+export const ACCOUNT_TYPES = {
+  FREE: "free",
+  PRO: "pro",
+  PREMIUM: "premium",
+} as const;
+
+export const PROFILE_STATUSES = {
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+  SUSPENDED: "suspended",
+  DELETED: "deleted",
+} as const;
+
+export const THEMES = {
+  LIGHT: "light",
+  DARK: "dark",
+  AUTO: "auto",
+} as const;
+
+export type AccountType = (typeof ACCOUNT_TYPES)[keyof typeof ACCOUNT_TYPES];
+export type ProfileStatus =
+  (typeof PROFILE_STATUSES)[keyof typeof PROFILE_STATUSES];
+export type Theme = (typeof THEMES)[keyof typeof THEMES];
 
 export interface Profile {
   id: string;

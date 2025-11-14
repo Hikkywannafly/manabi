@@ -4,4 +4,4 @@ export type {
   Profile,
   ProfileStatus,
   Theme,
-} from "../db/profile";
+} from "./profile";

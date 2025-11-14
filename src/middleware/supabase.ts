@@ -27,7 +27,7 @@ export async function initSupabase(
   });
 }
 
-export async function getProfile(
+export async function getProfileForMiddleware(
   supabase: ReturnType<typeof import("@supabase/ssr").createServerClient>,
   userId: string,
 ) {

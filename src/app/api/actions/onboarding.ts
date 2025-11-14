@@ -41,7 +41,6 @@ export async function completeOnboarding(data: OnboardingData) {
       return { error: authError.message };
     }
 
-    // 2. Upsert profile with clean answers
     const onboardingAnswers = { ...data.answers };
     delete onboardingAnswers.nickname;
 

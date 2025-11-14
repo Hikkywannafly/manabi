@@ -5,7 +5,7 @@ import {
   redirectToLogin,
   redirectToOnboarding,
 } from "./redirects";
-import { getProfile, initSupabase } from "./supabase";
+import { getProfileForMiddleware, initSupabase } from "./supabase";
 import { checkRouteType, extractLocale, removeLocaleFromPath } from "./utils";
 
 export async function updateSession(
@@ -37,6 +37,7 @@ export async function updateSession(
     pathnameWithoutLocale,
     ONBOARDING_ROUTES,
   );
+  const isHomePage = pathnameWithoutLocale === "/";
 
   // Not authenticated - redirect to login
   if ((isProtectedRoute || isOnboardingRoute) && !user) {
@@ -44,12 +45,27 @@ export async function updateSession(
   }
 
   // User authenticated - handle route logic
-  if (user && (isProtectedRoute || isOnboardingRoute || isAuthRoute)) {
+  if (
+    user &&
+    (isProtectedRoute || isOnboardingRoute || isAuthRoute || isHomePage)
+  ) {
     try {
-      const { data: profile, error } = await getProfile(supabase, user.id);
+      const { data: profile, error } = await getProfileForMiddleware(
+        supabase,
+        user.id,
+      );
 
       if (error) {
-        if (error.code === "PGRST116" && isOnboardingRoute) {
+        // Profile not found - new user without onboarding yet
+        if (error.code === "PGRST116") {
+          // Allow access to onboarding page for new users
+          if (isOnboardingRoute) {
+            return response;
+          }
+          // Redirect to onboarding if trying to access protected/home/login pages
+          if (isProtectedRoute || isHomePage || isAuthRoute) {
+            return redirectToOnboarding(locale, request);
+          }
           return response;
         }
         console.error("Profile fetch error:", error);
@@ -58,16 +74,33 @@ export async function updateSession(
 
       const onboardingCompleted = profile?.onboarding_completed === true;
 
+      // Redirect flow:
+      // 1. Protected route (dashboard, etc.) → check onboarding
       if (isProtectedRoute && !onboardingCompleted) {
         return redirectToOnboarding(locale, request);
       }
 
+      // 2. Onboarding page → if completed, go to dashboard
       if (isOnboardingRoute && onboardingCompleted) {
         return redirectToDashboard(locale, request);
       }
 
-      if (isAuthRoute && onboardingCompleted) {
-        return redirectToDashboard(locale, request);
+      // 3. Login page → if completed, go to dashboard; if not, go to onboarding
+      if (isAuthRoute) {
+        if (onboardingCompleted) {
+          return redirectToDashboard(locale, request);
+        } else {
+          return redirectToOnboarding(locale, request);
+        }
+      }
+
+      // 4. Home page → if not completed, go to onboarding; if completed, go to dashboard
+      if (isHomePage) {
+        if (!onboardingCompleted) {
+          return redirectToOnboarding(locale, request);
+        } else {
+          return redirectToDashboard(locale, request);
+        }
       }
     } catch (err) {
       console.error("Middleware error:", err);

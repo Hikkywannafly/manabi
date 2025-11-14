@@ -123,7 +123,7 @@ export function OnboardingStepper({
       <Discovery
         isVisible={currentStep === 6}
         answers={answers}
-        onAnswer={(value) => handleAnswer("source", value)}
+        onAnswer={(value) => handleAnswer("sources", value)}
         onBack={handleBack}
         onComplete={handleComplete}
         onSkip={handleSkip}

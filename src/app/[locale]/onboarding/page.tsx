@@ -32,12 +32,16 @@ export default function GettingStartedPage() {
   }, []);
 
   const handleComplete = useCallback(
-    async (answers: Record<string, string>) => {
+    async (finalAnswers: Record<string, string>) => {
       try {
+        const nickname = finalAnswers.nickname?.trim() || "";
+
+        const { nickname: _, ...otherAnswers } = finalAnswers;
+
         const result = await completeOnboarding({
-          nickname: answers.nickname?.trim() || "",
+          nickname,
           full_name: user?.user_metadata?.full_name,
-          answers,
+          answers: otherAnswers,
         });
 
         if (result.error) {
@@ -45,6 +49,7 @@ export default function GettingStartedPage() {
           return;
         }
 
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         handleNavigate("Welcome to Manabi! Let's get started.");
       } catch (error) {
         console.error("Error completing onboarding:", error);

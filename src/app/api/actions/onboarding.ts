@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import type { Profile } from "@/db/profile";
 import { createClient } from "@/lib/supabase/server";
+import type { Profile } from "@/types/db/profile";
 
 export interface OnboardingData {
   nickname: string;
@@ -41,7 +41,9 @@ export async function completeOnboarding(data: OnboardingData) {
       return { error: authError.message };
     }
 
-    // 2. Upsert profile
+    const onboardingAnswers = { ...data.answers };
+    delete onboardingAnswers.nickname;
+
     const profileData: Partial<Profile> = {
       id: user.id,
       nickname: nickname,
@@ -62,7 +64,7 @@ export async function completeOnboarding(data: OnboardingData) {
       total_following: 0,
       updated_at: new Date().toISOString(),
       metadata: {
-        onboarding_answers: data.answers,
+        onboarding_answers: onboardingAnswers,
       },
     };
 
@@ -73,8 +75,12 @@ export async function completeOnboarding(data: OnboardingData) {
       .single();
 
     if (profileError) {
-      console.error("Profile update error:", profileError);
-      return { error: profileError.message };
+      console.error("Profile upsert error:", profileError);
+      return { error: `Failed to save profile: ${profileError.message}` };
+    }
+
+    if (!profile) {
+      return { error: "Failed to retrieve profile after creation" };
     }
 
     revalidatePath("/", "layout");
@@ -127,8 +133,12 @@ export async function skipOnboarding() {
       .single();
 
     if (profileError) {
-      console.error("Profile update error:", profileError);
-      return { error: profileError.message };
+      console.error("Profile upsert error:", profileError);
+      return { error: `Failed to save profile: ${profileError.message}` };
+    }
+
+    if (!profile) {
+      return { error: "Failed to retrieve profile after creation" };
     }
 
     revalidatePath("/", "layout");

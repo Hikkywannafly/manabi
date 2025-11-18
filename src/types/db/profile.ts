@@ -98,6 +98,7 @@ export const ProfileSchema = z.object({
   total_following: z.number().int().min(0),
 
   // Timestamps
+  created_at: datetimeString(),
   updated_at: datetimeString(),
 
   // Metadata

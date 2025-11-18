@@ -8,7 +8,6 @@ import {
   skipOnboarding,
 } from "@/app/api/actions/onboarding";
 import { OnboardingStepper } from "@/components/onboarding";
-import { TIMING } from "@/constants/timing";
 import { useAuth } from "@/contexts/auth-provider";
 
 export default function GettingStartedPage() {
@@ -17,14 +16,6 @@ export default function GettingStartedPage() {
 
   const googleName =
     user?.user_metadata?.name || user?.email?.split("@")[0] || "";
-
-  const handleNavigate = useCallback(
-    (message: string) => {
-      toast.success(message);
-      router.push("/dashboard");
-    },
-    [router],
-  );
 
   const handleError = useCallback((error: string, title: string) => {
     toast.error(title, {
@@ -41,7 +32,7 @@ export default function GettingStartedPage() {
 
         const result = await completeOnboarding({
           nickname,
-          full_name: user?.user_metadata?.full_name,
+          full_name: user?.user_metadata?.full_name || googleName,
           answers: otherAnswers,
         });
 
@@ -50,17 +41,12 @@ export default function GettingStartedPage() {
           return;
         }
 
-        // Refresh profile state để middleware có thể check onboarding_completed
-        await refreshProfile();
+        // Show success message immediately
+        toast.success("Welcome to Manabi! Let's get started.");
 
-        // Force router refresh để middleware re-run
-        router.refresh();
-
-        // Small delay để đảm bảo state đã update (database replication)
-        await new Promise((resolve) =>
-          setTimeout(resolve, TIMING.PROFILE_REFRESH_DELAY),
-        );
-        handleNavigate("Welcome to Manabi! Let's get started.");
+        // Refresh profile in background and navigate immediately
+        refreshProfile();
+        router.push("/dashboard");
       } catch (error) {
         console.error("Error completing onboarding:", error);
         handleError("", "Something went wrong");
@@ -68,10 +54,10 @@ export default function GettingStartedPage() {
     },
     [
       user?.user_metadata?.full_name,
+      googleName,
       handleError,
-      handleNavigate,
-      refreshProfile,
       router,
+      refreshProfile,
     ],
   );
 
@@ -84,19 +70,17 @@ export default function GettingStartedPage() {
         return;
       }
 
-      // Refresh profile state
-      await refreshProfile();
-      router.refresh();
+      // Show success message immediately
+      toast.success("Skipping onboarding...");
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, TIMING.PROFILE_REFRESH_DELAY),
-      );
-      handleNavigate("Skipping onboarding...");
+      // Refresh profile in background and navigate immediately
+      refreshProfile();
+      router.push("/dashboard");
     } catch (error) {
       console.error("Error skipping onboarding:", error);
       handleError("", "Something went wrong");
     }
-  }, [handleError, handleNavigate, refreshProfile, router]);
+  }, [handleError, refreshProfile, router]);
 
   return (
     <OnboardingStepper

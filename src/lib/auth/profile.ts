@@ -41,6 +41,11 @@ export async function fetchProfile(
       throw new Error(profileError.message);
     }
 
+    // Return null if no profile exists (e.g., during onboarding)
+    if (!profileData) {
+      return null;
+    }
+
     // Validate with Zod schema
     const validated = PartialProfileSchema.safeParse(profileData);
     if (validated.success) {
@@ -52,6 +57,10 @@ export async function fetchProfile(
   } catch (err) {
     // Don't throw abort errors, just return null
     if (err instanceof Error && err.name === "AbortError") {
+      return null;
+    }
+    // Handle abort errors from Supabase
+    if (err instanceof Error && err.message?.includes("AbortError")) {
       return null;
     }
     throw err;

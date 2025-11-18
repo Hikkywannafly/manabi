@@ -55,20 +55,13 @@ export async function updateSession(
         user.id,
       );
 
+      // Profile should always exist due to trigger, but handle error gracefully
       if (error) {
-        // Profile not found - new user without onboarding yet
-        if (error.code === "PGRST116") {
-          // Allow access to onboarding page for new users
-          if (isOnboardingRoute) {
-            return response;
-          }
-          // Redirect to onboarding if trying to access protected/home/login pages
-          if (isProtectedRoute || isHomePage || isAuthRoute) {
-            return redirectToOnboarding(locale, request);
-          }
-          return response;
-        }
         console.error("Profile fetch error:", error);
+        // If profile doesn't exist (shouldn't happen), redirect to onboarding
+        if (error.code === "PGRST116" && !isOnboardingRoute) {
+          return redirectToOnboarding(locale, request);
+        }
         return response;
       }
 

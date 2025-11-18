@@ -21,10 +21,10 @@ export async function completeOnboarding(data: OnboardingData) {
     return { error: "Unauthorized" };
   }
 
-  // Validate nickname
-  const nickname = data.nickname?.trim();
+  // Use nickname or fallback to full_name
+  const nickname = data.nickname?.trim() || data.full_name?.trim();
   if (!nickname) {
-    return { error: "Please enter a nickname" };
+    return { error: "Please enter a nickname or use your Google name" };
   }
 
   try {

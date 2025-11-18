@@ -116,11 +116,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
               initialSession.user.id,
               abortController.signal,
             );
-            if (!abortController.signal.aborted) {
+            if (!abortController.signal.aborted && profileData !== null) {
               dispatch({ type: "SET_PROFILE", payload: profileData });
             }
           } catch (err) {
             if (!abortController.signal.aborted) {
+              console.error("Error fetching initial profile:", err);
               dispatch({
                 type: "SET_ERROR",
                 payload: err instanceof Error ? err : new Error(String(err)),
@@ -144,13 +145,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     initializeAuth();
-    return () => abortController.abort();
+    return () => {
+      abortController.abort();
+    };
   }, [supabase]);
 
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
+    } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       dispatch({
         type: "SET_SESSION",
         payload: {
@@ -158,21 +161,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
           user: currentSession?.user ?? null,
         },
       });
-
-      if (currentSession?.user) {
+      if (
+        currentSession?.user &&
+        (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")
+      ) {
         try {
           const profileData = await fetchProfile(
             supabase,
             currentSession.user.id,
           );
-          dispatch({ type: "SET_PROFILE", payload: profileData });
+          if (profileData !== null) {
+            dispatch({ type: "SET_PROFILE", payload: profileData });
+          }
         } catch (err) {
-          dispatch({
-            type: "SET_ERROR",
-            payload: err instanceof Error ? err : new Error(String(err)),
-          });
+          if (err instanceof Error && !err.message?.includes("AbortError")) {
+            console.error("Error fetching profile on auth change:", err);
+            dispatch({
+              type: "SET_ERROR",
+              payload: err,
+            });
+          }
         }
-      } else {
+      } else if (!currentSession?.user) {
         dispatch({ type: "SET_PROFILE", payload: null });
       }
 
@@ -202,12 +212,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       const profileData = await fetchProfile(supabase, state.user.id);
-      dispatch({ type: "SET_PROFILE", payload: profileData });
+      if (profileData !== null) {
+        dispatch({ type: "SET_PROFILE", payload: profileData });
+      }
     } catch (err) {
-      dispatch({
-        type: "SET_ERROR",
-        payload: err instanceof Error ? err : new Error(String(err)),
-      });
+      // Only dispatch error if it's not an abort error
+      if (err instanceof Error && !err.message?.includes("AbortError")) {
+        dispatch({
+          type: "SET_ERROR",
+          payload: err,
+        });
+      }
     }
   }, [supabase, state.user?.id]);
 

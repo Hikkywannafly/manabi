@@ -44,25 +44,12 @@ export async function completeOnboarding(data: OnboardingData) {
     const onboardingAnswers = { ...data.answers };
     delete onboardingAnswers.nickname;
 
-    const profileData: Partial<Profile> = {
-      id: user.id,
+    // 2. Update profile (profile already exists from trigger)
+    const profileUpdates: Partial<Profile> = {
       nickname: nickname,
       full_name: data.full_name,
-      avatar_url: user.user_metadata?.avatar_url || undefined,
       onboarding_completed: true,
       onboarding_completed_at: new Date().toISOString(),
-      status: "active",
-      account_type: "free",
-      language: "en",
-      timezone: "UTC",
-      theme: "light",
-      is_public: true,
-      allow_messages: true,
-      show_email: false,
-      total_posts: 0,
-      total_followers: 0,
-      total_following: 0,
-      updated_at: new Date().toISOString(),
       metadata: {
         onboarding_answers: onboardingAnswers,
       },
@@ -70,17 +57,18 @@ export async function completeOnboarding(data: OnboardingData) {
 
     const { error: profileError, data: profile } = await supabase
       .from("profiles")
-      .upsert(profileData, { onConflict: "id" })
+      .update(profileUpdates)
+      .eq("id", user.id)
       .select()
       .single();
 
     if (profileError) {
-      console.error("Profile upsert error:", profileError);
-      return { error: `Failed to save profile: ${profileError.message}` };
+      console.error("Profile update error:", profileError);
+      return { error: `Failed to update profile: ${profileError.message}` };
     }
 
     if (!profile) {
-      return { error: "Failed to retrieve profile after creation" };
+      return { error: "Failed to retrieve profile after update" };
     }
 
     revalidatePath("/", "layout");
@@ -103,42 +91,26 @@ export async function skipOnboarding() {
   }
 
   try {
-    const nickname =
-      user.user_metadata?.name || user.email?.split("@")[0] || "User";
-
-    const profileData: Partial<Profile> = {
-      id: user.id,
-      nickname: nickname,
-      avatar_url: user.user_metadata?.avatar_url || undefined,
+    // Profile already exists from trigger, just mark onboarding as completed
+    const profileUpdates: Partial<Profile> = {
       onboarding_completed: true,
       onboarding_completed_at: new Date().toISOString(),
-      status: "active",
-      account_type: "free",
-      language: "en",
-      timezone: "UTC",
-      theme: "light",
-      is_public: true,
-      allow_messages: true,
-      show_email: false,
-      total_posts: 0,
-      total_followers: 0,
-      total_following: 0,
-      updated_at: new Date().toISOString(),
     };
 
     const { error: profileError, data: profile } = await supabase
       .from("profiles")
-      .upsert(profileData, { onConflict: "id" })
+      .update(profileUpdates)
+      .eq("id", user.id)
       .select()
       .single();
 
     if (profileError) {
-      console.error("Profile upsert error:", profileError);
-      return { error: `Failed to save profile: ${profileError.message}` };
+      console.error("Profile update error:", profileError);
+      return { error: `Failed to update profile: ${profileError.message}` };
     }
 
     if (!profile) {
-      return { error: "Failed to retrieve profile after creation" };
+      return { error: "Failed to retrieve profile after update" };
     }
 
     revalidatePath("/", "layout");

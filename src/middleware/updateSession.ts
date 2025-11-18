@@ -16,17 +16,17 @@ export async function updateSession(
   if (!supabase) return response;
 
   const pathname = request.nextUrl.pathname;
+  const locale = extractLocale(pathname);
+  const pathnameWithoutLocale = removeLocaleFromPath(pathname);
 
-  if (pathname.startsWith("/api/")) {
+  // Skip middleware for API routes (check after removing locale)
+  if (pathnameWithoutLocale.startsWith("/api/")) {
     return response;
   }
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const locale = extractLocale(pathname);
-  const pathnameWithoutLocale = removeLocaleFromPath(pathname);
 
   const isProtectedRoute = checkRouteType(
     pathnameWithoutLocale,

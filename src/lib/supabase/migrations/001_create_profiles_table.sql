@@ -59,25 +59,24 @@ CREATE INDEX IF NOT EXISTS profiles_created_at_idx ON public.profiles(onboarding
 CREATE INDEX IF NOT EXISTS profiles_is_public_idx ON public.profiles(is_public);
 
 -- RLS Policies
--- Policy: Users can view their own profile
+-- Policy: Users can view own profile OR public profiles (merged for performance)
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
-CREATE POLICY "Users can view own profile" ON public.profiles
-  FOR SELECT USING (auth.uid() = id);
-
--- Policy: Public profiles visible to all
 DROP POLICY IF EXISTS "Public profiles visible to all" ON public.profiles;
-CREATE POLICY "Public profiles visible to all" ON public.profiles
-  FOR SELECT USING (is_public = TRUE);
+DROP POLICY IF EXISTS "Profiles are viewable by owner or if public" ON public.profiles;
+CREATE POLICY "Profiles are viewable by owner or if public" ON public.profiles
+  FOR SELECT USING (
+    (select auth.uid()) = id OR is_public = TRUE
+  );
 
 -- Policy: Users can update their own profile
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles
-  FOR UPDATE USING (auth.uid() = id);
+  FOR UPDATE USING ((select auth.uid()) = id);
 
 -- Policy: Users can insert their own profile
 DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 CREATE POLICY "Users can insert own profile" ON public.profiles
-  FOR INSERT WITH CHECK (auth.uid() = id);
+  FOR INSERT WITH CHECK ((select auth.uid()) = id);
 
 -- Trigger: Auto update updated_at
 CREATE OR REPLACE FUNCTION update_profiles_updated_at()

@@ -3,161 +3,258 @@
 import type { Session, User } from "@supabase/supabase-js";
 import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useReducer,
 } from "react";
-import { createClient } from "@/lib/supabase/client";
-import type { Profile } from "@/types/db/profile";
+import { fetchProfile } from "@/lib/auth/profile";
+import { getSupabaseClient } from "@/lib/supabase/client-singleton";
+import type { PartialProfile } from "@/types/db/profile";
 
-type AuthContextType = {
+/**
+ * Auth state shape
+ */
+export type AuthState = {
   user: User | null;
   session: Session | null;
-  profile: Profile | null;
+  profile: PartialProfile | null;
   isLoading: boolean;
+  error: Error | null;
+};
+
+/**
+ * Public context API
+ */
+export type AuthContextType = AuthState & {
   isOnboardingCompleted: boolean;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
+
+/**
+ * Reducer actions
+ */
+type AuthAction =
+  | {
+      type: "SET_SESSION";
+      payload: { session: Session | null; user: User | null };
+    }
+  | { type: "SET_PROFILE"; payload: PartialProfile | null }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_ERROR"; payload: Error | null }
+  | { type: "RESET" };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 type AuthProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
+const initialState: AuthState = {
+  user: null,
+  session: null,
+  profile: null,
+  isLoading: true,
+  error: null,
+};
+
+function authReducer(state: AuthState, action: AuthAction): AuthState {
+  switch (action.type) {
+    case "SET_SESSION":
+      return {
+        ...state,
+        session: action.payload.session,
+        user: action.payload.user,
+      };
+    case "SET_PROFILE":
+      return {
+        ...state,
+        profile: action.payload,
+        error: null,
+      };
+    case "SET_LOADING":
+      return {
+        ...state,
+        isLoading: action.payload,
+      };
+    case "SET_ERROR":
+      return {
+        ...state,
+        error: action.payload,
+      };
+    case "RESET":
+      return {
+        ...initialState,
+        isLoading: false,
+      };
+    default:
+      return state;
+  }
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [state, dispatch] = useReducer(authReducer, initialState);
+  const supabase = useMemo(() => getSupabaseClient(), []);
 
-  const supabase = useMemo(() => createClient(), []);
-
-  // Initialize auth state
   useEffect(() => {
+    const abortController = new AbortController();
+
     const initializeAuth = async () => {
       try {
         const {
           data: { session: initialSession },
         } = await supabase.auth.getSession();
 
-        setSession(initialSession);
-        setUser(initialSession?.user ?? null);
+        if (abortController.signal.aborted) return;
 
-        // Only fetch profile fields we need (skip full select)
+        dispatch({
+          type: "SET_SESSION",
+          payload: {
+            session: initialSession,
+            user: initialSession?.user ?? null,
+          },
+        });
+
         if (initialSession?.user) {
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("id, nickname, avatar_url, onboarding_completed, status")
-            .eq("id", initialSession.user.id)
-            .single();
-
-          setProfile((profileData as Profile) || null);
+          try {
+            const profileData = await fetchProfile(
+              supabase,
+              initialSession.user.id,
+              abortController.signal,
+            );
+            if (!abortController.signal.aborted) {
+              dispatch({ type: "SET_PROFILE", payload: profileData });
+            }
+          } catch (err) {
+            if (!abortController.signal.aborted) {
+              dispatch({
+                type: "SET_ERROR",
+                payload: err instanceof Error ? err : new Error(String(err)),
+              });
+            }
+          }
         }
       } catch (error) {
-        console.error("Error initializing auth:", error);
+        if (!abortController.signal.aborted) {
+          console.error("Error initializing auth:", error);
+          dispatch({
+            type: "SET_ERROR",
+            payload: error instanceof Error ? error : new Error(String(error)),
+          });
+        }
       } finally {
-        setIsLoading(false);
+        if (!abortController.signal.aborted) {
+          dispatch({ type: "SET_LOADING", payload: false });
+        }
       }
     };
 
     initializeAuth();
+    return () => abortController.abort();
   }, [supabase]);
 
-  // Listen for auth changes
   useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
+      dispatch({
+        type: "SET_SESSION",
+        payload: {
+          session: currentSession,
+          user: currentSession?.user ?? null,
+        },
+      });
 
-      // Fetch profile if user exists
       if (currentSession?.user) {
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("id, nickname, avatar_url, onboarding_completed, status")
-          .eq("id", currentSession.user.id)
-          .single();
-
-        setProfile((profileData as Profile) || null);
+        try {
+          const profileData = await fetchProfile(
+            supabase,
+            currentSession.user.id,
+          );
+          dispatch({ type: "SET_PROFILE", payload: profileData });
+        } catch (err) {
+          dispatch({
+            type: "SET_ERROR",
+            payload: err instanceof Error ? err : new Error(String(err)),
+          });
+        }
       } else {
-        setProfile(null);
+        dispatch({ type: "SET_PROFILE", payload: null });
       }
 
-      setIsLoading(false);
+      dispatch({ type: "SET_LOADING", payload: false });
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, [supabase]);
 
   const handleSignOut = useCallback(async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-
-      setUser(null);
-      setSession(null);
-      setProfile(null);
+      dispatch({ type: "RESET" });
     } catch (error) {
       console.error("Error signing out:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload: error instanceof Error ? error : new Error(String(error)),
+      });
       throw error;
     }
   }, [supabase]);
 
-  const isOnboardingCompleted = profile?.onboarding_completed === true;
+  const refreshProfile = useCallback(async () => {
+    if (!state.user?.id) return;
+
+    try {
+      const profileData = await fetchProfile(supabase, state.user.id);
+      dispatch({ type: "SET_PROFILE", payload: profileData });
+    } catch (err) {
+      dispatch({
+        type: "SET_ERROR",
+        payload: err instanceof Error ? err : new Error(String(err)),
+      });
+    }
+  }, [supabase, state.user?.id]);
 
   const value = useMemo(
     () => ({
-      user,
-      session,
-      profile,
-      isLoading,
-      isOnboardingCompleted,
+      ...state,
+      isOnboardingCompleted: state.profile?.onboarding_completed === true,
       signOut: handleSignOut,
+      refreshProfile,
     }),
-    [user, session, profile, isLoading, isOnboardingCompleted, handleSignOut],
+    [state, handleSignOut, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-/**
- * Hook to access auth context
- * Must be used within AuthProvider
- */
-export function useAuth() {
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
-
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth must be used within AuthProvider");
   }
-
   return context;
 }
 
-/**
- * Hook to require authentication
- * Throws error if user is not authenticated
- */
 export function useRequireAuth() {
   const { user, isLoading } = useAuth();
 
-  if (isLoading || user) {
-    return { user, isLoading };
+  if (isLoading) {
+    return { user: null, isLoading: true };
   }
 
-  throw new Error("Authentication required");
+  if (!user) {
+    throw new Error("Authentication required");
+  }
+
+  return { user, isLoading: false };
 }
 
-/**
- * Hook to access user data
- * Returns the current user or null
- */
 export function useUser() {
   const { user, profile } = useAuth();
   return { user, profile };

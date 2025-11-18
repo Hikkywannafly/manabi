@@ -8,11 +8,12 @@ import {
   skipOnboarding,
 } from "@/app/api/actions/onboarding";
 import { OnboardingStepper } from "@/components/onboarding";
+import { TIMING } from "@/constants/timing";
 import { useAuth } from "@/contexts/auth-provider";
 
 export default function GettingStartedPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
 
   const googleName =
     user?.user_metadata?.name || user?.email?.split("@")[0] || "";
@@ -49,14 +50,29 @@ export default function GettingStartedPage() {
           return;
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Refresh profile state để middleware có thể check onboarding_completed
+        await refreshProfile();
+
+        // Force router refresh để middleware re-run
+        router.refresh();
+
+        // Small delay để đảm bảo state đã update (database replication)
+        await new Promise((resolve) =>
+          setTimeout(resolve, TIMING.PROFILE_REFRESH_DELAY),
+        );
         handleNavigate("Welcome to Manabi! Let's get started.");
       } catch (error) {
         console.error("Error completing onboarding:", error);
         handleError("", "Something went wrong");
       }
     },
-    [user?.user_metadata?.full_name, handleError, handleNavigate],
+    [
+      user?.user_metadata?.full_name,
+      handleError,
+      handleNavigate,
+      refreshProfile,
+      router,
+    ],
   );
 
   const handleSkip = useCallback(async () => {
@@ -67,12 +83,20 @@ export default function GettingStartedPage() {
         handleError(result.error, "Oops!");
         return;
       }
+
+      // Refresh profile state
+      await refreshProfile();
+      router.refresh();
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, TIMING.PROFILE_REFRESH_DELAY),
+      );
       handleNavigate("Skipping onboarding...");
     } catch (error) {
       console.error("Error skipping onboarding:", error);
       handleError("", "Something went wrong");
     }
-  }, [handleError, handleNavigate]);
+  }, [handleError, handleNavigate, refreshProfile, router]);
 
   return (
     <OnboardingStepper

@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/auth-provider";
 
 export default function GettingStartedPage() {
   const router = useRouter();
-  const { user, refreshProfile } = useAuth();
+  const { user } = useAuth();
 
   const googleName =
     user?.user_metadata?.name || user?.email?.split("@")[0] || "";
@@ -41,24 +41,14 @@ export default function GettingStartedPage() {
           return;
         }
 
-        // Show success message immediately
         toast.success("Welcome to Manabi! Let's get started.");
-
-        // Refresh profile in background and navigate immediately
-        refreshProfile();
         router.push("/dashboard");
       } catch (error) {
         console.error("Error completing onboarding:", error);
         handleError("", "Something went wrong");
       }
     },
-    [
-      user?.user_metadata?.full_name,
-      googleName,
-      handleError,
-      router,
-      refreshProfile,
-    ],
+    [user?.user_metadata?.full_name, googleName, handleError, router],
   );
 
   const handleSkip = useCallback(async () => {
@@ -70,17 +60,13 @@ export default function GettingStartedPage() {
         return;
       }
 
-      // Show success message immediately
       toast.success("Skipping onboarding...");
-
-      // Refresh profile in background and navigate immediately
-      refreshProfile();
       router.push("/dashboard");
     } catch (error) {
       console.error("Error skipping onboarding:", error);
       handleError("", "Something went wrong");
     }
-  }, [handleError, refreshProfile, router]);
+  }, [handleError, router]);
 
   return (
     <OnboardingStepper

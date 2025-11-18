@@ -161,10 +161,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           user: currentSession?.user ?? null,
         },
       });
-      if (
-        currentSession?.user &&
-        (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")
-      ) {
+      // Only fetch profile on SIGNED_IN (profile auto-created by trigger)
+      // TOKEN_REFRESHED doesn't need profile refetch
+      if (currentSession?.user && event === "SIGNED_IN") {
         try {
           const profileData = await fetchProfile(
             supabase,

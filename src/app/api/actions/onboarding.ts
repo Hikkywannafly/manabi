@@ -28,23 +28,10 @@ export async function completeOnboarding(data: OnboardingData) {
   }
 
   try {
-    // 1. Update user metadata
-    const { error: authError } = await supabase.auth.updateUser({
-      data: {
-        nickname: nickname,
-        full_name: data.full_name,
-      },
-    });
-
-    if (authError) {
-      console.error("Auth update error:", authError);
-      return { error: authError.message };
-    }
-
     const onboardingAnswers = { ...data.answers };
     delete onboardingAnswers.nickname;
 
-    // 2. Update profile (profile already exists from trigger)
+    // Update profile (profile already exists from trigger)
     const profileUpdates: Partial<Profile> = {
       nickname: nickname,
       full_name: data.full_name,
@@ -133,12 +120,10 @@ export async function updateProfile(profileUpdates: Partial<Profile>) {
   }
 
   try {
+    // updated_at is automatically handled by database trigger
     const { error, data: profile } = await supabase
       .from("profiles")
-      .update({
-        ...profileUpdates,
-        updated_at: new Date().toISOString(),
-      })
+      .update(profileUpdates)
       .eq("id", user.id)
       .select()
       .single();

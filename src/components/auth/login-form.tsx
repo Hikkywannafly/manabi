@@ -2,7 +2,7 @@
 
 import { Github, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { signInWithOAuth } from "@/app/api/auth/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,25 +12,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAuthAction } from "@/hooks/use-auth-action";
 
 export function LoginForm() {
   const t = useTranslations("login");
-  const [isPending, startTransition] = useTransition();
+  const { execute, isPending, error } = useAuthAction();
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const handleOAuthLogin = async (provider: "google" | "github") => {
     setLoadingProvider(provider);
-    setError(null);
 
-    startTransition(async () => {
-      const result = await signInWithOAuth(provider);
-
-      if (result?.error) {
-        setError(result.error);
-        setLoadingProvider(null);
-      }
-    });
+    await execute(() => signInWithOAuth(provider));
+    setLoadingProvider(null);
   };
 
   const isLoading = isPending || loadingProvider !== null;

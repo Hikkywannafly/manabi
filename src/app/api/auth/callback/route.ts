@@ -19,7 +19,8 @@ export async function GET(request: Request) {
 
     if (!error) {
       // Middleware will handle routing based on onboarding status
-      return NextResponse.redirect(new URL(next, requestUrl.origin));
+      // Use 303 for POST-Redirect-GET pattern
+      return NextResponse.redirect(new URL(next, requestUrl.origin), 303);
     }
 
     console.error("Auth callback error:", error);
@@ -29,9 +30,10 @@ export async function GET(request: Request) {
         `/login?error=${encodeURIComponent(error.message)}`,
         requestUrl.origin,
       ),
+      303,
     );
   }
 
   // Middleware will add locale automatically
-  return NextResponse.redirect(new URL("/login", requestUrl.origin));
+  return NextResponse.redirect(new URL("/login", requestUrl.origin), 303);
 }

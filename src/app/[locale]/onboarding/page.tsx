@@ -67,7 +67,6 @@ export default function GettingStartedPage() {
         handleError(result.error, "Oops!");
         return;
       }
-
       handleNavigate("Skipping onboarding...");
     } catch (error) {
       console.error("Error skipping onboarding:", error);

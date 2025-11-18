@@ -41,7 +41,7 @@ export async function fetchProfile(
       throw new Error(profileError.message);
     }
 
-    // Return null if no profile exists (e.g., during onboarding)
+    // Return null if no profile exists (shouldn't happen with auto-create trigger)
     if (!profileData) {
       return null;
     }

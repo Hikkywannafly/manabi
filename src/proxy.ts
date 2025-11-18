@@ -19,8 +19,6 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Exclude static files and images from middleware
-  // API routes are handled but return early in updateSession.ts
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff|woff2|ttf|eot)$).*)",
   ],

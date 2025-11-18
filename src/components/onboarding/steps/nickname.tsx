@@ -45,12 +45,18 @@ export function Nickname({
             <Input
               id="nickname"
               type="text"
-              placeholder={googleName}
-              value={nickname || googleName}
+              placeholder={googleName || "Enter your nickname"}
+              value={nickname}
               onChange={(e) => onNicknameChange(e.target.value)}
               disabled={loading}
               variant="outline"
             />
+            {googleName && !nickname && (
+              <p className="text-muted-foreground text-sm">
+                Leave empty to use your Google name:{" "}
+                <strong>{googleName}</strong>
+              </p>
+            )}
           </div>
         </div>
       </StepLayout>

@@ -14,9 +14,6 @@ import { fetchProfile } from "@/lib/auth/profile";
 import { getSupabaseClient } from "@/lib/supabase/client-singleton";
 import type { PartialProfile } from "@/types/db/profile";
 
-/**
- * Auth state shape
- */
 export type AuthState = {
   user: User | null;
   session: Session | null;
@@ -25,18 +22,12 @@ export type AuthState = {
   error: Error | null;
 };
 
-/**
- * Public context API
- */
 export type AuthContextType = AuthState & {
   isOnboardingCompleted: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
 
-/**
- * Reducer actions
- */
 type AuthAction =
   | {
       type: "SET_SESSION";

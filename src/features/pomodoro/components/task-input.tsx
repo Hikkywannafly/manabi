@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronDown, Flag } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,6 +9,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useTaskInput } from "../hooks";
 import { TASK_TAGS } from "../types";
 
 interface TaskInputProps {
@@ -17,9 +17,8 @@ interface TaskInputProps {
 }
 
 export function TaskInput({ className }: TaskInputProps) {
-  const [task, setTask] = useState("");
-  const [selectedTag, setSelectedTag] = useState(TASK_TAGS[0]);
-  const [isOpen, setIsOpen] = useState(false);
+  const { task, selectedTag, isOpen, setTask, setSelectedTag, setIsOpen } =
+    useTaskInput();
 
   return (
     <div className={cn("flex flex-col items-center gap-3", className)}>

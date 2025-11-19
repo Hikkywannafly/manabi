@@ -4,7 +4,6 @@ import { Clock, Image, Maximize, Music } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-// import { FloatingLogoToggle } from "@/features/pomodoro/components/floating-logo-toggle";
 import { PomodoroTimer } from "@/features/pomodoro/components/pomodoro-timer";
 import { StatsButton } from "@/features/pomodoro/components/stats-button";
 import { TaskInput } from "@/features/pomodoro/components/task-input";
@@ -36,7 +35,7 @@ export default function PomodoroPage() {
     <div
       className={cn(
         "relative flex min-h-screen flex-col overflow-hidden",
-        "bg-gradient-to-br transition-all duration-700",
+        "bg-linear-to-br transition-all duration-700",
         getModeGradient(mode),
       )}
     >

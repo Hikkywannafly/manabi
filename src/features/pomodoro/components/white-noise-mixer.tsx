@@ -11,8 +11,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { WHITE_NOISE_PRESETS } from "../constants";
-import type { WhiteNoisePreset } from "../types";
+import { useWhiteNoise } from "../hooks";
 
 interface WhiteNoiseMixerProps {
   className?: string;
@@ -20,18 +19,13 @@ interface WhiteNoiseMixerProps {
 
 export function WhiteNoiseMixer({ className }: WhiteNoiseMixerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMasterOn, setIsMasterOn] = useState(false);
-  const [sounds, setSounds] = useState<WhiteNoisePreset[]>(WHITE_NOISE_PRESETS);
-
-  const handleVolumeChange = (id: string, volume: number) => {
-    setSounds((prev) =>
-      prev.map((sound) =>
-        sound.id === id ? { ...sound, volume, isActive: volume > 0 } : sound,
-      ),
-    );
-  };
-
-  const activeSoundsCount = sounds.filter((s) => s.isActive).length;
+  const {
+    isMasterOn,
+    sounds,
+    activeSoundsCount,
+    handleVolumeChange,
+    setIsMasterOn,
+  } = useWhiteNoise();
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>

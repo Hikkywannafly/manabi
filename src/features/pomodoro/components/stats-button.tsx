@@ -8,12 +8,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useTimerStats } from "../hooks";
 
 interface StatsButtonProps {
   className?: string;
 }
 
 export function StatsButton({ className }: StatsButtonProps) {
+  const { stats, formatFocusTime } = useTimerStats();
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -38,17 +41,19 @@ export function StatsButton({ className }: StatsButtonProps) {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/70">Focus Time</span>
-              <span className="font-bold">0h 0m</span>
+              <span className="font-bold">
+                {formatFocusTime(stats.focusTime)}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/70">Completed Sessions</span>
-              <span className="font-bold">0</span>
+              <span className="font-bold">{stats.completedSessions}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/70">Current Streak</span>
               <div className="flex items-center gap-1">
                 <span className="text-lg">🔥</span>
-                <span className="font-bold">0 days</span>
+                <span className="font-bold">{stats.currentStreak} days</span>
               </div>
             </div>
           </div>

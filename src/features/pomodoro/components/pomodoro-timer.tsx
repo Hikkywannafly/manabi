@@ -1,68 +1,25 @@
 "use client";
 
 import { Settings, SkipForward } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { TimerMode, TimerState } from "../types";
+import { usePomodoroTimer } from "../hooks";
 
 interface PomodoroTimerProps {
   className?: string;
 }
 
 export function PomodoroTimer({ className }: PomodoroTimerProps) {
-  const [mode, setMode] = useState<TimerMode>("focus");
-  const [state, setState] = useState<TimerState>("idle");
-  const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes in seconds
-  const [sessionCount] = useState(1);
-
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
-
-  const getModeConfig = (m: TimerMode) => {
-    switch (m) {
-      case "focus":
-        return {
-          label: "Focus",
-          duration: 25 * 60,
-          gradient: "from-violet-500 via-purple-500 to-indigo-600",
-        };
-      case "shortBreak":
-        return {
-          label: "Short Break",
-          duration: 5 * 60,
-          gradient: "from-emerald-400 via-teal-500 to-cyan-600",
-        };
-      case "longBreak":
-        return {
-          label: "Long Break",
-          duration: 15 * 60,
-          gradient: "from-pink-400 via-rose-500 to-red-500",
-        };
-    }
-  };
-
-  const handleStart = () => {
-    setState("running");
-    // Timer logic will be added via hook later
-  };
-
-  const handlePause = () => {
-    setState("paused");
-  };
-
-  // const handleReset = () => {
-  //   setState("idle");
-  //   setTimeLeft(getModeConfig(mode).duration);
-  // };
-
-  const handleModeChange = (newMode: TimerMode) => {
-    setMode(newMode);
-    setState("idle");
-    setTimeLeft(getModeConfig(newMode).duration);
-  };
-
-  // const currentConfig = getModeConfig(mode);
+  const {
+    mode,
+    state,
+    minutes,
+    seconds,
+    sessionCount,
+    start,
+    pause,
+    changeMode,
+  } = usePomodoroTimer();
 
   return (
     <div
@@ -72,7 +29,7 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
       <div className="flex items-center gap-4 sm:gap-6">
         <button
           type="button"
-          onClick={() => handleModeChange("focus")}
+          onClick={() => changeMode("focus")}
           className="group relative flex items-center justify-center transition-all duration-200"
           title="Focus"
         >
@@ -87,7 +44,7 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
         </button>
         <button
           type="button"
-          onClick={() => handleModeChange("shortBreak")}
+          onClick={() => changeMode("shortBreak")}
           className="group relative flex items-center justify-center transition-all duration-200"
           title="Short Break"
         >
@@ -102,7 +59,7 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
         </button>
         <button
           type="button"
-          onClick={() => handleModeChange("longBreak")}
+          onClick={() => changeMode("longBreak")}
           className="group relative flex items-center justify-center transition-all duration-200"
           title="Long Break"
         >
@@ -147,7 +104,7 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
 
         {/* Main Start/Pause Button */}
         <Button
-          onClick={state === "running" ? handlePause : handleStart}
+          onClick={state === "running" ? pause : start}
           className={cn(
             "h-14 w-36 rounded-full font-semibold text-lg transition-all duration-300 ease-out sm:h-16 sm:w-56 sm:text-xl",
             "bg-white text-black shadow-lg hover:scale-105 hover:bg-white/95 hover:shadow-xl",

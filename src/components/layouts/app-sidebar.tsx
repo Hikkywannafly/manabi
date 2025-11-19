@@ -17,6 +17,7 @@ import {
   navItems,
   studyToolsNavItems,
 } from "@/constants/data";
+import { cn } from "@/lib/utils";
 import { Logo } from "../logo";
 import { SidebarControlSettings } from "./sidebar-control-settings";
 import { SidebarNavGroup } from "./sidebar-nav-group";
@@ -30,7 +31,11 @@ export default function AppSidebar() {
         <Logo
           size="md"
           className="transition-[gap] duration-300 ease-in-out group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:gap-2"
-          textClassName="transition-[max-width,opacity] duration-300 ease-in-out group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:max-w-0 group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:inline-block group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:opacity-100 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:max-w-[200px]"
+          textClassName={cn(
+            "transition-[max-width,opacity] duration-300 ease-in-out",
+            "group-data-[collapsible=icon]:inline-block group-data-[collapsible=icon]:max-w-0 group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:opacity-0",
+            "group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:max-w-[200px] group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:opacity-100",
+          )}
         />
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden">

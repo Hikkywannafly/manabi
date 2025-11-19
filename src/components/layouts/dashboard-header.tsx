@@ -1,7 +1,6 @@
 "use client";
 
 import { IconBell, IconSearch } from "@tabler/icons-react";
-import { Menu } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
@@ -18,13 +17,11 @@ import { UserDropdown } from "./user-dropdown";
 
 export function DashboardHeader() {
   return (
-    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-border border-b bg-background/80 px-4 backdrop-blur-lg md:px-6">
+    <header className="flex h-16 w-full shrink-0 items-center justify-between border-border border-b bg-background px-4 md:px-6 lg:px-8">
       {/* Left Section: Sidebar Trigger + Search */}
       <div className="flex flex-1 items-center gap-4">
-        {/* Sidebar Trigger */}
-        <SidebarTrigger className="lg:hidden">
-          <Menu className="h-5 w-5" />
-        </SidebarTrigger>
+        {/* Sidebar Trigger - Only on mobile */}
+        <SidebarTrigger className="md:hidden" />
 
         {/* Search Bar */}
         <div className="w-full max-w-2xl">

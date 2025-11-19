@@ -235,7 +235,7 @@ function Sidebar({
       <div
         data-slot="sidebar-gap"
         className={cn(
-          "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-in-out",
+          "relative w-(--sidebar-width) bg-transparent transition-[width] duration-300 ease-in-out",
           "group-data-[collapsible=offcanvas]:w-0",
           "group-data-[side=right]:rotate-180",
           variant === "floating" || variant === "inset"
@@ -246,7 +246,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "group/sidebar-container fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-in-out md:flex",
+          "group/sidebar-container fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-300 ease-in-out md:flex",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -393,7 +393,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sidebar-content"
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:overflow-auto",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:overflow-y-auto group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:overflow-x-hidden",
         className,
       )}
       {...props}
@@ -424,9 +424,9 @@ function SidebarGroupLabel({
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
       className={cn(
-        "flex h-8 shrink-0 items-center rounded-md px-2 font-medium text-sidebar-foreground/70 text-xs outline-hidden ring-sidebar-ring transition-[margin,opacity] duration-200 ease-in-out focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
-        "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
-        "group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:mt-0 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:opacity-100",
+        "flex h-8 shrink-0 items-center rounded-md px-2 font-medium text-sidebar-foreground/70 text-xs outline-hidden ring-sidebar-ring transition-[margin,opacity] duration-300 ease-in-out focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "group-data-[collapsible=icon]:opacity-0",
+        "group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:opacity-100",
         className,
       )}
       {...props}
@@ -536,9 +536,9 @@ function SidebarMenuButton({
   const buttonClass = cn(
     sidebarMenuButtonVariants({ variant, size }),
     // Override size-8! when hovering sidebar
-    "group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:h-auto! group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:w-full! group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:p-2!",
+    "group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:w-full! group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:p-2!",
     // Handle text visibility (use [&>span] instead of [&>span:last-child] to handle cases with chevrons)
-    "[&>span]:transition-[max-width,opacity] [&>span]:duration-200 [&>span]:ease-in-out",
+    "[&>span]:transition-[max-width,opacity] [&>span]:duration-300 [&>span]:ease-in-out",
     "group-data-[collapsible=icon]:[&>span]:inline-block group-data-[collapsible=icon]:[&>span]:max-w-0 group-data-[collapsible=icon]:[&>span]:opacity-0",
     "group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:[&>span]:max-w-[200px] group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:[&>span]:opacity-100",
     // Handle chevron visibility (secondary icons)

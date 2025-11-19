@@ -26,11 +26,11 @@ export default function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>
+      <SidebarHeader className="group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0">
         <Logo
           size="md"
-          className="transition-[gap] duration-200 ease-in-out group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:gap-2"
-          textClassName="transition-[max-width,opacity] duration-200 ease-in-out group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:max-w-0 group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:inline-block group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:opacity-100 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:max-w-[200px]"
+          className="transition-[gap] duration-300 ease-in-out group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:gap-2"
+          textClassName="transition-[max-width,opacity] duration-300 ease-in-out group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:max-w-0 group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:inline-block group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:opacity-100 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:max-w-[200px]"
         />
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden">

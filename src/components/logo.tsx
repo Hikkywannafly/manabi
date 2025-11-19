@@ -5,10 +5,16 @@ import { cn } from "@/lib/utils";
 interface LogoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
+  textClassName?: string;
   showText?: boolean;
 }
 
-export function Logo({ size = "md", className, showText = true }: LogoProps) {
+export function Logo({
+  size = "md",
+  className,
+  textClassName,
+  showText = true,
+}: LogoProps) {
   const sizes = {
     sm: {
       container: "h-8 w-8",
@@ -33,7 +39,7 @@ export function Logo({ size = "md", className, showText = true }: LogoProps) {
     <Link href="/" className={cn("group flex items-center gap-2", className)}>
       <div
         className={cn(
-          "flex items-center justify-center rounded-lg bg-primary/10 transition-transform duration-300 group-hover:rotate-6",
+          "flex items-center justify-center rounded-lg bg-primary/10",
           currentSize.container,
         )}
       >
@@ -44,6 +50,7 @@ export function Logo({ size = "md", className, showText = true }: LogoProps) {
           className={cn(
             "font-bold text-foreground transition-colors group-hover:text-primary",
             currentSize.text,
+            textClassName,
           )}
         >
           Manabi

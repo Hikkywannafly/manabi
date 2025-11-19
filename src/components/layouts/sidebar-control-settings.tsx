@@ -1,7 +1,7 @@
 "use client";
 
 import { IconSettings } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,40 +15,54 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
 
-type SidebarMode = "expanded" | "collapsed" | "expand-on-hover";
+type SidebarMode = "mini" | "expanded" | "collapsed";
 
 const SIDEBAR_MODE_KEY = "sidebar_mode";
 
 export function SidebarControlSettings() {
-  const { setOpen } = useSidebar();
-  const [mode, setMode] = useState<SidebarMode>("expanded");
+  const { setOpen, setIsMini } = useSidebar();
+  const [mode, setMode] = useState<SidebarMode>("mini");
+
+  const applyMode = React.useCallback(
+    (newMode: SidebarMode) => {
+      switch (newMode) {
+        case "expanded":
+          setOpen(true);
+          setIsMini(false);
+          break;
+        case "collapsed":
+          setOpen(false);
+          setIsMini(false);
+          break;
+        case "mini":
+          setOpen(false);
+          setIsMini(true);
+          break;
+      }
+    },
+    [setOpen, setIsMini],
+  );
+
+  const handleModeChange = React.useCallback(
+    (newMode: SidebarMode) => {
+      setMode(newMode);
+      localStorage.setItem(SIDEBAR_MODE_KEY, newMode);
+      applyMode(newMode);
+    },
+    [applyMode],
+  );
 
   // Load saved mode from localStorage on mount
   useEffect(() => {
     const savedMode = localStorage.getItem(SIDEBAR_MODE_KEY) as SidebarMode;
     if (savedMode) {
       setMode(savedMode);
-      // Apply the saved mode
-      if (savedMode === "expanded") {
-        setOpen(true);
-      } else {
-        setOpen(false);
-      }
+      applyMode(savedMode);
+    } else {
+      // Default to mini mode
+      applyMode("mini");
     }
-  }, [setOpen]);
-
-  const handleModeChange = (newMode: SidebarMode) => {
-    setMode(newMode);
-    localStorage.setItem(SIDEBAR_MODE_KEY, newMode);
-
-    if (newMode === "expanded") {
-      setOpen(true);
-    } else if (newMode === "collapsed") {
-      setOpen(false);
-    } else if (newMode === "expand-on-hover") {
-      setOpen(false); // Start collapsed, will expand on hover via CSS
-    }
-  };
+  }, [applyMode]);
 
   return (
     <DropdownMenu>
@@ -72,6 +86,11 @@ export function SidebarControlSettings() {
             value={mode}
             onValueChange={(value) => handleModeChange(value as SidebarMode)}
           >
+            <DropdownMenuRadioItem value="mini">
+              <span className="flex w-full items-center justify-between">
+                Mini Sidebar
+              </span>
+            </DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="expanded">
               <span className="flex w-full items-center justify-between">
                 Expanded
@@ -80,11 +99,6 @@ export function SidebarControlSettings() {
             <DropdownMenuRadioItem value="collapsed">
               <span className="flex w-full items-center justify-between">
                 Collapsed
-              </span>
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="expand-on-hover">
-              <span className="flex w-full items-center justify-between">
-                Expand on hover
               </span>
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>

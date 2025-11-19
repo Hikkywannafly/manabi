@@ -1,3 +1,6 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { DashboardHeader } from "@/components/layouts";
 import AppSidebar from "@/components/layouts/app-sidebar";
@@ -8,6 +11,9 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isPomodoroPage = pathname?.includes("/pomodoro");
+
   return (
     <ErrorBoundary>
       <SidebarProvider>
@@ -17,11 +23,15 @@ export default function DashboardLayout({
 
           {/* Main Content Area */}
           <div className="flex flex-1 flex-col overflow-hidden">
-            {/* Dashboard Header */}
-            <DashboardHeader />
+            {/* Dashboard Header - Hidden on Pomodoro page */}
+            {!isPomodoroPage && <DashboardHeader />}
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto bg-background p-4 md:p-6 lg:p-8">
+            <main
+              className={`flex-1 overflow-y-auto ${
+                isPomodoroPage ? "" : "bg-background p-4 md:p-6 lg:p-8"
+              }`}
+            >
               {children}
             </main>
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { IconSettings } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,21 +15,40 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
 
-type SidebarState = "expanded" | "collapsed" | "expand-on-hover";
+type SidebarMode = "expanded" | "collapsed" | "expand-on-hover";
+
+const SIDEBAR_MODE_KEY = "sidebar_mode";
 
 export function SidebarControlSettings() {
-  const { state, setOpen } = useSidebar();
+  const { setOpen } = useSidebar();
+  const [mode, setMode] = useState<SidebarMode>("expanded");
 
-  const handleStateChange = (newState: SidebarState) => {
-    if (newState === "expanded") {
-      setOpen(true);
-    } else if (newState === "collapsed") {
-      setOpen(false);
+  // Load saved mode from localStorage on mount
+  useEffect(() => {
+    const savedMode = localStorage.getItem(SIDEBAR_MODE_KEY) as SidebarMode;
+    if (savedMode) {
+      setMode(savedMode);
+      // Apply the saved mode
+      if (savedMode === "expanded") {
+        setOpen(true);
+      } else {
+        setOpen(false);
+      }
     }
-    // "expand-on-hover" would be handled differently depending on your sidebar implementation
-  };
+  }, [setOpen]);
 
-  const currentState = state === "collapsed" ? "collapsed" : "expanded";
+  const handleModeChange = (newMode: SidebarMode) => {
+    setMode(newMode);
+    localStorage.setItem(SIDEBAR_MODE_KEY, newMode);
+
+    if (newMode === "expanded") {
+      setOpen(true);
+    } else if (newMode === "collapsed") {
+      setOpen(false);
+    } else if (newMode === "expand-on-hover") {
+      setOpen(false); // Start collapsed, will expand on hover via CSS
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -49,8 +69,8 @@ export function SidebarControlSettings() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuRadioGroup
-            value={currentState}
-            onValueChange={handleStateChange as (value: string) => void}
+            value={mode}
+            onValueChange={(value) => handleModeChange(value as SidebarMode)}
           >
             <DropdownMenuRadioItem value="expanded">
               <span className="flex w-full items-center justify-between">

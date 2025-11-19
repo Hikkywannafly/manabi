@@ -1,5 +1,5 @@
 "use client";
-import { IconChevronRight, IconPhotoUp } from "@tabler/icons-react";
+import { IconChevronRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -21,6 +21,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   contentNavItems,
@@ -28,34 +29,17 @@ import {
   studyToolsNavItems,
 } from "@/constants/data";
 import { Icons } from "../icons";
-import { OrgSwitcher } from "../org-switcher";
+import { Logo } from "../logo";
 import { SidebarControlSettings } from "./sidebar-control-settings";
-export const company = {
-  name: "Acme Inc",
-  logo: IconPhotoUp,
-  plan: "Enterprise",
-};
-
-const tenants = [
-  { id: "1", name: "Acme Inc" },
-  { id: "2", name: "Beta Corp" },
-  { id: "3", name: "Gamma Ltd" },
-];
 
 export default function AppSidebar() {
   const pathname = usePathname();
-  const handleSwitchTenant = (_tenantId: string) => {};
-
-  const activeTenant = tenants[0];
+  const { state } = useSidebar();
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <OrgSwitcher
-          tenants={tenants}
-          defaultTenant={activeTenant}
-          onTenantSwitch={handleSwitchTenant}
-        />
+        <Logo size="md" showText={state !== "collapsed"} />
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden">
         <SidebarGroup>

@@ -27,7 +27,7 @@ export default function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0">
+      <SidebarHeader className="transition-[padding] duration-300 ease-in-out group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:px-2">
         <Logo
           size="md"
           className="transition-[gap] duration-300 ease-in-out group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:gap-2"

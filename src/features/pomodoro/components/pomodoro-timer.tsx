@@ -23,124 +23,116 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
 
   return (
     <div
-      className={cn("flex flex-col items-center gap-8 sm:gap-12", className)}
+      className={cn(
+        "flex flex-col items-center justify-center gap-8",
+        className,
+      )}
     >
+      {/* Task Display (Placeholder) */}
+      <div className="flex flex-col items-center gap-2">
+        <div className="flex items-center gap-2 rounded-full bg-black/20 px-4 py-1.5 backdrop-blur-sm">
+          <div className="size-2 rounded-full bg-orange-500" />
+          <span className="font-medium text-sm text-white/90">
+            Design System Update
+          </span>
+        </div>
+      </div>
+
       {/* Mode Indicators */}
-      <div className="flex items-center gap-4 sm:gap-6">
+      <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={() => changeMode("focus")}
-          className="group relative flex items-center justify-center transition-all duration-200"
+          className={cn(
+            "size-3 rounded-full transition-all duration-300",
+            mode === "focus"
+              ? "scale-125 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+              : "bg-white/30 hover:bg-white/50",
+          )}
           title="Focus"
-        >
-          <div
-            className={cn(
-              "size-6 rounded-full transition-all duration-200",
-              mode === "focus"
-                ? "scale-125 bg-white shadow-lg shadow-white/50"
-                : "bg-white/30 hover:bg-white/50 group-hover:scale-110",
-            )}
-          />
-        </button>
+        />
         <button
           type="button"
           onClick={() => changeMode("shortBreak")}
-          className="group relative flex items-center justify-center transition-all duration-200"
+          className={cn(
+            "size-3 rounded-full transition-all duration-300",
+            mode === "shortBreak"
+              ? "scale-125 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+              : "bg-white/30 hover:bg-white/50",
+          )}
           title="Short Break"
-        >
-          <div
-            className={cn(
-              "size-6 rounded-full transition-all duration-200",
-              mode === "shortBreak"
-                ? "scale-125 bg-white shadow-lg shadow-white/50"
-                : "bg-white/30 hover:bg-white/50 group-hover:scale-110",
-            )}
-          />
-        </button>
+        />
         <button
           type="button"
           onClick={() => changeMode("longBreak")}
-          className="group relative flex items-center justify-center transition-all duration-200"
+          className={cn(
+            "size-3 rounded-full transition-all duration-300",
+            mode === "longBreak"
+              ? "scale-125 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+              : "bg-white/30 hover:bg-white/50",
+          )}
           title="Long Break"
-        >
-          <div
-            className={cn(
-              "size-6 rounded-full transition-all duration-200",
-              mode === "longBreak"
-                ? "scale-125 bg-white shadow-lg shadow-white/50"
-                : "bg-white/30 hover:bg-white/50 group-hover:scale-110",
-            )}
-          />
-        </button>
+        />
       </div>
 
       {/* Timer Display */}
-      <div className="mb-0 py-0">
+      <div className="relative">
         <div
           className={cn(
-            "font-bold text-white tracking-wider transition-all duration-300 ease-in-out",
-            "text-7xl leading-none sm:text-8xl md:text-9xl",
-            "drop-shadow-[0_2px_30px_rgba(255,255,255,0.3)]",
-            state === "running" && "animate-pulse",
+            "select-none font-bold text-white tracking-tighter transition-all duration-300",
+            "text-[8rem] leading-none sm:text-[10rem] md:text-[12rem]",
+            "drop-shadow-2xl",
           )}
         >
           {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
         </div>
+
+        {/* Session Counter (Absolute) */}
+        <div className="-bottom-6 -translate-x-1/2 absolute left-1/2 whitespace-nowrap">
+          <span className="font-medium text-sm text-white/60 uppercase tracking-widest">
+            {mode === "focus"
+              ? "Focus"
+              : mode === "shortBreak"
+                ? "Short Break"
+                : "Long Break"}{" "}
+            • {sessionCount}/4
+          </span>
+        </div>
       </div>
 
       {/* Controls */}
-      <div className="relative flex items-center gap-3">
-        {/* Settings Button (Left) */}
-        <div className="-translate-x-[110%] sm:-translate-x-[130%] absolute left-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-12 rounded-full text-white transition-all hover:scale-110 hover:bg-white/10"
-            title="Settings"
-          >
-            <Settings className="size-6" />
-          </Button>
-        </div>
+      <div className="mt-8 flex items-center gap-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-10 rounded-full text-white/70 hover:bg-white/10 hover:text-white"
+          title="Settings"
+        >
+          <Settings className="size-5" />
+        </Button>
 
-        {/* Main Start/Pause Button */}
         <Button
           onClick={state === "running" ? pause : start}
           className={cn(
-            "h-14 w-36 rounded-full font-semibold text-lg transition-all duration-300 ease-out sm:h-16 sm:w-56 sm:text-xl",
-            "bg-white text-black shadow-lg hover:scale-105 hover:bg-white/95 hover:shadow-xl",
-            "active:scale-95 active:shadow-md",
+            "h-14 min-w-[140px] rounded-full font-bold text-lg transition-all duration-300",
+            "bg-white text-black hover:scale-105 hover:bg-white/90 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]",
+            "active:scale-95",
           )}
         >
-          <span className="relative z-10">
-            {state === "running"
-              ? "Pause"
-              : state === "paused"
-                ? "Resume"
-                : "Start"}
-          </span>
+          {state === "running" ? "Pause" : "Start"}
         </Button>
 
-        {/* Skip Button (Right) */}
-        <div className="absolute right-0 translate-x-[115%]">
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "size-12 rounded-full text-white transition-all duration-300",
-              state === "running"
-                ? "opacity-100 hover:scale-110 hover:bg-white/10"
-                : "pointer-events-none opacity-0",
-            )}
-            title="Skip"
-          >
-            <SkipForward className="size-6" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Session Counter */}
-      <div className="font-medium text-sm text-white/70 sm:text-base">
-        Session {sessionCount}/4
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "size-10 rounded-full text-white/70 transition-all hover:bg-white/10 hover:text-white",
+            state !== "running" && "pointer-events-none opacity-50",
+          )}
+          title="Skip"
+        >
+          <SkipForward className="size-5" />
+        </Button>
       </div>
     </div>
   );

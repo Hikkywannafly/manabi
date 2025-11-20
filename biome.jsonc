@@ -57,6 +57,7 @@
       },
       "suspicious": {
         "noArrayIndexKey": "off",
+        "noExplicitAny": "off",
         "noDebugger": "error",
         "noConsole": {
           "level": "warn",

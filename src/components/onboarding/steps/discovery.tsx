@@ -28,11 +28,11 @@ export function Discovery({
 }: DiscoveryProps) {
   const [otherValue, setOtherValue] = useState("");
 
-  const selectedSources = answers["sources"]
-    ? typeof answers["sources"] === "string"
-      ? answers["sources"].split(",").filter((s) => s.trim())
-      : Array.isArray(answers["sources"])
-        ? answers["sources"]
+  const selectedSources = answers.sources
+    ? typeof answers.sources === "string"
+      ? answers.sources.split(",").filter((s) => s.trim())
+      : Array.isArray(answers.sources)
+        ? answers.sources
         : []
     : [];
 
@@ -115,7 +115,9 @@ export function Discovery({
               id="other-source"
               placeholder="Enter another source..."
               value={otherValue}
-              onChange={(e) => handleOtherChange(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                handleOtherChange(e.target.value);
+              }}
               variant="outline"
             />
           </div>

@@ -3,7 +3,9 @@ import { TASK_TAGS } from "../types";
 
 export function useTaskInput() {
   const [task, setTask] = useState("");
-  const [selectedTag, setSelectedTag] = useState(TASK_TAGS[0]);
+  const [selectedTag, setSelectedTag] = useState<(typeof TASK_TAGS)[number]>(
+    TASK_TAGS[0],
+  );
   const [isOpen, setIsOpen] = useState(false);
 
   const handleTaskChange = useCallback((value: string) => {

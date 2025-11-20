@@ -23,7 +23,7 @@ export function Role({
   loading = false,
   direction = "forward",
 }: RoleProps) {
-  const selectedRole = answers["role"] || "";
+  const selectedRole = answers.role || "";
 
   const roles = [
     { label: "Student", icon: "🎓" },

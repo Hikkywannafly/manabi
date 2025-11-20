@@ -23,7 +23,7 @@ export function Goal({
   loading = false,
   direction = "forward",
 }: GoalProps) {
-  const selectedGoal = answers["goal"] || "";
+  const selectedGoal = answers.goal || "";
 
   const goals = [
     { label: "Exam Prep" },

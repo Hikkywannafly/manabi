@@ -11,7 +11,9 @@ const activeSounds = new Map<string, AudioBufferSourceNode>();
 function getAudioContext(): AudioContext {
   if (!audioContext) {
     audioContext = new (
-      window.AudioContext || (window as any).webkitAudioContext
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext
     )();
   }
   return audioContext;
@@ -47,14 +49,10 @@ export function playCompletionSound(): void {
 /**
  * Play white noise
  */
-export function playWhiteNoise(id: string, volume: number): void {
-  try {
-    // TODO: Load and play white noise audio files
-    // This is a placeholder implementation
-    console.log(`Playing white noise: ${id} at volume ${volume}`);
-  } catch (error) {
-    console.error("Failed to play white noise:", error);
-  }
+export function playWhiteNoise(_id: string, _volume: number): void {
+  // TODO: Load and play white noise audio files
+  // This is a placeholder implementation
+  // console.log(`Playing white noise: ${id} at volume ${volume}`);
 }
 
 /**
@@ -89,7 +87,7 @@ export function stopAllSounds(): void {
 /**
  * Set volume for a specific sound
  */
-export function setVolume(id: string, volume: number): void {
+export function setVolume(_id: string, _volume: number): void {
   // TODO: Implement volume control
-  console.log(`Setting volume for ${id}: ${volume}`);
+  // console.log(`Setting volume for ${id}: ${volume}`);
 }

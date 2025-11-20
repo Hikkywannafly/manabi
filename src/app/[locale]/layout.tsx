@@ -1,12 +1,10 @@
 import { Analytics } from "@vercel/analytics/react";
 import { Nunito } from "next/font/google";
 import { notFound } from "next/navigation";
-import { NextIntlClientProvider } from "next-intl";
+
 import { getMessages } from "next-intl/server";
 import NextTopLoader from "nextjs-toploader";
-import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/contexts/auth-provider";
-import { ThemeProvider } from "@/contexts/theme-provider";
+import { AppProviders } from "@/components/providers/app-providers";
 import i18nConfig from "../../i18nConfig";
 
 const nunito = Nunito({
@@ -43,14 +41,9 @@ export default async function LocaleLayout({ children, params }: Props) {
       >
         <NextTopLoader />
         <Analytics />
-        <ThemeProvider defaultTheme="light" storageKey="manabi-theme">
-          <AuthProvider>
-            <NextIntlClientProvider messages={messages}>
-              {children}
-            </NextIntlClientProvider>
-            <Toaster />
-          </AuthProvider>
-        </ThemeProvider>
+        <AppProviders messages={messages} locale={locale}>
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

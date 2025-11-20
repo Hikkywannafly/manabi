@@ -115,7 +115,7 @@ export function Discovery({
               id="other-source"
               placeholder="Enter another source..."
               value={otherValue}
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 handleOtherChange(e.target.value);
               }}
               variant="outline"

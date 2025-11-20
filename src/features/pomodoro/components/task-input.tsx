@@ -41,12 +41,12 @@ export function TaskInput({ className }: TaskInputProps) {
         </PopoverTrigger>
         <PopoverContent className="w-48 p-2" align="center">
           <div className="flex flex-col gap-1">
-            {TASK_TAGS.map((tag: any) => (
+            {TASK_TAGS.map((tag) => (
               <button
                 key={tag.name}
                 type="button"
                 onClick={() => {
-                  setSelectedTag(tag);
+                  setSelectedTag(tag as any);
                   setIsOpen(false);
                 }}
                 className={cn(
@@ -72,7 +72,9 @@ export function TaskInput({ className }: TaskInputProps) {
           type="text"
           placeholder="What are you working on?"
           value={task}
-          onChange={(e) => setTask(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setTask(e.target.value)
+          }
           className={cn(
             "h-12 border-white/10 bg-black/20 text-white backdrop-blur-sm placeholder:text-white/50",
             "focus:border-white/30 focus:ring-white/20",

@@ -86,13 +86,11 @@ export function Header() {
 
             {/* Login Button */}
             {!user ? (
-              <>
-                <Link href="/login" className="hidden md:inline-flex">
-                  <Button variant="outline" className="rounded-xl">
-                    {t("login")}
-                  </Button>
-                </Link>
-              </>
+              <Link href="/login" className="hidden md:inline-flex">
+                <Button variant="outline" className="rounded-xl">
+                  {t("login")}
+                </Button>
+              </Link>
             ) : (
               <div className="hidden md:flex md:items-center md:gap-4">
                 <UserDropdown variant="header" />
@@ -160,17 +158,15 @@ export function Header() {
               <LanguageSwitcher />
             </div>
             {!user ? (
-              <>
-                <Link href="/login" className="md:hidden">
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-xl"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {t("login")}
-                  </Button>
-                </Link>
-              </>
+              <Link href="/login" className="md:hidden">
+                <Button
+                  variant="outline"
+                  className="w-full rounded-xl"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {t("login")}
+                </Button>
+              </Link>
             ) : (
               <div className="md:hidden">
                 <UserDropdown variant="header" />

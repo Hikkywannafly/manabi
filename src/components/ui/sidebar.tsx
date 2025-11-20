@@ -18,87 +18,47 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useSidebarStore } from "@/stores/use-sidebar-store";
 
-const SIDEBAR_COOKIE_NAME = "sidebar_state";
-const SIDEBAR_MINI_COOKIE_NAME = "sidebar_mini_state";
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
-type SidebarContextProps = {
-  state: "expanded" | "collapsed";
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  isMini: boolean;
-  setIsMini: (mini: boolean) => void;
-  openMobile: boolean;
-  setOpenMobile: (open: boolean) => void;
-  isMobile: boolean;
-  toggleSidebar: () => void;
-};
-
-const SidebarContext = React.createContext<SidebarContextProps | null>(null);
-
 function useSidebar() {
-  const context = React.useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider.");
-  }
+  const store = useSidebarStore();
+  const isMobile = useIsMobile();
 
-  return context;
+  // Derived state for convenience
+  const state = store.open ? "expanded" : "collapsed";
+
+  return {
+    ...store,
+    isMobile,
+    state,
+  };
 }
 
-function SidebarProvider({
-  defaultOpen = true,
-  open: openProp,
-  onOpenChange: setOpenProp,
-  defaultMini = true,
+function Sidebar({
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
   className,
-  style,
   children,
   ...props
 }: React.ComponentProps<"div"> & {
-  defaultOpen?: boolean;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  defaultMini?: boolean;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
 }) {
-  const isMobile = useIsMobile();
-  const [openMobile, setOpenMobile] = React.useState(false);
+  const { isMobile, state, isMini, openMobile, setOpenMobile, toggleSidebar } =
+    useSidebar();
 
-  const [_open, _setOpen] = React.useState(defaultOpen);
-  const open = openProp ?? _open;
-  const setOpen = React.useCallback(
-    (value: boolean | ((value: boolean) => boolean)) => {
-      const openState = typeof value === "function" ? value(open) : value;
-      if (setOpenProp) {
-        setOpenProp(openState);
-      } else {
-        _setOpen(openState);
-      }
-
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
-    },
-    [setOpenProp, open],
-  );
-
-  const [isMini, setIsMini] = React.useState(defaultMini);
-  const setMini = React.useCallback((value: boolean) => {
-    setIsMini(value);
-    document.cookie = `${SIDEBAR_MINI_COOKIE_NAME}=${value}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
-  }, []);
-
-  const toggleSidebar = React.useCallback(() => {
-    return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
-  }, [isMobile, setOpen]);
-
+  // Keyboard shortcut
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
@@ -114,73 +74,6 @@ function SidebarProvider({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [toggleSidebar]);
 
-  // We add a state so that we can do data-state="expanded" or "collapsed".
-  // This makes it easier to style the sidebar with Tailwind classes.
-  const state = open ? "expanded" : "collapsed";
-
-  const contextValue = React.useMemo<SidebarContextProps>(
-    () => ({
-      state,
-      open,
-      setOpen,
-      isMini,
-      setIsMini: setMini,
-      isMobile,
-      openMobile,
-      setOpenMobile,
-      toggleSidebar,
-    }),
-    [
-      state,
-      open,
-      setOpen,
-      isMini,
-      setMini,
-      isMobile,
-      openMobile,
-      toggleSidebar,
-    ],
-  );
-
-  return (
-    <SidebarContext.Provider value={contextValue}>
-      <TooltipProvider delayDuration={0}>
-        <div
-          data-slot="sidebar-wrapper"
-          style={
-            {
-              "--sidebar-width": SIDEBAR_WIDTH,
-              "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
-              ...style,
-            } as React.CSSProperties
-          }
-          className={cn(
-            "group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar",
-            className,
-          )}
-          {...props}
-        >
-          {children}
-        </div>
-      </TooltipProvider>
-    </SidebarContext.Provider>
-  );
-}
-
-function Sidebar({
-  side = "left",
-  variant = "sidebar",
-  collapsible = "offcanvas",
-  className,
-  children,
-  ...props
-}: React.ComponentProps<"div"> & {
-  side?: "left" | "right";
-  variant?: "sidebar" | "floating" | "inset";
-  collapsible?: "offcanvas" | "icon" | "none";
-}) {
-  const { isMobile, state, isMini, openMobile, setOpenMobile } = useSidebar();
-
   if (collapsible === "none") {
     return (
       <div
@@ -189,6 +82,11 @@ function Sidebar({
           "flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground",
           className,
         )}
+        style={
+          {
+            "--sidebar-width": SIDEBAR_WIDTH,
+          } as React.CSSProperties
+        }
         {...props}
       >
         {children}
@@ -230,6 +128,12 @@ function Sidebar({
       data-side={side}
       data-slot="sidebar"
       data-mini={isMini}
+      style={
+        {
+          "--sidebar-width": SIDEBAR_WIDTH,
+          "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+        } as React.CSSProperties
+      }
     >
       {/* This is what handles the sidebar gap on desktop */}
       <div
@@ -760,7 +664,7 @@ export {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarProvider,
+  // SidebarProvider, // Removed as we use Zustand now
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,

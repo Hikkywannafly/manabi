@@ -25,7 +25,7 @@ export function HowItWorks({
   loading = false,
   direction = "forward",
 }: HowItWorksProps) {
-  const selectedSettings = answers["settings"] || "";
+  const selectedSettings = answers.settings || "";
 
   return (
     <StepWrapper

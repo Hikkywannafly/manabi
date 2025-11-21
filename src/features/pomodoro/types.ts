@@ -72,3 +72,37 @@ export const TASK_TAGS = [
   { name: "Reading", color: "#f59e0b" },
   { name: "Project", color: "#ef4444" },
 ] as const;
+
+// Lofi Types
+export interface Scene {
+  id: string;
+  name: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  hasDayNight: boolean;
+}
+
+export interface Soundscape {
+  id: string;
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  audioUrl: string;
+  volume: number; // 0-100
+  isActive: boolean;
+}
+
+export interface Playlist {
+  id: string;
+  name: string;
+  author: string;
+  coverUrl: string;
+  tracks: Track[];
+}
+
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  url: string;
+  duration: number;
+}

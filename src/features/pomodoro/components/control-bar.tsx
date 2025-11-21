@@ -1,28 +1,27 @@
 "use client";
 
 import {
-  Image as ImageIcon,
   Maximize,
   MoreVertical,
-  Music,
   Pause,
   Play,
   SkipBack,
   SkipForward,
-  Volume2,
 } from "lucide-react";
-import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { usePomodoroStore } from "@/stores/use-pomodoro-store";
+import { MusicSelector } from "./music-selector";
+import { SceneSelector } from "./scene-selector";
+import { SoundscapeMixer } from "./soundscape-mixer";
 
 interface ControlBarProps {
   className?: string;
 }
 
 export function ControlBar({ className }: ControlBarProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState([50]);
+  const { isPlaying, setIsPlaying } = usePomodoroStore();
 
   return (
     <div
@@ -34,15 +33,7 @@ export function ControlBar({ className }: ControlBarProps) {
     >
       {/* Left: Music Info */}
       <div className="flex w-1/3 items-center gap-4">
-        <div className="flex size-12 items-center justify-center rounded-lg bg-white/10">
-          <Music className="size-6 text-white/70" />
-        </div>
-        <div className="flex flex-col overflow-hidden">
-          <span className="truncate font-medium text-sm text-white">
-            misty morning through a lonely window
-          </span>
-          <span className="truncate text-white/50 text-xs">By Kainbeats</span>
-        </div>
+        <MusicSelector />
       </div>
 
       {/* Center: Playback Controls */}
@@ -80,31 +71,13 @@ export function ControlBar({ className }: ControlBarProps) {
 
       {/* Right: System Controls */}
       <div className="flex w-1/3 items-center justify-end gap-4">
-        {/* Volume */}
-        <div className="group flex items-center gap-2">
-          <Volume2 className="size-5 text-white/70" />
-          <div className="w-0 overflow-hidden transition-all duration-300 group-hover:w-24">
-            <Slider
-              value={volume}
-              onValueChange={setVolume}
-              max={100}
-              step={1}
-              className="w-24"
-            />
-          </div>
-        </div>
+        {/* Soundscapes & Volume */}
+        <SoundscapeMixer />
 
         <div className="h-6 w-px bg-white/10" />
 
         {/* Scene Switcher */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white/70 hover:text-white"
-          title="Scenes"
-        >
-          <ImageIcon className="size-5" />
-        </Button>
+        <SceneSelector />
 
         {/* Fullscreen */}
         <Button
@@ -112,6 +85,13 @@ export function ControlBar({ className }: ControlBarProps) {
           size="icon"
           className="text-white/70 hover:text-white"
           title="Fullscreen"
+          onClick={() => {
+            if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen();
+            } else {
+              document.exitFullscreen();
+            }
+          }}
         >
           <Maximize className="size-5" />
         </Button>

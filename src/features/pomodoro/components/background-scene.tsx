@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { SCENES, usePomodoroStore } from "@/stores/use-pomodoro-store";
 
 interface BackgroundSceneProps {
   className?: string;
@@ -9,6 +10,9 @@ interface BackgroundSceneProps {
 
 export function BackgroundScene({ className }: BackgroundSceneProps) {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const { currentSceneId } = usePomodoroStore();
+
+  const currentScene = SCENES.find((s) => s.id === currentSceneId) || SCENES[0];
 
   return (
     <div
@@ -21,13 +25,13 @@ export function BackgroundScene({ className }: BackgroundSceneProps) {
           isVideoLoaded ? "opacity-0" : "opacity-100",
         )}
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=2572&auto=format&fit=crop')",
+          backgroundImage: `url('${currentScene.thumbnailUrl}')`,
         }}
       />
 
       {/* Video Background */}
       <video
+        key={currentScene.videoUrl} // Force re-render on video change
         autoPlay
         loop
         muted
@@ -37,7 +41,7 @@ export function BackgroundScene({ className }: BackgroundSceneProps) {
           "absolute inset-0 h-full w-full object-cover transition-opacity duration-1000",
           isVideoLoaded ? "opacity-100" : "opacity-0",
         )}
-        src="https://1230610135274225734.discordsays.com/.proxy/static-assets/scenes/chill-vibes/bedroom/videos/day-rain.mp4"
+        src={currentScene.videoUrl}
       />
 
       {/* Overlay to ensure text readability */}

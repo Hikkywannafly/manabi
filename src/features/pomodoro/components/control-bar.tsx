@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { MusicSelector } from "./music-selector";
+import { NightSwitch } from "./night-switch";
 import { SceneSelector } from "./scene-selector";
 import { SoundscapeMixer } from "./soundscape-mixer";
 
@@ -78,6 +79,9 @@ export function ControlBar({ className }: ControlBarProps) {
 
         {/* Scene Switcher */}
         <SceneSelector />
+
+        {/* Day/Night Switch */}
+        <NightSwitch />
 
         {/* Fullscreen */}
         <Button

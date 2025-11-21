@@ -77,8 +77,15 @@ export const TASK_TAGS = [
 export interface Scene {
   id: string;
   name: string;
-  videoUrl: string;
-  thumbnailUrl: string;
+  variants: {
+    day: {
+      videoUrl: string;
+    };
+    night: {
+      videoUrl: string;
+    };
+  };
+  thumbnail: string;
   hasDayNight: boolean;
 }
 

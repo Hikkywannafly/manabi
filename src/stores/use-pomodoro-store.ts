@@ -36,25 +36,40 @@ interface PomodoroState {
   toggleStreak: () => void;
 }
 
-// Mock Data (Move to constants later)
 export const SCENES: Scene[] = [
   {
     id: "bedroom",
     name: "Cozy Bedroom",
-    videoUrl:
-      "https://1230610135274225734.discordsays.com/.proxy/static-assets/scenes/chill-vibes/bedroom/videos/day-rain.mp4",
-    thumbnailUrl:
+    variants: {
+      day: {
+        videoUrl:
+          "https://1230610135274225734.discordsays.com/.proxy/static-assets/scenes/chill-vibes/bedroom/videos/day-rain.mp4",
+      },
+      night: {
+        videoUrl:
+          "https://1230610135274225734.discordsays.com/.proxy/static-assets/scenes/chill-vibes/bedroom/videos/night-rain.mp4",
+      },
+    },
+    thumbnail:
       "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=300&auto=format&fit=crop",
     hasDayNight: true,
   },
   {
     id: "cafe",
     name: "Midnight Cafe",
-    videoUrl:
-      "https://1230610135274225734.discordsays.com/.proxy/static-assets/scenes/chill-vibes/cafe/videos/night-rain.mp4",
-    thumbnailUrl:
+    variants: {
+      day: {
+        videoUrl:
+          "https://1230610135274225734.discordsays.com/.proxy/static-assets/scenes/book-cafe/book-cafe-in/videos/day.mp4",
+      },
+      night: {
+        videoUrl:
+          "https://1230610135274225734.discordsays.com/.proxy/static-assets/scenes/book-cafe/book-cafe-in/videos/night.mp4",
+      },
+    },
+    thumbnail:
       "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=300&auto=format&fit=crop",
-    hasDayNight: false,
+    hasDayNight: true,
   },
 ];
 

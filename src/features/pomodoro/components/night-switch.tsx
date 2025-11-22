@@ -1,8 +1,9 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
+import { SCENES } from "@/features/pomodoro/data/scenes";
 import { cn } from "@/lib/utils";
-import { SCENES, usePomodoroStore } from "@/stores/use-pomodoro-store";
+import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 
 interface NightSwitchProps {
   className?: string;

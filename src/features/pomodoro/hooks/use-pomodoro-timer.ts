@@ -1,66 +1,93 @@
-import { useCallback, useEffect, useState } from "react";
-import type { TimerMode, TimerState } from "../types";
-import { getModeConfig } from "../utils";
+import { useCallback, useEffect } from "react";
+import { usePomodoroStore } from "@/stores/use-pomodoro-store";
+import { playCompletionSound } from "../services/audio-service";
+import type { TimerMode } from "../types";
 
 export function usePomodoroTimer() {
-  const [mode, setMode] = useState<TimerMode>("focus");
-  const [state, setState] = useState<TimerState>("idle");
-  const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes in seconds
-  const [sessionCount, setSessionCount] = useState(1);
+  const {
+    mode,
+    timerState,
+    timeLeft,
+    sessionCount,
+    setMode,
+    setTimeLeft,
+    setSessionCount,
+    setIsPlaying,
+  } = usePomodoroStore();
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
   const handleTimerComplete = useCallback(() => {
-    // Play completion sound
-    // Save session to database
-    // Update session count
+    playCompletionSound();
+
     if (mode === "focus") {
-      setSessionCount((prev) => prev + 1);
+      const nextCount = sessionCount + 1;
+      setSessionCount(nextCount);
+
+      // Flow: Focus -> Short -> Focus -> Short -> Focus -> Long
+      // 3 Focus sessions per cycle
+      if (nextCount % 3 === 0) {
+        setMode("longBreak");
+      } else {
+        setMode("shortBreak");
+      }
+    } else {
+      // After break, back to focus
+      setMode("focus");
     }
-  }, [mode]);
+
+    // Auto-pause after completion (default behavior)
+    setIsPlaying(false);
+  }, [mode, sessionCount, setSessionCount, setMode, setIsPlaying]);
 
   // Timer countdown effect
   useEffect(() => {
-    if (state !== "running") return;
+    if (timerState !== "running") return;
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) {
-          // Timer completed
-          setState("idle");
-          handleTimerComplete();
-          return getModeConfig(mode).duration;
-        }
+        if (prev <= 0) return 0;
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [state, mode, handleTimerComplete]);
+  }, [timerState, setTimeLeft]);
+
+  // Handle completion when time reaches 0
+  useEffect(() => {
+    if (timeLeft === 0 && timerState !== "idle") {
+      handleTimerComplete();
+    }
+  }, [timeLeft, timerState, handleTimerComplete]);
 
   const start = useCallback(() => {
-    setState("running");
-  }, []);
+    setIsPlaying(true);
+  }, [setIsPlaying]);
 
   const pause = useCallback(() => {
-    setState("paused");
-  }, []);
+    setIsPlaying(false);
+  }, [setIsPlaying]);
 
   const reset = useCallback(() => {
-    setState("idle");
-    setTimeLeft(getModeConfig(mode).duration);
-  }, [mode]);
+    setMode(mode);
+  }, [mode, setMode]);
 
-  const changeMode = useCallback((newMode: TimerMode) => {
-    setMode(newMode);
-    setState("idle");
-    setTimeLeft(getModeConfig(newMode).duration);
-  }, []);
+  const skip = useCallback(() => {
+    handleTimerComplete();
+  }, [handleTimerComplete]);
+
+  const changeMode = useCallback(
+    (newMode: TimerMode) => {
+      setMode(newMode);
+    },
+    [setMode],
+  );
 
   return {
     mode,
-    state,
+    state: timerState,
     timeLeft,
     minutes,
     seconds,
@@ -68,6 +95,7 @@ export function usePomodoroTimer() {
     start,
     pause,
     reset,
+    skip,
     changeMode,
   };
 }

@@ -14,7 +14,7 @@ interface SidebarState {
 export const useSidebarStore = create<SidebarState>()(
   persist(
     (set, _get) => ({
-      open: true,
+      open: false,
       isMini: true,
       openMobile: false,
       setOpen: (open) =>

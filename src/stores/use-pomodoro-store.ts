@@ -1,7 +1,12 @@
 import { CloudRain, Coffee, Flame, Wind } from "lucide-react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Soundscape } from "@/features/pomodoro/types";
+import type {
+  Soundscape,
+  TimerMode,
+  TimerState,
+} from "@/features/pomodoro/types";
+import { getModeConfig } from "@/features/pomodoro/utils";
 
 interface PomodoroState {
   // Scene State
@@ -17,6 +22,13 @@ interface PomodoroState {
   soundscapes: Soundscape[];
   masterVolume: number;
 
+  // Timer State
+  mode: TimerMode;
+  timerState: TimerState;
+  timeLeft: number;
+  duration: number;
+  sessionCount: number;
+
   // Social State
   isLeaderboardOpen: boolean;
   isRoomSettingsOpen: boolean;
@@ -30,6 +42,12 @@ interface PomodoroState {
   setMasterVolume: (volume: number) => void;
   toggleSoundscape: (id: string) => void;
   setSoundscapeVolume: (id: string, volume: number) => void;
+
+  // Timer Actions
+  setMode: (mode: TimerMode) => void;
+  setTimerState: (state: TimerState) => void;
+  setTimeLeft: (time: number | ((prev: number) => number)) => void;
+  setSessionCount: (count: number | ((prev: number) => number)) => void;
 
   toggleLeaderboard: () => void;
   toggleRoomSettings: () => void;
@@ -82,6 +100,13 @@ export const usePomodoroStore = create<PomodoroState>()(
       soundscapes: INITIAL_SOUNDSCAPES,
       masterVolume: 80,
 
+      // Timer Initial State
+      mode: "focus",
+      timerState: "idle",
+      timeLeft: 25 * 60,
+      duration: 25 * 60,
+      sessionCount: 0,
+
       isLeaderboardOpen: false,
       isRoomSettingsOpen: false,
       isStreakOpen: false,
@@ -89,7 +114,13 @@ export const usePomodoroStore = create<PomodoroState>()(
       setScene: (sceneId) => set({ currentSceneId: sceneId }),
       toggleDayMode: () => set((state) => ({ isDayMode: !state.isDayMode })),
       setMusicVolume: (volume) => set({ musicVolume: volume }),
-      setIsPlaying: (isPlaying) => set({ isPlaying }),
+
+      setIsPlaying: (isPlaying) =>
+        set((_state) => ({
+          isPlaying,
+          timerState: isPlaying ? "running" : "paused",
+        })),
+
       setMasterVolume: (volume) => set({ masterVolume: volume }),
 
       toggleSoundscape: (id) =>
@@ -106,6 +137,35 @@ export const usePomodoroStore = create<PomodoroState>()(
           ),
         })),
 
+      // Timer Actions
+      setMode: (mode) => {
+        const config = getModeConfig(mode);
+        set({
+          mode,
+          timeLeft: config.duration,
+          duration: config.duration,
+          timerState: "idle",
+          isPlaying: false,
+        });
+      },
+
+      setTimerState: (timerState) =>
+        set({
+          timerState,
+          isPlaying: timerState === "running",
+        }),
+
+      setTimeLeft: (value) =>
+        set((state) => ({
+          timeLeft: typeof value === "function" ? value(state.timeLeft) : value,
+        })),
+
+      setSessionCount: (value) =>
+        set((state) => ({
+          sessionCount:
+            typeof value === "function" ? value(state.sessionCount) : value,
+        })),
+
       toggleLeaderboard: () =>
         set((state) => ({ isLeaderboardOpen: !state.isLeaderboardOpen })),
       toggleRoomSettings: () =>
@@ -120,7 +180,11 @@ export const usePomodoroStore = create<PomodoroState>()(
         isDayMode: state.isDayMode,
         musicVolume: state.musicVolume,
         masterVolume: state.masterVolume,
-        soundscapes: state.soundscapes, // Persist active soundscapes and volumes
+        soundscapes: state.soundscapes,
+        // Persist timer state? Maybe not timeLeft to avoid stale state on reload,
+        // but sessionCount and mode might be useful.
+        // For now, let's persist sessionCount.
+        sessionCount: state.sessionCount,
       }),
     },
   ),

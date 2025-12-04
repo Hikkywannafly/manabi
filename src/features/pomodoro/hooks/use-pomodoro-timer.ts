@@ -8,11 +8,13 @@ export function usePomodoroTimer() {
     mode,
     timerState,
     timeLeft,
+    duration,
     sessionCount,
     setMode,
     setTimeLeft,
     setSessionCount,
     setIsPlaying,
+    saveSession,
   } = usePomodoroStore();
 
   const minutes = Math.floor(timeLeft / 60);
@@ -20,6 +22,19 @@ export function usePomodoroTimer() {
 
   const handleTimerComplete = useCallback(() => {
     playCompletionSound();
+
+    // Save session to Supabase
+    const endTime = new Date();
+    // Calculate start time based on duration
+    // duration is in seconds
+    const startTime = new Date(endTime.getTime() - duration * 1000);
+
+    saveSession({
+      mode,
+      start_time: startTime.toISOString(),
+      end_time: endTime.toISOString(),
+      duration_minutes: Math.round(duration / 60),
+    });
 
     if (mode === "focus") {
       const nextCount = sessionCount + 1;
@@ -39,7 +54,15 @@ export function usePomodoroTimer() {
 
     // Auto-pause after completion (default behavior)
     setIsPlaying(false);
-  }, [mode, sessionCount, setSessionCount, setMode, setIsPlaying]);
+  }, [
+    mode,
+    sessionCount,
+    duration,
+    setSessionCount,
+    setMode,
+    setIsPlaying,
+    saveSession,
+  ]);
 
   // Timer countdown effect
   useEffect(() => {

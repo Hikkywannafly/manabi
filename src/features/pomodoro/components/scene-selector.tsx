@@ -1,159 +1,174 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
+import { CloudUpload, Image as ImageIcon, X } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { SCENES } from "@/features/pomodoro/data/scenes";
 import { cn } from "@/lib/utils";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 
 export function SceneSelector() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white/70 hover:text-white"
-          title="Scenes"
-        >
-          <ImageIcon className="size-5" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-auto rounded-3xl border-none bg-black/90 p-3 backdrop-blur-xl"
-        align="center"
-        sideOffset={20}
-      >
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <div className="flex h-[30px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg bg-black/20 px-2 hover:bg-black/50 sm:h-[40px] sm:rounded-xl sm:px-3">
+          <ImageIcon className="pointer-events-none text-[20px] text-white" />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="flex max-h-[85vh] w-[90vw] max-w-7xl flex-col overflow-hidden rounded-2xl border-none bg-black/90 p-0 text-white shadow-2xl backdrop-blur-xl">
         <ScenePicker />
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 function ScenePicker() {
   const { currentSceneId, setScene } = usePomodoroStore();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const isFirstRender = useRef(true);
-
-  // Scroll to active scene on mount and when changed
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      const selectedElement = scrollContainerRef.current.querySelector(
-        `[data-scene-id="${currentSceneId}"]`,
-      );
-      if (selectedElement) {
-        if (isFirstRender.current) {
-          // Immediate scroll without animation for "jump" effect on open
-          selectedElement.scrollIntoView({
-            behavior: "auto",
-            block: "nearest",
-            inline: "center",
-          });
-          isFirstRender.current = false;
-        } else {
-          // Smooth scroll to center when selection changes
-          selectedElement.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "center",
-          });
-        }
-      }
-    }
-  }, [currentSceneId]);
-
-  const scroll = (direction: "left" | "right") => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 300; // Approx one item width + gap
-      scrollContainerRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
-      });
-    }
-  };
+  const [subTab, setSubTab] = useState<"motion" | "stills" | "personalize">(
+    "motion",
+  );
 
   return (
-    <div className="relative flex items-center justify-center">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => scroll("left")}
-        className="absolute left-1 z-20 flex h-8 w-8 shrink-0 items-center justify-center bg-black/50 text-[#e2b769] transition-all hover:border-[#e2b769] hover:bg-black/80 hover:text-[#e2b769]"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-
-      {/* Scrollable Container */}
-      <div
-        ref={scrollContainerRef}
-        className="flex w-[580px] gap-4 overflow-x-auto px-2 py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        style={{ scrollSnapType: "x mandatory" }}
-      >
-        {SCENES.map((scene) => (
+    <div className="flex h-full flex-col overflow-hidden p-6 sm:p-8">
+      {/* Header */}
+      <div className="mb-4 flex shrink-0 items-center justify-between">
+        <h2 className="font-bold text-lg sm:text-2xl">Set your focus scene</h2>
+        <DialogClose asChild>
           <button
-            key={scene.id}
-            data-scene-id={scene.id}
             type="button"
-            onClick={() => setScene(scene.id)}
-            className={cn(
-              "group relative h-[160px] w-[280px] shrink-0 overflow-hidden rounded-xl transition-all duration-500 ease-out",
-              "snap-center",
-              currentSceneId === scene.id
-                ? "z-10 scale-105 shadow-[0_0_20px_rgba(226,183,105,0.3)] ring-2 ring-[#e2b769]"
-                : "opacity-50 hover:scale-105 hover:opacity-100",
-            )}
+            className="text-white/60 text-xl hover:text-white"
           >
-            {/* Thumbnail */}
-            <Image
-              src={scene.thumbnail}
-              alt={scene.name}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-110"
-            />
-
-            {/* Overlay */}
-            <div
-              className={cn(
-                "absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent transition-opacity duration-300",
-                currentSceneId === scene.id
-                  ? "opacity-80"
-                  : "opacity-60 group-hover:opacity-40",
-              )}
-            />
-
-            {/* Content */}
-            <div className="absolute bottom-0 left-0 w-full p-4 text-center">
-              <p
-                className={cn(
-                  "font-bold text-sm uppercase tracking-widest transition-all duration-300",
-                  currentSceneId === scene.id
-                    ? "translate-y-0 text-[#e2b769]"
-                    : "translate-y-2 text-white/70 group-hover:translate-y-0 group-hover:text-white",
-                )}
-              >
-                {scene.name}
-              </p>
-            </div>
+            <X className="size-6" />
           </button>
-        ))}
+        </DialogClose>
       </div>
 
-      {/* Right Arrow */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => scroll("right")}
-        className="absolute right-1 z-20 flex h-8 w-8 shrink-0 items-center justify-center bg-black/50 text-[#e2b769] transition-all hover:bg-black/80 hover:text-[#e2b769]"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </Button>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        {/* Sub Tabs */}
+        <div className="mb-6 flex shrink-0 border-white/10 border-b">
+          <button
+            type="button"
+            onClick={() => setSubTab("motion")}
+            className={cn(
+              "flex-1 border-b-[0.5px] py-3 font-medium text-sm transition-colors sm:px-6",
+              subTab === "motion"
+                ? "border-white font-bold text-white"
+                : "border-transparent text-white/50 hover:text-white",
+            )}
+          >
+            Motion
+          </button>
+          <button
+            type="button"
+            onClick={() => setSubTab("stills")}
+            className={cn(
+              "flex-1 border-b-[0.5px] py-3 font-medium text-sm transition-colors sm:px-6",
+              subTab === "stills"
+                ? "border-white font-bold text-white"
+                : "border-transparent text-white/50 hover:text-white",
+            )}
+          >
+            Stills
+          </button>
+          <button
+            type="button"
+            onClick={() => setSubTab("personalize")}
+            className={cn(
+              "flex-1 border-b-[0.5px] py-3 font-medium text-sm transition-colors sm:px-6",
+              subTab === "personalize"
+                ? "border-white font-bold text-white"
+                : "border-transparent text-white/50 hover:text-white",
+            )}
+          >
+            Personalize
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto pr-2">
+          {subTab === "motion" && (
+            <div className="grid grid-cols-1 gap-4 pb-4 sm:grid-cols-3">
+              {SCENES.map((scene) => (
+                <button
+                  type="button"
+                  key={scene.id}
+                  onClick={() => setScene(scene.id)}
+                  className={cn(
+                    "group relative aspect-video overflow-hidden rounded-lg transition-all",
+                    currentSceneId === scene.id
+                      ? "opacity-100"
+                      : "opacity-70 hover:opacity-100",
+                  )}
+                >
+                  <Image
+                    src={scene.thumbnail}
+                    alt={scene.name}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-black/20" />
+
+                  {/* Selected Indicator (Checkmark) - Optional replacement for ring */}
+                  {currentSceneId === scene.id && (
+                    <div className="absolute top-2 right-2 rounded-full bg-white p-1 text-black">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-3 w-3"
+                      >
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-2 text-left">
+                    <span className="font-medium text-white text-xs">
+                      {scene.name}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {subTab === "stills" && (
+            <div className="flex h-40 items-center justify-center text-white/50">
+              <p>Coming soon...</p>
+            </div>
+          )}
+
+          {subTab === "personalize" && (
+            <div className="space-y-4">
+              <div className="cursor-pointer rounded-lg border-2 border-white/50 border-dashed p-8 text-center transition-colors hover:border-white hover:bg-white/10">
+                <CloudUpload className="mx-auto mb-2 size-10 text-white/50" />
+                <div className="mb-2 flex flex-row items-center justify-center gap-2 text-white">
+                  <span>Bring your own photo</span>
+                  <div className="rounded-lg bg-white/10 px-2 py-0.5 font-extrabold font-title text-3xl text-sm text-yellow-400">
+                    <span className="font-extrabold italic">Plus</span>
+                  </div>
+                </div>
+                <p className="text-sm text-white/50">
+                  Maximum 10MB • JPG, PNG, GIF
+                </p>
+              </div>
+              <input accept="image/*" className="hidden" type="file" />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

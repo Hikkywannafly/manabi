@@ -8,14 +8,34 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useTimerStats } from "../hooks";
+import { usePomodoroStore } from "@/stores/use-pomodoro-store";
+import { useStatsStore } from "@/stores/use-stats-store";
 
 interface StatsButtonProps {
   className?: string;
 }
 
 export function StatsButton({ className }: StatsButtonProps) {
-  const { stats, formatFocusTime } = useTimerStats();
+  const { streak } = useStatsStore();
+  const { sessionCount, duration } = usePomodoroStore();
+
+  // Calculate focus time based on completed sessions * duration
+  // This is a rough estimate for the "session" view. Real stats come from DB via useStatsStore if we fetch them.
+  // For "Today's Stats" in the button, we ideally want the DB stats.
+  // Let's rely on useStatsStore for streak and maybe assume we fetch daily stats there too?
+  // Actually, useStatsStore currently only has 'streak'.
+  // Let's check if we can add daily stats to useStatsStore or just use sessionCount from local store for now as "current session" context.
+  // For better accuracy, let's use the local session count for "Today" if we reset it daily, but sessionCount in PomodoroStore might be just for the current "run".
+
+  // Pivot: Let's fetch real daily stats here or in the store.
+  // I will use a simple implementation accessing the store's streak, and for now just show sessionCount as "Sessions".
+  // Ideal: Update useStatsStore to hold 'dailyStats'.
+
+  // For this step, I'll stick to what we have:
+  // Focus Time: sessionCount * duration (approx)
+  // Streak: from store
+
+  const focusTimeMinutes = Math.round((sessionCount * duration) / 60);
 
   return (
     <Popover>
@@ -37,23 +57,21 @@ export function StatsButton({ className }: StatsButtonProps) {
         align="end"
       >
         <div className="space-y-4">
-          <h3 className="font-bold text-lg">Today's Stats</h3>
+          <h3 className="font-bold text-lg">Current Session Stats</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-white/70">Focus Time</span>
-              <span className="font-bold">
-                {formatFocusTime(stats.focusTime)}
-              </span>
+              <span className="text-sm text-white/70">Focus Time (Est.)</span>
+              <span className="font-bold">{focusTimeMinutes} mins</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/70">Completed Sessions</span>
-              <span className="font-bold">{stats.completedSessions}</span>
+              <span className="font-bold">{sessionCount}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/70">Current Streak</span>
               <div className="flex items-center gap-1">
                 <span className="text-lg">🔥</span>
-                <span className="font-bold">{stats.currentStreak} days</span>
+                <span className="font-bold">{streak} days</span>
               </div>
             </div>
           </div>

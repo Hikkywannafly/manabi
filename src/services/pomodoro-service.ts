@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 import { achievementService } from "./achievement-service";
+import { statsService } from "./stats-service";
 
 export type PomodoroSession = {
   id: string;
@@ -25,7 +26,7 @@ export const pomodoroService = {
     const { data, error } = await supabase
       .from("pomodoro_sessions")
       .insert({
-        user_id: user.id,
+        user_id: user.id, // Ensure this matches schema expectation (auth.uid() referencing profiles logic handled by trigger or assumes user exists in profiles)
         ...session,
       })
       .select()
@@ -34,46 +35,13 @@ export const pomodoroService = {
     if (error) throw error;
 
     // Update user_stats
-    const today = new Date().toISOString().split("T")[0];
-
-    // First get current stats for today to increment safely (or use upsert with RPC if possible, but simple upsert works if we read first or rely on unique constraint)
-    // Supabase upsert:
-    void (await supabase.rpc("increment_user_stats", {
-      row_user_id: user.id,
-      row_date: today,
-      minutes: session.duration_minutes,
-    }));
-
-    // If RPC doesn't exist (we didn't create it), we do read-modify-write or simple upsert if we can.
-    // Since we didn't create RPC, let's do read-modify-write for now, or just insert/update.
-    // Actually, let's add the RPC to schema.sql and assume user runs it, OR do it in code.
-    // Doing it in code:
-    const { data: existingStats } = await supabase
-      .from("user_stats")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("date", today)
-      .single();
-
-    if (existingStats) {
-      await supabase
-        .from("user_stats")
-        .update({
-          focus_minutes: existingStats.focus_minutes + session.duration_minutes,
-          sessions_count: existingStats.sessions_count + 1,
-        })
-        .eq("id", existingStats.id);
-    } else {
-      await supabase.from("user_stats").insert({
-        user_id: user.id,
-        date: today,
-        focus_minutes: session.duration_minutes,
-        sessions_count: 1,
-      });
+    try {
+      await statsService.incrementDailyStats(user.id, session.duration_minutes);
+    } catch (err) {
+      console.error("Failed to update user stats:", err);
     }
 
     // Check for achievements
-    // We don't await this to avoid blocking the UI response, or we can catch errors silently
     achievementService.checkAndUnlockAchievements(user.id).catch((err) => {
       console.error("Failed to check achievements:", err);
     });

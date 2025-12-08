@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { MusicPlayer } from "./music-player";
 import { NightSwitch } from "./night-switch";
 import { SceneSelector } from "./scene-selector";
+import { SoundManager } from "./sound-manager";
 import { WhiteNoiseMixer } from "./soundscape-mixer";
 
 interface ControlBarProps {
@@ -89,6 +90,9 @@ export function ControlBar({ className }: ControlBarProps) {
           </button>
         </div>
       </div>
+
+      {/* Sound Manager (Headless) */}
+      <SoundManager />
     </div>
   );
 }

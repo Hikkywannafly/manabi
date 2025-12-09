@@ -24,7 +24,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     set({ isLoading: true });
     try {
       const tasks = await taskService.getTasks();
-      set({ tasks });
+      set({ tasks: tasks || [] });
     } catch (error) {
       console.error("Failed to fetch tasks:", error);
     } finally {
@@ -34,10 +34,32 @@ export const useTaskStore = create<TaskState>((set, get) => ({
 
   addTask: async (title, estimatedPomodoros = 1) => {
     try {
+      // Create optimistic task
+      const tempId = crypto.randomUUID();
+      const optimisticTask: Task = {
+        id: tempId,
+        user_id: "temp",
+        title,
+        status: "todo",
+        estimated_pomodoros: estimatedPomodoros,
+        actual_pomodoros: 0,
+        created_at: new Date().toISOString(),
+      };
+
+      set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
+
       const newTask = await taskService.createTask(title, estimatedPomodoros);
-      set((state) => ({ tasks: [newTask, ...state.tasks] }));
+
+      // Replace optimistic task with real one
+      set((state) => ({
+        tasks: state.tasks.map((t) => (t.id === tempId ? newTask : t)),
+      }));
     } catch (error) {
       console.error("Failed to add task:", error);
+      // Remove optimistic task on failure
+      // Note: This logic needs to be careful about which tempId, but for now capture flow is fine.
+      // Re-fetch to be safe
+      get().fetchTasks();
     }
   },
 

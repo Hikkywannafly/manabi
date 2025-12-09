@@ -23,11 +23,7 @@ export function SceneSelector() {
           <ImageIcon className="pointer-events-none text-[20px] text-white" />
         </div>
       </DialogTrigger>
-      {/*
-        Changes:
-        - Fixed height h-[90vh] ensures the flex-grow scroll area works reliably.
-        - max-w-[90vw] makes it large.
-      */}
+
       <DialogContent className="flex h-[90vh] w-[95vw] max-w-[95vw] flex-col overflow-hidden rounded-2xl border-none bg-black/90 p-0 text-white shadow-2xl backdrop-blur-xl sm:max-w-6xl">
         <ScenePicker />
       </DialogContent>

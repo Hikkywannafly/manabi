@@ -21,7 +21,7 @@ export const taskService = {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    return data as Task[];
+    return (data || []) as Task[];
   },
 
   async createTask(title: string, estimated_pomodoros = 1) {

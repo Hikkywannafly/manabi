@@ -8,6 +8,11 @@ import type {
 } from "@/features/pomodoro/types";
 import { getModeConfig } from "@/features/pomodoro/utils";
 
+import {
+  type PomodoroSession,
+  pomodoroService,
+} from "@/services/pomodoro-service";
+
 interface PomodoroState {
   // Scene State
   currentSceneId: string;
@@ -52,6 +57,10 @@ interface PomodoroState {
   toggleLeaderboard: () => void;
   toggleRoomSettings: () => void;
   toggleStreak: () => void;
+
+  saveSession: (
+    session: Omit<PomodoroSession, "id" | "created_at" | "user_id">,
+  ) => Promise<void>;
 }
 
 const INITIAL_SOUNDSCAPES: Soundscape[] = [
@@ -172,6 +181,14 @@ export const usePomodoroStore = create<PomodoroState>()(
         set((state) => ({ isRoomSettingsOpen: !state.isRoomSettingsOpen })),
       toggleStreak: () =>
         set((state) => ({ isStreakOpen: !state.isStreakOpen })),
+
+      saveSession: async (sessionData) => {
+        try {
+          await pomodoroService.createSession(sessionData);
+        } catch (error) {
+          console.error("Failed to save session:", error);
+        }
+      },
     }),
     {
       name: "pomodoro-storage",
@@ -181,9 +198,6 @@ export const usePomodoroStore = create<PomodoroState>()(
         musicVolume: state.musicVolume,
         masterVolume: state.masterVolume,
         soundscapes: state.soundscapes,
-        // Persist timer state? Maybe not timeLeft to avoid stale state on reload,
-        // but sessionCount and mode might be useful.
-        // For now, let's persist sessionCount.
         sessionCount: state.sessionCount,
       }),
     },

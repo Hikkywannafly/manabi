@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronDown, Flag } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,87 +10,74 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useTaskInput } from "../hooks";
-import { TASK_TAGS } from "../types";
+import { useTaskStore } from "@/stores/use-task-store";
+import { TaskList } from "./task-list";
 
 interface TaskInputProps {
   className?: string;
 }
 
 export function TaskInput({ className }: TaskInputProps) {
-  const { task, selectedTag, isOpen, setTask, setSelectedTag, setIsOpen } =
-    useTaskInput();
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const { addTask, activeTaskId, tasks } = useTaskStore();
+  const [isListOpen, setIsListOpen] = useState(false);
+
+  const activeTask = tasks.find((t) => t.id === activeTaskId);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && newTaskTitle.trim()) {
+      addTask(newTaskTitle.trim());
+      setNewTaskTitle("");
+      setIsListOpen(true);
+    }
+  };
 
   return (
-    <div className={cn("flex flex-col items-center gap-3", className)}>
-      {/* Tag Selector */}
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            className="h-auto bg-black/30 px-4 py-2 font-light text-sm backdrop-blur-sm hover:bg-black/40"
-          >
-            <div className="flex items-center gap-2">
-              <div
-                className="size-3 rounded-sm"
-                style={{ backgroundColor: selectedTag.color }}
-              />
-              <span className="font-medium text-white">{selectedTag.name}</span>
-            </div>
-            <ChevronDown className="ml-2 size-4 text-white/50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-48 p-2" align="center">
-          <div className="flex flex-col gap-1">
-            {TASK_TAGS.map((tag) => (
-              <button
-                key={tag.name}
-                type="button"
-                onClick={() => {
-                  setSelectedTag(tag as any);
-                  setIsOpen(false);
-                }}
-                className={cn(
-                  "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
-                  "hover:bg-accent",
-                  selectedTag.name === tag.name && "bg-accent",
-                )}
-              >
-                <div
-                  className="size-3 rounded-sm"
-                  style={{ backgroundColor: tag.color }}
-                />
-                <span>{tag.name}</span>
-              </button>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
-
-      {/* Task Input */}
-      <div className="relative w-full max-w-md">
-        <Input
-          type="text"
-          placeholder="What are you working on?"
-          value={task}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setTask(e.target.value)
-          }
-          className={cn(
-            "h-12 border-white/10 bg-black/20 text-white backdrop-blur-sm placeholder:text-white/50",
-            "focus:border-white/30 focus:ring-white/20",
-            "text-center text-base sm:text-lg",
-          )}
-        />
-      </div>
-
-      {/* Goal Display (Optional) */}
-      {task && (
-        <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1.5 backdrop-blur-sm">
-          <Flag className="size-4 text-white/70" />
-          <span className="text-sm text-white/70">{task}</span>
+    <div className={cn("flex flex-col items-center gap-4", className)}>
+      {/* Active Task Display */}
+      {activeTask && (
+        <div className="fade-in slide-in-from-bottom-2 flex animate-in items-center gap-2 rounded-full bg-orange-500/20 px-4 py-1.5 backdrop-blur-sm">
+          <div className="size-2 animate-pulse rounded-full bg-orange-500" />
+          <span className="font-medium text-orange-100 text-sm">
+            Focusing on: {activeTask.title}
+          </span>
         </div>
       )}
+
+      {/* Task Input & List Toggle */}
+      <div className="relative w-full max-w-md">
+        <div className="flex gap-2">
+          <Input
+            type="text"
+            placeholder="What are you working on?"
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className={cn(
+              "h-12 border-white/10 bg-black/20 text-white backdrop-blur-sm placeholder:text-white/50",
+              "focus:border-white/30 focus:ring-white/20",
+              "text-base sm:text-lg",
+            )}
+          />
+          <Popover open={isListOpen} onOpenChange={setIsListOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="h-12 border-white/10 bg-black/20 text-white hover:bg-black/40 hover:text-white"
+              >
+                <span className="mr-2 hidden sm:inline">Tasks</span>
+                <ChevronDown className="size-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-[350px] border-white/10 bg-black/80 p-4 backdrop-blur-xl sm:w-[400px]"
+              align="end"
+            >
+              <TaskList />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
     </div>
   );
 }

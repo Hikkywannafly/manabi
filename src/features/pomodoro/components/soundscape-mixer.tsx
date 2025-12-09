@@ -1,103 +1,92 @@
 "use client";
 
-import { Volume2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CloudRain } from "lucide-react";
+import { useState } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 
-export function SoundscapeMixer() {
-  const {
-    soundscapes,
-    masterVolume,
-    setMasterVolume,
-    toggleSoundscape,
-    setSoundscapeVolume,
-  } = usePomodoroStore();
+export function WhiteNoiseMixer() {
+  const { soundscapes, toggleSoundscape, setSoundscapeVolume } =
+    usePomodoroStore();
+
+  const [isEnabled, setIsEnabled] = useState(true);
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white/70 hover:text-white"
-          title="Soundscapes & Volume"
-        >
-          <Volume2 className="size-5" />
-        </Button>
+        <div className="whitenoise-toolbar-button flex h-[30px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg bg-black/20 px-2 hover:bg-black/50 sm:h-[40px] sm:rounded-xl sm:px-3">
+          <CloudRain className="pointer-events-none text-[20px] text-white" />
+        </div>
       </PopoverTrigger>
       <PopoverContent
-        className="w-80 border-white/10 bg-black/90 p-4 backdrop-blur-xl"
-        align="center"
+        className="w-auto border-none bg-transparent p-0 shadow-none"
+        align="start"
         sideOffset={10}
       >
-        <div className="space-y-6">
-          {/* Master Volume */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-medium text-sm text-white">
-                Master Volume
-              </span>
-              <span className="text-white/50 text-xs">{masterVolume}%</span>
+        <div className="w-[300px] rounded-xl bg-black/70 px-5 py-4 text-white shadow-xs backdrop-blur-xl sm:w-auto sm:max-w-[500px]">
+          <div className="mx-auto max-w-[500px] rounded-xl px-2 py-2">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-bold font-heading text-white text-xl">
+                  White Noise Mixer
+                </span>
+              </div>
+              <Switch
+                checked={isEnabled}
+                onCheckedChange={setIsEnabled}
+                className="scale-110 data-[state=checked]:bg-blue-500"
+              />
             </div>
-            <Slider
-              value={[masterVolume]}
-              onValueChange={([val]) => setMasterVolume(val)}
-              max={100}
-              step={1}
-              className="w-full"
-            />
-          </div>
 
-          <div className="h-px bg-white/10" />
-
-          {/* Soundscapes */}
-          <div className="space-y-4">
-            <span className="font-medium text-sm text-white/50">
-              Soundscapes
-            </span>
-            <div className="grid gap-4">
+            <div
+              className={cn(
+                "grid grid-cols-4 gap-2 sm:grid-cols-3 md:grid-cols-5",
+                !isEnabled && "pointer-events-none opacity-50",
+              )}
+            >
               {soundscapes.map((sound) => (
-                <div key={sound.id} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => toggleSoundscape(sound.id)}
-                      className={cn(
-                        "flex items-center gap-2 rounded-md px-2 py-1 transition-colors",
-                        sound.isActive
-                          ? "bg-white/10 text-white"
-                          : "text-white/50 hover:bg-white/5 hover:text-white/70",
-                      )}
-                    >
-                      <sound.icon className="size-4" />
-                      <span className="text-sm">{sound.name}</span>
-                    </button>
-                    {sound.isActive && (
-                      <span className="text-white/50 text-xs">
-                        {sound.volume}%
-                      </span>
+                <button
+                  key={sound.id}
+                  type="button"
+                  title={sound.name}
+                  className="relative flex w-full cursor-pointer flex-col items-center rounded-lg border-none bg-transparent p-2 transition"
+                  onClick={() => {
+                    if (!sound.isActive) toggleSoundscape(sound.id);
+                  }}
+                >
+                  <div
+                    className={cn(
+                      "mb-0 text-xl opacity-60 hover:opacity-100 sm:text-3xl",
+                      sound.isActive && "opacity-100",
                     )}
+                  >
+                    {/* Map icons to emojis for this specific UI design if needed, or use Lucide icons */}
+                    {/* For now using the icon from store but styled differently */}
+                    <sound.icon className="size-8" />
                   </div>
-
-                  {sound.isActive && (
+                  <div className="relative w-full">
                     <Slider
                       value={[sound.volume]}
-                      onValueChange={([val]) =>
-                        setSoundscapeVolume(sound.id, val)
-                      }
+                      onValueChange={([val]) => {
+                        if (!sound.isActive) toggleSoundscape(sound.id);
+                        setSoundscapeVolume(sound.id, val);
+                      }}
                       max={100}
                       step={1}
-                      className="w-full"
+                      className={cn(
+                        "mt-2 w-full transition-opacity duration-150",
+                        sound.isActive ? "opacity-100" : "opacity-0",
+                      )}
                     />
-                  )}
-                </div>
+                  </div>
+                </button>
               ))}
             </div>
           </div>

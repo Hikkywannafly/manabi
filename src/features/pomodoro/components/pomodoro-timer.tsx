@@ -3,6 +3,7 @@
 import { Settings, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTaskStore } from "@/stores/use-task-store";
 import { usePomodoroTimer } from "../hooks";
 
 interface PomodoroTimerProps {
@@ -20,6 +21,8 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
     pause,
     changeMode,
   } = usePomodoroTimer();
+  const { tasks, activeTaskId } = useTaskStore();
+  const activeTask = tasks.find((t) => t.id === activeTaskId);
 
   return (
     <div
@@ -28,14 +31,22 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
         className,
       )}
     >
-      {/* Task Display (Placeholder) */}
+      {/* Task Display */}
       <div className="flex flex-col items-center gap-2">
-        <div className="flex items-center gap-2 rounded-full bg-black/20 px-4 py-1.5 backdrop-blur-sm">
-          <div className="size-2 rounded-full bg-orange-500" />
-          <span className="font-medium text-sm text-white/90">
-            Design System Update
-          </span>
-        </div>
+        {activeTask ? (
+          <div className="flex items-center gap-2 rounded-full bg-black/20 px-4 py-1.5 backdrop-blur-sm">
+            <div className="size-2 rounded-full bg-orange-500" />
+            <span className="font-medium text-sm text-white/90">
+              {activeTask.title}
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 rounded-full bg-black/10 px-4 py-1.5 backdrop-blur-sm">
+            <span className="font-medium text-sm text-white/50">
+              No active task
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Mode Indicators */}

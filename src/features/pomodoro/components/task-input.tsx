@@ -1,36 +1,18 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useTaskStore } from "@/stores/use-task-store";
-import { TaskList } from "./task-list";
+import { TaskBoard } from "./task-board";
 
 interface TaskInputProps {
   className?: string;
 }
 
 export function TaskInput({ className }: TaskInputProps) {
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const { addTask, activeTaskId, tasks } = useTaskStore();
-  const [isListOpen, setIsListOpen] = useState(false);
-
+  const { activeTaskId, tasks } = useTaskStore();
   const activeTask = tasks.find((t) => t.id === activeTaskId);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && newTaskTitle.trim()) {
-      addTask(newTaskTitle.trim());
-      setNewTaskTitle("");
-      setIsListOpen(true);
-    }
-  };
 
   return (
     <div className={cn("flex flex-col items-center gap-4", className)}>
@@ -44,40 +26,31 @@ export function TaskInput({ className }: TaskInputProps) {
         </div>
       )}
 
-      {/* Task Input & List Toggle */}
-      <div className="relative w-full max-w-md">
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="What are you working on?"
-            value={newTaskTitle}
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className={cn(
-              "h-12 border-white/10 bg-black/20 text-white backdrop-blur-sm placeholder:text-white/50",
-              "focus:border-white/30 focus:ring-white/20",
-              "text-base sm:text-lg",
-            )}
-          />
-          <Popover open={isListOpen} onOpenChange={setIsListOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="h-12 border-white/10 bg-black/20 text-white hover:bg-black/40 hover:text-white"
-              >
-                <span className="mr-2 hidden sm:inline">Tasks</span>
-                <ChevronDown className="size-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-[350px] border-white/10 bg-black/80 p-4 backdrop-blur-xl sm:w-[400px]"
-              align="end"
+      {/* Task Board Trigger */}
+      <TaskBoard>
+        <div className="relative w-full max-w-md cursor-pointer">
+          <div className="flex gap-2">
+            <div
+              className={cn(
+                "flex h-12 w-full items-center justify-between rounded-md border border-white/10 bg-black/20 px-4 text-white backdrop-blur-sm transition-all hover:bg-black/30",
+              )}
             >
-              <TaskList />
-            </PopoverContent>
-          </Popover>
+              <span className="text-white/50">
+                {activeTask ? "Manage tasks..." : "What are you working on?"}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 text-white/50 hover:text-white"
+                >
+                  <Plus className="size-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </TaskBoard>
     </div>
   );
 }

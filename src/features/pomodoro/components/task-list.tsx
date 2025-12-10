@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Circle, MoreVertical, Play, Trash2 } from "lucide-react";
+import { Check, GripVertical, MoreVertical, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useTaskStore } from "@/stores/use-task-store";
 
@@ -32,114 +31,121 @@ export function TaskList() {
   const doneTasks = tasks.filter((t) => t.status === "done");
 
   if (isLoading && tasks.length === 0) {
+    // Use a skeleton or just return null to avoid layout shift/flicker
+    return null;
+  }
+
+  if (tasks.length === 0) {
     return (
-      <div className="text-center text-sm text-white/50">Loading tasks...</div>
+      <div className="flex h-40 flex-col items-center justify-center text-center">
+        <p className="text-lg text-white/50">No tasks yet</p>
+        <p className="text-white/30 text-xs">Add a task below to get focused</p>
+      </div>
     );
   }
 
   return (
-    <div className="w-full max-w-md space-y-4">
-      <ScrollArea className="h-[300px] pr-4">
-        <div className="space-y-2">
-          {todoTasks.map((task) => (
-            <div
-              key={task.id}
+    <div className="space-y-1">
+      {todoTasks.map((task) => (
+        <div
+          key={task.id}
+          className={cn(
+            "group flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all hover:bg-white/5",
+            activeTaskId === task.id && "bg-white/5",
+          )}
+        >
+          {/* Drag Handle (Visual only for now) */}
+          <div className="cursor-grab text-white/20 opacity-0 transition-opacity hover:text-white group-hover:opacity-100">
+            <GripVertical className="size-4" />
+          </div>
+
+          {/* Checkbox */}
+          <button
+            type="button"
+            onClick={() => updateTaskStatus(task.id, "done")}
+            className="flex size-5 items-center justify-center rounded-md border border-white/30 text-transparent transition-colors hover:border-white hover:text-white/50"
+          >
+            {/* Empty square */}
+          </button>
+
+          {/* Task Content */}
+          <button
+            type="button"
+            className="flex-1 cursor-pointer text-left"
+            onClick={() => setActiveTask(task.id)}
+          >
+            <span
               className={cn(
-                "group flex items-center justify-between rounded-lg border border-white/10 bg-black/20 p-3 transition-all hover:bg-black/30",
-                activeTaskId === task.id &&
-                  "border-orange-500/50 bg-orange-500/10",
+                "font-medium text-white transition-colors",
+                activeTaskId === task.id ? "text-orange-400" : "",
               )}
             >
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => updateTaskStatus(task.id, "done")}
-                  className="text-white/50 hover:text-orange-500"
+              {task.title}
+            </span>
+          </button>
+
+          {/* Actions */}
+          <div className="opacity-0 transition-opacity group-hover:opacity-100">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="size-8 text-white/30 hover:text-white"
                 >
-                  <Circle className="size-5" />
-                </button>
-                <div className="flex flex-col">
-                  <span className="font-medium text-sm text-white">
-                    {task.title}
-                  </span>
-                  <span className="text-white/40 text-xs">
-                    {task.actual_pomodoros} / {task.estimated_pomodoros}{" "}
-                    Pomodoros
-                  </span>
-                </div>
-              </div>
+                  <MoreVertical className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="border-white/10 bg-black/90 text-white backdrop-blur-xl"
+              >
+                <DropdownMenuItem
+                  className="text-red-400 focus:bg-white/10 focus:text-red-400"
+                  onClick={() => deleteTask(task.id)}
+                >
+                  <Trash2 className="mr-2 size-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      ))}
 
-              <div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                {activeTaskId !== task.id && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="size-8 text-white/50 hover:text-white"
-                    onClick={() => setActiveTask(task.id)}
-                    title="Focus on this task"
-                  >
-                    <Play className="size-4" />
-                  </Button>
-                )}
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-8 text-white/50 hover:text-white"
-                    >
-                      <MoreVertical className="size-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="bg-black/90 text-white backdrop-blur-xl"
-                  >
-                    <DropdownMenuItem
-                      className="text-red-400 focus:text-red-400"
-                      onClick={() => deleteTask(task.id)}
-                    >
-                      <Trash2 className="mr-2 size-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+      {doneTasks.length > 0 && (
+        <div className="pt-4">
+          {/* Separator or title if needed, or just list them */}
+          {doneTasks.map((task) => (
+            <div
+              key={task.id}
+              className="group flex items-center gap-3 rounded-xl p-3 opacity-50 transition-opacity hover:opacity-100"
+            >
+              <div className="w-4" /> {/* Spacer for grip */}
+              <button
+                type="button"
+                onClick={() => updateTaskStatus(task.id, "todo")}
+                className="flex size-5 items-center justify-center rounded-md border border-white/30 bg-white/10 text-white"
+              >
+                <Check className="size-3" />
+              </button>
+              <span className="flex-1 text-white line-through">
+                {task.title}
+              </span>
+              <div className="opacity-0 transition-opacity group-hover:opacity-100">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="size-8 text-white/30 hover:text-red-400"
+                  onClick={() => deleteTask(task.id)}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
               </div>
             </div>
           ))}
-
-          {doneTasks.length > 0 && (
-            <>
-              <div className="py-2 text-center text-white/30 text-xs uppercase tracking-widest">
-                Completed
-              </div>
-              {doneTasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="flex items-center justify-between rounded-lg border border-white/5 bg-black/10 p-3 opacity-60"
-                >
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => updateTaskStatus(task.id, "todo")}
-                      className="text-orange-500"
-                    >
-                      <CheckCircle2 className="size-5" />
-                    </button>
-                    <span className="font-medium text-sm text-white line-through">
-                      {task.title}
-                    </span>
-                  </div>
-                  <span className="text-white/40 text-xs">
-                    {task.actual_pomodoros} Poms
-                  </span>
-                </div>
-              ))}
-            </>
-          )}
         </div>
-      </ScrollArea>
+      )}
     </div>
   );
 }

@@ -19,11 +19,12 @@ export function SceneSelector() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <div className="flex h-[30px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg bg-black/20 px-2 hover:bg-black/50 sm:h-[40px] sm:rounded-xl sm:px-3">
+        <div className="flex h-[100px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg bg-black/20 px-2 hover:bg-black/50 sm:h-[40px] sm:rounded-xl sm:px-3">
           <ImageIcon className="pointer-events-none text-[20px] text-white" />
         </div>
       </DialogTrigger>
-      <DialogContent className="flex max-h-[85vh] w-[90vw] max-w-7xl flex-col overflow-hidden rounded-2xl border-none bg-black/90 p-0 text-white shadow-2xl backdrop-blur-xl">
+
+      <DialogContent className="flex h-[90vh] w-[95vw] max-w-[95vw] flex-col overflow-hidden rounded-2xl border-none bg-black/90 p-0 text-white shadow-2xl backdrop-blur-xl sm:max-w-6xl">
         <ScenePicker />
       </DialogContent>
     </Dialog>
@@ -95,7 +96,7 @@ function ScenePicker() {
         {/* Content */}
         <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto pr-2">
           {subTab === "motion" && (
-            <div className="grid grid-cols-1 gap-4 pb-4 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 pb-4 sm:grid-cols-3">
               {SCENES.map((scene) => (
                 <button
                   type="button"

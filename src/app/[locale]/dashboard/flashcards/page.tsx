@@ -81,11 +81,11 @@ export default function FlashcardsPage() {
       card.definition.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const handleView = (id: string) => {
+  const handleView = (_id: string) => {
     // Navigate to view page
   };
 
-  const handleEdit = (id: string) => {
+  const handleEdit = (_id: string) => {
     // Navigate to edit page
   };
 

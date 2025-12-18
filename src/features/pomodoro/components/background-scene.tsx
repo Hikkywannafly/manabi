@@ -47,6 +47,7 @@ function SceneLayer({
         loop
         muted
         playsInline
+        preload="metadata"
         onLoadedData={handleLoad}
         className={cn(
           "absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out",
@@ -60,6 +61,7 @@ function SceneLayer({
         loop
         muted
         playsInline
+        preload="metadata"
         onLoadedData={handleLoad}
         className={cn(
           "absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out",

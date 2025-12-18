@@ -2,10 +2,12 @@
 
 import { Howl } from "howler";
 import { useEffect, useRef } from "react";
-import { usePomodoroStore } from "@/stores/use-pomodoro-store";
+import { useAudioStore } from "@/stores/use-audio-store";
+import { useTimerStore } from "@/stores/use-timer-store";
 
 export function SoundManager() {
-  const { soundscapes, masterVolume, timerState } = usePomodoroStore();
+  const { soundscapes, masterVolume } = useAudioStore();
+  const { status, mode } = useTimerStore();
   const howlsRef = useRef<Record<string, Howl>>({});
   const tickingRef = useRef<Howl | null>(null);
 
@@ -59,20 +61,15 @@ export function SoundManager() {
   }, [soundscapes, masterVolume]);
 
   // Handle Ticking Sound
-  // TODO: Add a specific toggle for ticking sound in store if needed
-  // For now, let's assume it plays when timer is running and mode is focus
   useEffect(() => {
-    if (
-      timerState === "running" &&
-      usePomodoroStore.getState().mode === "focus"
-    ) {
+    if (status === "running" && mode === "focus") {
       if (!tickingRef.current?.playing()) {
         tickingRef.current?.play();
       }
     } else {
       tickingRef.current?.stop();
     }
-  }, [timerState]);
+  }, [status, mode]);
 
   return null; // This component is headless
 }

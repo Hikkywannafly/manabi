@@ -10,11 +10,11 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { usePomodoroStore } from "@/stores/use-pomodoro-store";
+import { useAudioStore } from "@/stores/use-audio-store";
 
 export function WhiteNoiseMixer() {
   const { soundscapes, toggleSoundscape, setSoundscapeVolume } =
-    usePomodoroStore();
+    useAudioStore();
 
   const [isEnabled, setIsEnabled] = useState(true);
 

@@ -8,8 +8,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { useStatsStore } from "@/stores/use-stats-store";
+import { useTimerStore } from "@/stores/use-timer-store";
 
 interface StatsButtonProps {
   className?: string;
@@ -17,7 +17,7 @@ interface StatsButtonProps {
 
 export function StatsButton({ className }: StatsButtonProps) {
   const { streak } = useStatsStore();
-  const { sessionCount, duration } = usePomodoroStore();
+  const { sessionCount, duration } = useTimerStore();
 
   // Calculate focus time based on completed sessions * duration
   // This is a rough estimate for the "session" view. Real stats come from DB via useStatsStore if we fetch them.

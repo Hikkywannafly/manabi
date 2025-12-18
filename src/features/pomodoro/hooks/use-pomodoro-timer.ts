@@ -1,45 +1,66 @@
 import { useCallback, useEffect, useRef } from "react";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { useTaskStore } from "@/stores/use-task-store";
+import { useTimerStore } from "@/stores/use-timer-store";
+import { TimerEngine } from "../engines/timer-engine";
 import { playCompletionSound } from "../services/audio-service";
 import type { TimerMode } from "../types";
+import { getModeConfig } from "../utils";
 
 export function usePomodoroTimer() {
   const {
     mode,
-    timerState,
+    status,
     timeLeft,
     duration,
     sessionCount,
-    setMode,
+    setMode: setTimerMode,
+    setStatus,
     setTimeLeft,
-    setSessionCount,
-    setIsPlaying,
-    saveSession,
-  } = usePomodoroStore();
+    setDuration,
+    incrementSessionCount,
+  } = useTimerStore();
 
-  const workerRef = useRef<Worker | null>(null);
+  const { saveSession } = usePomodoroStore();
+  const engineRef = useRef<TimerEngine | null>(null);
+  const sessionStartTimeRef = useRef<number | null>(null);
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
+  const changeMode = useCallback(
+    (newMode: TimerMode) => {
+      if (!engineRef.current) return;
+
+      engineRef.current.stop();
+      const config = getModeConfig(newMode);
+
+      setTimerMode(newMode);
+      setTimeLeft(config.duration);
+      setDuration(config.duration);
+      setStatus("idle");
+      sessionStartTimeRef.current = null;
+    },
+    [setTimerMode, setTimeLeft, setDuration, setStatus],
+  );
+
   const handleTimerComplete = useCallback(() => {
     playCompletionSound();
 
-    // Save session to Supabase
-    const endTime = new Date();
-    const startTime = new Date(endTime.getTime() - duration * 1000);
+    // Calculate actual session time
+    const endTime = Date.now();
+    const startTime = sessionStartTimeRef.current || endTime - duration * 1000;
 
+    // Save session to Supabase
     saveSession({
       mode,
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
+      start_time: new Date(startTime).toISOString(),
+      end_time: new Date(endTime).toISOString(),
       duration_minutes: Math.round(duration / 60),
     });
 
     if (mode === "focus") {
-      const nextCount = sessionCount + 1;
-      setSessionCount(nextCount);
+      incrementSessionCount();
 
       // Increment active task pomodoro count
       const { activeTaskId, incrementTaskPomodoro } = useTaskStore.getState();
@@ -48,66 +69,53 @@ export function usePomodoroTimer() {
       }
 
       // Flow: Focus -> Short -> Focus -> Short -> Focus -> Long
+      const nextCount = sessionCount + 1;
       if (nextCount % 3 === 0) {
-        setMode("longBreak");
+        changeMode("longBreak");
       } else {
-        setMode("shortBreak");
+        changeMode("shortBreak");
       }
     } else {
-      setMode("focus");
+      changeMode("focus");
     }
 
-    setIsPlaying(false);
+    setStatus("idle");
+    sessionStartTimeRef.current = null;
 
     // Send notification
     if (Notification.permission === "granted") {
       new Notification("Manabi Timer", {
         body: `${mode === "focus" ? "Focus session" : "Break"} complete!`,
-        icon: "/icon.png", // Make sure this exists or remove
+        icon: "/icon.png",
       });
     }
   }, [
     mode,
     sessionCount,
     duration,
-    setSessionCount,
-    setMode,
-    setIsPlaying,
     saveSession,
+    incrementSessionCount,
+    setStatus,
+    changeMode,
   ]);
 
-  // Initialize Worker
+  // Initialize Timer Engine
   useEffect(() => {
-    workerRef.current = new Worker(
-      new URL("../workers/timer.worker.ts", import.meta.url),
-    );
+    engineRef.current = new TimerEngine();
 
-    workerRef.current.onmessage = (e) => {
-      const { type, payload } = e.data;
-      if (type === "TICK") {
-        setTimeLeft(payload.timeLeft);
-      } else if (type === "COMPLETE") {
+    const unsubscribe = engineRef.current.on((event) => {
+      if (event.type === "tick") {
+        setTimeLeft(event.timeLeft);
+      } else if (event.type === "complete") {
         handleTimerComplete();
       }
-    };
+    });
 
     return () => {
-      workerRef.current?.terminate();
+      unsubscribe();
+      engineRef.current?.destroy();
     };
-  }, [setTimeLeft, handleTimerComplete]);
-
-  // Sync Worker with State
-  // biome-ignore lint/correctness/useExhaustiveDependencies: timeLeft is intentionally omitted to avoid restarting the worker on every tick
-  useEffect(() => {
-    if (timerState === "running") {
-      workerRef.current?.postMessage({
-        type: "START",
-        payload: { duration: timeLeft },
-      });
-    } else {
-      workerRef.current?.postMessage({ type: "PAUSE" });
-    }
-  }, [timerState]); // Don't include timeLeft here to avoid restart loops
+  }, [handleTimerComplete, setTimeLeft]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Request Notification Permission
   useEffect(() => {
@@ -117,37 +125,55 @@ export function usePomodoroTimer() {
   }, []);
 
   const start = useCallback(() => {
-    setIsPlaying(true);
-  }, [setIsPlaying]);
+    if (!engineRef.current) return;
+
+    sessionStartTimeRef.current = Date.now();
+    setStatus("running");
+    engineRef.current.start(timeLeft);
+  }, [timeLeft, setStatus]);
 
   const pause = useCallback(() => {
-    setIsPlaying(false);
-  }, [setIsPlaying]);
+    if (!engineRef.current) return;
+
+    setStatus("paused");
+    engineRef.current.pause();
+  }, [setStatus]);
+
+  const resume = useCallback(() => {
+    if (!engineRef.current) return;
+
+    setStatus("running");
+    engineRef.current.resume();
+  }, [setStatus]);
 
   const reset = useCallback(() => {
-    setMode(mode);
-  }, [mode, setMode]);
+    if (!engineRef.current) return;
+
+    engineRef.current.stop();
+    const config = getModeConfig(mode);
+    setTimeLeft(config.duration);
+    setDuration(config.duration);
+    setStatus("idle");
+    sessionStartTimeRef.current = null;
+  }, [mode, setTimeLeft, setDuration, setStatus]);
 
   const skip = useCallback(() => {
+    if (!engineRef.current) return;
+
+    engineRef.current.stop();
     handleTimerComplete();
   }, [handleTimerComplete]);
 
-  const changeMode = useCallback(
-    (newMode: TimerMode) => {
-      setMode(newMode);
-    },
-    [setMode],
-  );
-
   return {
     mode,
-    state: timerState,
+    state: status,
     timeLeft,
     minutes,
     seconds,
     sessionCount,
     start,
     pause,
+    resume,
     reset,
     skip,
     changeMode,

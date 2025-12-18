@@ -15,7 +15,7 @@ export function MusicPlayer() {
         "music-toolbar-button flex h-[30px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg px-2 transition-all sm:h-[40px] sm:rounded-xl sm:px-3",
         isMenuOpen || isPlaying
           ? "bg-green-500/20 text-green-500 hover:bg-green-500/30"
-          : "bg-black/20 text-white hover:bg-black/50",
+          : "bg-black/20 hover:bg-black/50",
       )}
     >
       <Music

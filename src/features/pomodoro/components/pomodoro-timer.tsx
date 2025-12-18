@@ -19,10 +19,27 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
     sessionCount,
     start,
     pause,
+    resume,
     changeMode,
   } = usePomodoroTimer();
   const { tasks, activeTaskId } = useTaskStore();
   const activeTask = tasks.find((t) => t.id === activeTaskId);
+
+  const handlePlayPause = () => {
+    if (state === "running") {
+      pause();
+    } else if (state === "paused") {
+      resume();
+    } else {
+      start();
+    }
+  };
+
+  const getButtonLabel = () => {
+    if (state === "running") return "Pause";
+    if (state === "paused") return "Resume";
+    return "Start";
+  };
 
   return (
     <div
@@ -123,14 +140,14 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
         </Button>
 
         <Button
-          onClick={state === "running" ? pause : start}
+          onClick={handlePlayPause}
           className={cn(
             "h-14 min-w-[140px] rounded-full font-bold text-lg transition-all duration-300",
             "bg-white text-black hover:scale-105 hover:bg-white/90 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]",
             "active:scale-95",
           )}
         >
-          {state === "running" ? "Pause" : "Start"}
+          {getButtonLabel()}
         </Button>
 
         <Button

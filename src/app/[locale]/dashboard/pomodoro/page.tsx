@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useSidebar } from "@/components/ui/sidebar";
+import { BackgroundMusicPlayer } from "@/features/pomodoro/components/background-music-player";
 import { BackgroundScene } from "@/features/pomodoro/components/background-scene";
 import { ControlBar } from "@/features/pomodoro/components/control-bar";
 import { LeaderboardModal } from "@/features/pomodoro/components/leaderboard-modal";
@@ -19,6 +20,9 @@ export default function PomodoroPage() {
 
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-black">
+      {/* Persistent Music Player */}
+      <BackgroundMusicPlayer />
+
       {/* Background Scene */}
       <BackgroundScene />
 

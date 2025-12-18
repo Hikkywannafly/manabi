@@ -9,7 +9,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { usePomodoroStore } from "@/stores/use-pomodoro-store";
+import { useAudioStore } from "@/stores/use-audio-store";
 import type { Playlist } from "../types";
 
 const PLAYLISTS: Playlist[] = [
@@ -40,7 +40,12 @@ const PLAYLISTS: Playlist[] = [
 ];
 
 export function MusicSelector() {
-  const { currentPlaylistId, isPlaying, setIsPlaying } = usePomodoroStore();
+  const {
+    currentPlaylistId,
+    isMusicPlaying,
+    setIsMusicPlaying,
+    setCurrentPlaylist,
+  } = useAudioStore();
 
   const currentPlaylist = PLAYLISTS.find((p) => p.id === currentPlaylistId);
 
@@ -49,7 +54,7 @@ export function MusicSelector() {
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className="flex h-14 w-full max-w-[240px] items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 hover:bg-white/10"
+          className="flex h-14 w-full max-w-60 items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 hover:bg-white/10"
         >
           <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/10">
             <Music className="size-5 text-white/70" />
@@ -78,8 +83,8 @@ export function MusicSelector() {
               key={playlist.id}
               type="button"
               onClick={() => {
-                // setPlaylist(playlist.id);
-                if (!isPlaying) setIsPlaying(true);
+                setCurrentPlaylist(playlist.id);
+                if (!isMusicPlaying) setIsMusicPlaying(true);
               }}
               className={cn(
                 "flex w-full items-center gap-3 rounded-lg p-2 transition-colors",
@@ -91,6 +96,8 @@ export function MusicSelector() {
               <Image
                 src={playlist.coverUrl}
                 alt={playlist.name}
+                width={40}
+                height={40}
                 className="size-10 rounded-md object-cover"
               />
               <div className="flex flex-col items-start">

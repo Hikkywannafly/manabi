@@ -16,28 +16,27 @@ export interface DailyStats {
  * Calculate daily statistics from sessions
  */
 export function calculateDailyStats(sessions: PomodoroSessionDB[]): DailyStats {
-  const completedSessions = sessions.filter((s) => s.completed);
+  // All sessions in the database are already completed
   const totalSessions = sessions.length;
 
-  const focusTime =
-    completedSessions
-      .filter((s) => s.mode === "focus")
-      .reduce((acc, s) => acc + s.duration, 0) / 60; // Convert to minutes
+  const focusTime = sessions
+    .filter((s) => s.mode === "focus")
+    .reduce((acc, s) => acc + s.duration_minutes, 0); // Already in minutes
 
   const byMode = {
-    focus: completedSessions.filter((s) => s.mode === "focus").length,
-    shortBreak: completedSessions.filter((s) => s.mode === "shortBreak").length,
-    longBreak: completedSessions.filter((s) => s.mode === "longBreak").length,
+    focus: sessions.filter((s) => s.mode === "focus").length,
+    shortBreak: sessions.filter((s) => s.mode === "shortBreak").length,
+    longBreak: sessions.filter((s) => s.mode === "longBreak").length,
   };
 
-  const completionRate =
-    totalSessions > 0 ? (completedSessions.length / totalSessions) * 100 : 0;
+  // All sessions are completed, so completion rate is always 100%
+  const completionRate = totalSessions > 0 ? 100 : 0;
 
   return {
     focusTime: Math.round(focusTime),
-    completedSessions: completedSessions.length,
+    completedSessions: totalSessions,
     totalSessions,
-    completionRate: Math.round(completionRate),
+    completionRate,
     byMode,
   };
 }

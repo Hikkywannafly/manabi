@@ -1,16 +1,24 @@
-export * from "./background-scene";
-export * from "./control-bar";
-export * from "./leaderboard-modal";
-export * from "./music-player";
-export * from "./music-selector";
-export * from "./night-switch";
-export * from "./pomodoro-header";
-export * from "./pomodoro-timer";
-export * from "./room-card";
-export * from "./scene-selector";
-export * from "./sound-manager";
-export * from "./soundscape-mixer";
-export * from "./stats-button";
-export * from "./streak-card";
-export * from "./task-input";
-export * from "./task-list";
+// Phase 3: Analytics
+export * from "./analytics";
+export { BackgroundMusicPlayer } from "./background-music-player";
+export { BackgroundScene } from "./background-scene";
+export { ControlBar } from "./control-bar";
+// Phase 5: Focus Guard
+export { FocusGuard } from "./focus-guard";
+export { LeaderboardModal } from "./leaderboard-modal";
+export { MusicPlayer } from "./music-player";
+export { MusicSelector } from "./music-selector";
+export { NightSwitch } from "./night-switch";
+export { PomodoroHeader } from "./pomodoro-header";
+export { PomodoroTimer } from "./pomodoro-timer";
+export { SceneSelector } from "./scene-selector";
+export { SettingsPanel } from "./settings-panel";
+// Phase 4: Social
+export * from "./social";
+export { SoundManager } from "./sound-manager";
+export { WhiteNoiseMixer } from "./soundscape-mixer";
+export { StatsButton } from "./stats-button";
+export { StreakCard } from "./streak-card";
+export { TaskBoard } from "./task-board";
+export { TaskInput } from "./task-input";
+export { TaskList } from "./task-list";

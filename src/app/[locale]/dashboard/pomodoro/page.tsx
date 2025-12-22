@@ -9,14 +9,31 @@ import { LeaderboardModal } from "@/features/pomodoro/components/leaderboard-mod
 import { PomodoroHeader } from "@/features/pomodoro/components/pomodoro-header";
 import { PomodoroTimer } from "@/features/pomodoro/components/pomodoro-timer";
 import { TaskInput } from "@/features/pomodoro/components/task-input";
+import { useRoomStore } from "@/stores/use-room-store";
 
 export default function PomodoroPage() {
   const { setOpen } = useSidebar();
+  const { currentRoom } = useRoomStore();
 
   // Hide sidebar when entering Pomodoro page for fullscreen experience
   useEffect(() => {
     setOpen(false);
   }, [setOpen]);
+
+  // Auto-create/join personal room
+  useEffect(() => {
+    if (!currentRoom) {
+      // Just call initializePersonalRoom, it handles checks and creation
+      const initRoom = async () => {
+        // We can add a small delay or check if we have checked auth yet,
+        // but initializePersonalRoom checks auth too.
+        // We just need to make sure we don't loop. currentRoom check prevents loop.
+        const { initializePersonalRoom } = useRoomStore.getState();
+        await initializePersonalRoom();
+      };
+      initRoom();
+    }
+  }, [currentRoom]);
 
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-black">

@@ -9,6 +9,7 @@ import {
   Zap,
 } from "lucide-react";
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { MusicPlayer } from "./music-player";
 import { NightSwitch } from "./night-switch";
@@ -21,6 +22,7 @@ interface ControlBarProps {
 }
 
 export function ControlBar({ className }: ControlBarProps) {
+  const [activeTab, setActiveTab] = useState<"focus" | "timer">("focus");
   return (
     <div
       className={cn(
@@ -70,22 +72,40 @@ export function ControlBar({ className }: ControlBarProps) {
 
       {/* Floating Status Pill (Timer/Mode) */}
       <div className="-translate-x-1/2 absolute bottom-20 left-1/2 transform sm:bottom-24">
-        <div className="relative flex h-[28px] items-end gap-1 rounded-md border border-white/10 bg-black/30 p-0 shadow-lg backdrop-blur-xl sm:h-[35px]">
+        <div className="relative flex h-7 items-end gap-1 rounded-md border border-white/10 bg-black/30 p-0 shadow-lg backdrop-blur-xl sm:h-[35px]">
+          {/* Active tab indicator - dynamically positioned */}
           <div
-            className="absolute top-0 left-0 z-0 h-full rounded-md bg-gradient-to-tr from-white/70 via-pink-100 to-pink-300"
-            style={{ left: "1px", width: "50px" }} // Dynamic width based on active tab?
+            className={cn(
+              "absolute top-0 left-0 z-0 h-full rounded-md bg-linear-to-tr from-white/70 via-pink-100 to-pink-300 transition-transform duration-200",
+              activeTab === "focus"
+                ? "translate-x-0"
+                : "translate-x-[calc(100%+0.25rem)]",
+            )}
+            style={{ width: "50px" }}
           />
           <button
             type="button"
+            onClick={() => setActiveTab("focus")}
             className="relative z-10 flex cursor-pointer justify-center rounded-md px-2 py-1 font-semibold text-sm transition-all duration-200 sm:px-3"
           >
-            <Zap className="pb-[1px] pl-1 text-[14px] text-black transition-all duration-200 sm:text-[22px]" />
+            <Zap
+              className={cn(
+                "pb-px pl-1 text-[14px] transition-all duration-200 sm:text-[22px]",
+                activeTab === "focus" ? "text-black" : "text-white",
+              )}
+            />
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("timer")}
             className="relative z-10 flex cursor-pointer justify-center rounded-md px-2 py-1 font-semibold text-sm transition-all duration-200 sm:px-3"
           >
-            <Clock className="pb-[1px] pl-1 text-[14px] text-white transition-all duration-200 sm:text-[22px]" />
+            <Clock
+              className={cn(
+                "pb-px pl-1 text-[14px] transition-all duration-200 sm:text-[22px]",
+                activeTab === "timer" ? "text-black" : "text-white",
+              )}
+            />
             {/* Maybe show time here? */}
           </button>
         </div>

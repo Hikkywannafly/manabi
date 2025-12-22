@@ -1,6 +1,7 @@
 "use client";
 
 import { Brain, Loader2, Settings, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -19,10 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useFlashProcessor } from "@/features/flashcards/hooks/use-flash-processor";
+import { useGenerateFlashcardTitleDescription } from "@/features/flashcards/hooks/use-generate-flashcard-title-description";
 import { FileList } from "./file-list";
 import { FileUploadArea } from "./file-upload-area";
 import { SupportedFormats } from "./supported-formats";
-import type { UploadedFile } from "./types";
 
 interface AIGeneratedUploaderProps {
   onProcessingStart?: (fileName: string, label?: string) => void;
@@ -34,8 +36,7 @@ export function AIGeneratedUploader({
   onProcessingStart,
   onProcessingDone,
 }: AIGeneratedUploaderProps) {
-  // Local state for files since we don't have the store
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Settings state
@@ -54,23 +55,17 @@ export function AIGeneratedUploader({
   const [difficulty, setDifficulty] = useState<string>("easy");
   const [parsingMode, setParsingMode] = useState<string>("balanced");
 
-  const hasFiles = uploadedFiles.length > 0;
+  const {
+    uploadedFiles,
+    addFiles,
+    removeFile,
+    generateFromFiles,
+    extractFromFilesAI,
+    isProcessing,
+    hasFiles,
+  } = useFlashProcessor();
 
-  const addFiles = (droppedFiles: File[]) => {
-    const newFiles: UploadedFile[] = droppedFiles.map((file) => ({
-      id: Math.random().toString(36).substring(7), // Simple ID generation
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      status: "success", // Automatically mark as success for demo
-      progress: 100,
-    }));
-    setUploadedFiles((prev) => [...prev, ...newFiles]);
-  };
-
-  const removeFile = (fileId: string) => {
-    setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
-  };
+  const titleGenerator = useGenerateFlashcardTitleDescription();
 
   const handleGenerateFlashcards = async () => {
     if (uploadedFiles.length === 0) return;
@@ -83,12 +78,80 @@ export function AIGeneratedUploader({
         : "Processing file...",
     );
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const settings = {
+        generationMode,
+        flashcardType,
+        fileProcessingMode,
+        visibility,
+        language,
+        numberOfCards,
+        difficulty,
+        parsingMode,
+      };
+
+      let result: { flashcards: any[] };
+      if (generationMode === "GENERATE") {
+        result = await generateFromFiles(settings);
+      } else {
+        result = await extractFromFilesAI(settings);
+      }
+
+      // Generate better title/description asynchronously (non-blocking)
+      try {
+        const fileContent = uploadedFiles[0]?.parsedContent || "";
+        await titleGenerator.generateTitleDescription(
+          fileContent,
+          result.flashcards || [],
+          {
+            isExtractMode: generationMode === "EXTRACT",
+            targetLanguage: language,
+            filename: uploadedFiles[0]?.name,
+            category: flashcardType === "VOCABULARY" ? "Vocabulary" : undefined,
+          },
+        );
+      } catch (error) {
+        console.warn("⚠️ Failed to generate AI title (using fallback):", error);
+      }
+
       setIsGenerating(false);
       onProcessingDone?.(true);
-      toast.success("Flashcards generated successfully! (Mock)");
-    }, 2000);
+      toast.success(
+        `Generated ${result.flashcards.length} flashcards successfully!`,
+      );
+
+      // Navigate to edit page
+      router.push("/dashboard/flashcards/create/edit");
+    } catch (error) {
+      setIsGenerating(false);
+      onProcessingDone?.(false);
+
+      let errorMessage = "Unknown error";
+      let errorTitle = "Failed to generate flashcards";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+
+        // Customize error messages based on error type
+        if (errorMessage.includes("Rate limit")) {
+          errorTitle = "Too Many Requests";
+        } else if (errorMessage.includes("API quota")) {
+          errorTitle = "API Quota Exceeded";
+        } else if (errorMessage.includes("Invalid API key")) {
+          errorTitle = "Authentication Error";
+        } else if (errorMessage.includes("429")) {
+          errorTitle = "Rate Limit Exceeded";
+          errorMessage =
+            "You've made too many requests. Please wait a moment before trying again.";
+        }
+      }
+
+      toast.error(errorTitle, {
+        description: errorMessage,
+        duration: 5000,
+      });
+      console.error("Error generating flashcards:", error);
+    }
   };
 
   return (
@@ -97,10 +160,7 @@ export function AIGeneratedUploader({
         {/* Main area */}
         <div className="space-y-6 lg:col-span-2">
           {/* Upload Area */}
-          <FileUploadArea
-            onDrop={addFiles}
-            isDragActive={false} // Managed internally by Dropzone in FileUploadArea
-          />
+          <FileUploadArea onDrop={addFiles} isDragActive={false} />
           <FileList files={uploadedFiles} onRemoveFile={removeFile} />
 
           {/* Action */}
@@ -112,7 +172,7 @@ export function AIGeneratedUploader({
             </p>
             <div className="flex gap-2">
               <Button
-                disabled={!hasFiles || isGenerating}
+                disabled={!hasFiles || isProcessing || isGenerating}
                 onClick={handleGenerateFlashcards}
                 className="flex items-center gap-2"
               >

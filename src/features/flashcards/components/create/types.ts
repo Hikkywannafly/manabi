@@ -7,4 +7,5 @@ export interface UploadedFile {
   progress: number;
   error?: string;
   url?: string;
+  file?: File; // Store the actual File object for processing
 }

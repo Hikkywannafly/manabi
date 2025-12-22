@@ -38,39 +38,6 @@ export class TimerEngine {
     this.initWorker();
   }
 
-  private initWorker() {
-    try {
-      this.worker = new Worker(
-        new URL("../workers/timer.worker.ts", import.meta.url),
-      );
-
-      this.worker.onmessage = (e: MessageEvent) => {
-        const { type, payload } = e.data;
-
-        if (type === "TICK") {
-          this.state.timeLeft = payload.timeLeft;
-          this.emit({ type: "tick", timeLeft: payload.timeLeft });
-        } else if (type === "COMPLETE") {
-          this.state.status = "idle";
-          this.state.timeLeft = 0;
-          this.state.targetEndTime = null;
-          this.emit({ type: "complete", timeLeft: 0 });
-        }
-      };
-
-      this.worker.onerror = (error) => {
-        console.error("Timer worker error:", error);
-        this.emit({
-          type: "error",
-          timeLeft: this.state.timeLeft,
-          error: error.message,
-        });
-      };
-    } catch (error) {
-      console.error("Failed to initialize timer worker:", error);
-    }
-  }
-
   /**
    * Start the timer with a given duration
    */
@@ -159,15 +126,6 @@ export class TimerEngine {
   on(callback: (event: TimerEvent) => void) {
     this.listeners.add(callback);
     return () => this.listeners.delete(callback);
-  }
-
-  /**
-   * Emit event to all listeners
-   */
-  private emit(event: TimerEvent) {
-    this.listeners.forEach((callback) => {
-      callback(event);
-    });
   }
 
   /**

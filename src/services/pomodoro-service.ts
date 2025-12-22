@@ -9,6 +9,7 @@ export type PomodoroSession = {
   start_time: string;
   end_time: string;
   duration_minutes: number;
+  task_id?: string | null;
   created_at: string;
 };
 

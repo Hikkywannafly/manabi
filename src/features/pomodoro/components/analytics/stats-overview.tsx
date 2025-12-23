@@ -5,12 +5,12 @@ import { useCallback, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import type { PomodoroSessionDB } from "../../services/timer-service";
 import {
   calculateDailyStats,
   formatFocusTime,
   getProductivityScore,
-} from "../../services/stats-service";
-import type { PomodoroSessionDB } from "../../services/timer-service";
+} from "../../utils/stats-calculations";
 
 interface StatsOverviewProps {
   userId?: string;

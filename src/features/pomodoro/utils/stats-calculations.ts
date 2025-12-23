@@ -1,4 +1,4 @@
-import type { PomodoroSessionDB } from "./timer-service";
+import type { PomodoroSessionDB } from "../services/timer-service";
 
 export interface DailyStats {
   focusTime: number; // in minutes

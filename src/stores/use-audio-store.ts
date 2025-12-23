@@ -8,19 +8,10 @@ interface AudioState {
   soundscapes: Soundscape[];
   masterVolume: number;
 
-  // Music State
-  currentPlaylistId: string | null;
-  musicVolume: number;
-  isMusicPlaying: boolean;
-
   // Actions
   setMasterVolume: (volume: number) => void;
   toggleSoundscape: (id: string) => void;
   setSoundscapeVolume: (id: string, volume: number) => void;
-
-  setMusicVolume: (volume: number) => void;
-  setCurrentPlaylist: (playlistId: string | null) => void;
-  setIsMusicPlaying: (isPlaying: boolean) => void;
 }
 
 const INITIAL_SOUNDSCAPES: Soundscape[] = [
@@ -63,9 +54,6 @@ export const useAudioStore = create<AudioState>()(
     (set) => ({
       soundscapes: INITIAL_SOUNDSCAPES,
       masterVolume: 80,
-      currentPlaylistId: "chill-lofi",
-      musicVolume: 50,
-      isMusicPlaying: false,
 
       setMasterVolume: (volume) => set({ masterVolume: volume }),
 
@@ -82,18 +70,12 @@ export const useAudioStore = create<AudioState>()(
             s.id === id ? { ...s, volume } : s,
           ),
         })),
-
-      setMusicVolume: (volume) => set({ musicVolume: volume }),
-      setCurrentPlaylist: (playlistId) =>
-        set({ currentPlaylistId: playlistId }),
-      setIsMusicPlaying: (isPlaying) => set({ isMusicPlaying: isPlaying }),
     }),
     {
       name: "audio-storage",
       partialize: (state) => ({
         masterVolume: state.masterVolume,
         soundscapes: state.soundscapes,
-        musicVolume: state.musicVolume,
       }),
     },
   ),

@@ -34,7 +34,6 @@ export const navItems: NavItem[] = [
     url: "/dashboard/account", // Placeholder as there is no direct link for the parent
     icon: "billing",
     isActive: false,
-
     // items: [
     //   {
     //     title: "Profile",
@@ -64,7 +63,7 @@ export const navItems: NavItem[] = [
 export const contentNavItems: NavItem[] = [
   {
     title: "Quizzes",
-    url: "/dashboard/quizzes",
+    url: "/dashboard/quiz",
     icon: "post",
     isActive: false,
     items: [],

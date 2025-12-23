@@ -9,7 +9,7 @@ import {
   type FieldPath,
   type FieldValues,
   FormProvider,
-  type UseFormReturn,
+  // type UseFormReturn,
   useFormContext,
   useFormState,
 } from "react-hook-form";
@@ -17,27 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-type FormProps<TFieldValues extends FieldValues = FieldValues> = {
-  children: React.ReactNode;
-  onSubmit: React.FormEventHandler<HTMLFormElement>;
-  form: UseFormReturn<TFieldValues>;
-  className?: string;
-};
-
-const Form = <TFieldValues extends FieldValues = FieldValues>({
-  children,
-  onSubmit,
-  form,
-  className,
-}: FormProps<TFieldValues>) => {
-  return (
-    <FormProvider {...form}>
-      <form onSubmit={onSubmit} className={className}>
-        {children}
-      </form>
-    </FormProvider>
-  );
-};
+const Form = FormProvider;
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,

@@ -38,6 +38,62 @@ export class TimerEngine {
     this.initWorker();
   }
 
+  private initWorker() {
+    if (typeof window === "undefined") return;
+
+    const workerCode = `
+      let timerId = null;
+
+      self.onmessage = function(e) {
+        const { type, payload } = e.data;
+
+        if (type === 'START') {
+          const { endTime } = payload;
+
+          if (timerId) clearInterval(timerId);
+
+          timerId = setInterval(() => {
+            const now = Date.now();
+            const timeLeft = Math.ceil((endTime - now) / 1000);
+
+            if (timeLeft <= 0) {
+              clearInterval(timerId);
+              self.postMessage({ type: 'COMPLETE' });
+            } else {
+              self.postMessage({ type: 'TICK', payload: { timeLeft } });
+            }
+          }, 100); // Check every 100ms for responsiveness
+        }
+        else if (type === 'PAUSE' || type === 'STOP') {
+          if (timerId) {
+            clearInterval(timerId);
+            timerId = null;
+          }
+        }
+      };
+    `;
+
+    const blob = new Blob([workerCode], { type: "application/javascript" });
+    this.worker = new Worker(URL.createObjectURL(blob));
+
+    this.worker.onmessage = (e) => {
+      const { type, payload } = e.data;
+
+      if (type === "TICK") {
+        this.state.timeLeft = payload.timeLeft;
+        this.listeners.forEach((listener) => {
+          listener({ type: "tick", timeLeft: this.state.timeLeft });
+        });
+      } else if (type === "COMPLETE") {
+        this.state.status = "idle";
+        this.state.timeLeft = 0;
+        this.listeners.forEach((listener) => {
+          listener({ type: "complete", timeLeft: 0 });
+        });
+      }
+    };
+  }
+
   /**
    * Start the timer with a given duration
    */

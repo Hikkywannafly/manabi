@@ -5,12 +5,18 @@ const supabase = createClient();
 export type GenerationParams = {
   difficulty: "Easy" | "Medium" | "Hard";
   numberOfQuestions: number;
-  questionType: "Mixed" | "Multiple Choice" | "True/False";
+  questionType: string;
+  language: string;
+  mode: "quiz" | "exam";
+  parsingMode: "fast" | "balanced" | "premium";
+  task: "generate" | "extract";
+  customInstructions?: string;
 };
 
 export type ProgressPayload = {
   progress: number;
   message: string;
+  data?: any;
 };
 
 export const AIService = {
@@ -19,7 +25,8 @@ export const AIService = {
    * @returns The initial task response (e.g., successful start).
    */
   async generateContent(
-    filePath: string,
+    filePath: string | undefined,
+    textContent: string | undefined,
     quizId: string,
     params: GenerationParams,
   ) {
@@ -29,6 +36,7 @@ export const AIService = {
         body: {
           action: "generate_quiz",
           filePath,
+          textContent,
           quizId,
           generationParams: params,
         },

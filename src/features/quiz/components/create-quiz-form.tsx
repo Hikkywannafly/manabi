@@ -2,11 +2,15 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  Crown,
   Edit3,
   FileText,
   Image as ImageIcon,
   Link as LinkIcon,
+  Scale,
+  Sparkles,
   Youtube,
+  Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,14 +18,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -41,6 +44,8 @@ import { FileUpload } from "./file-upload";
 export function CreateQuizForm() {
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
+  const [textInput, setTextInput] = useState("");
+  const [activeTab, setActiveTab] = useState("file");
   const [uploading, setUploading] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generationStatus, setGenerationStatus] = useState("");
@@ -50,12 +55,12 @@ export function CreateQuizForm() {
     resolver: zodResolver(quizCreationSchema),
     defaultValues: {
       visibility: "private",
-      language: "auto",
+      language: "english",
       questionType: "mixed",
       numberOfQuestions: "5",
       mode: "quiz",
       difficulty: "medium",
-      task: "generate_quiz",
+      task: "generate",
       parsingMode: "fast",
       customInstructions: "",
     },
@@ -64,45 +69,70 @@ export function CreateQuizForm() {
   const supabase = createClient();
 
   const onSubmit = async (values: QuizCreationValues) => {
-    if (files.length === 0) {
+    // Validation based on active tab
+    if (activeTab === "file" && files.length === 0) {
       toast.error("Please upload at least one file.");
+      return;
+    }
+    if (activeTab === "text" && !textInput.trim()) {
+      toast.error("Please enter some text.");
       return;
     }
 
     try {
       setUploading(true);
       setIsGenerating(true);
-      setGenerationStatus("Uploading files...");
+      setGenerationStatus("Preparing content...");
 
-      // 1. Upload File (Supporting single file for MVP, logic can be loop for multiple)
-      const file = files[0];
-      const fileExt = file.name.split(".").pop();
-      const filePath = `${crypto.randomUUID()}.${fileExt}`;
+      let filePath: string | undefined;
+      let textContent: string | undefined;
 
-      const { error: uploadError } = await supabase.storage
-        .from("uploads")
-        .upload(filePath, file);
+      // Handle Text Input (Direct - No Storage)
+      if (activeTab === "text") {
+        textContent = textInput.trim();
+        setGenerationStatus("Processing text...");
+      } else {
+        // Handle File Upload
+        const file = files[0];
+        setGenerationStatus("Uploading file...");
 
-      if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+        const fileExt = file.name.split(".").pop();
+        filePath = `${crypto.randomUUID()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("uploads")
+          .upload(filePath, file);
+
+        if (uploadError)
+          throw new Error(`Upload failed: ${uploadError.message}`);
+      }
 
       setUploading(false);
       setGenerationStatus("Initializing AI Generation...");
 
       // 2. Create Quiz Record (Draft/Generating)
-      // Get current user
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
+      // Default Title
+      let title = "Generated Quiz";
+      if (activeTab === "file" && files[0]) {
+        const fileExt = files[0].name.split(".").pop();
+        title = files[0].name.replace(`.${fileExt}`, "");
+      } else if (activeTab === "text") {
+        title = "Text Content Quiz";
+      }
+
       const { data: quiz, error: quizError } = await supabase
         .from("quizzes")
         .insert({
           owner_id: user.id,
-          title: file.name.replace(`.${fileExt}`, ""), // Default title from filename
+          title: title,
           status: "generating",
-          source_type: "pdf", // Todo: Detect from mime
-          source_content: filePath,
+          source_type: activeTab === "file" ? "file" : "text",
+          source_content: filePath || "direct_text",
           generation_params: values,
         })
         .select()
@@ -122,17 +152,26 @@ export function CreateQuizForm() {
           toast.success("Quiz generated successfully!");
           // Redirect after a short delay
           setTimeout(() => {
-            router.push(`/dashboard/quiz/${quizId}`);
+            if (payload.data?.slug) {
+              router.push(`/dashboard/quiz/${quizId}/${payload.data.slug}`);
+            } else {
+              router.push(`/dashboard/quiz/${quizId}`);
+            }
           }, 1000);
         }
       });
 
       // 4. Trigger AI Service
-      await AIService.generateContent(filePath, quizId, {
-        difficulty: values.difficulty as any,
+      await AIService.generateContent(filePath, textContent, quizId, {
+        difficulty: (values.difficulty.charAt(0).toUpperCase() +
+          values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
         numberOfQuestions: parseInt(values.numberOfQuestions, 10),
-        questionType:
-          values.questionType === "mixed" ? "Mixed" : "Multiple Choice", // Mapping needed
+        questionType: values.questionType,
+        language: values.language,
+        mode: values.mode,
+        parsingMode: values.parsingMode,
+        task: values.task,
+        customInstructions: values.customInstructions,
       });
     } catch (error: any) {
       console.error(error);
@@ -150,8 +189,8 @@ export function CreateQuizForm() {
     return (
       <div className="fade-in zoom-in flex min-h-[400px] animate-in flex-col items-center justify-center space-y-6 text-center duration-500">
         <div className="relative">
-          {/* Spinner or Animation */}
           <div className="h-24 w-24 animate-spin rounded-full border-4 border-primary/30 border-t-primary"></div>
+          <Sparkles className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-8 w-8 animate-pulse text-primary" />
         </div>
         <div className="w-full max-w-md space-y-2">
           <h3 className="font-semibold text-xl">Generating your quiz...</h3>
@@ -175,7 +214,11 @@ export function CreateQuizForm() {
       >
         {/* Left Column: Source Input */}
         <div className="space-y-6 md:col-span-2">
-          <Tabs defaultValue="file" className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="mb-4 grid w-full grid-cols-5">
               <TabsTrigger value="file">
                 <FileText className="mr-2 h-4 w-4" /> File
@@ -183,13 +226,13 @@ export function CreateQuizForm() {
               <TabsTrigger value="text">
                 <Edit3 className="mr-2 h-4 w-4" /> Text
               </TabsTrigger>
-              <TabsTrigger value="link">
+              <TabsTrigger value="link" disabled>
                 <LinkIcon className="mr-2 h-4 w-4" /> Link
               </TabsTrigger>
-              <TabsTrigger value="image">
+              <TabsTrigger value="image" disabled>
                 <ImageIcon className="mr-2 h-4 w-4" /> Image
               </TabsTrigger>
-              <TabsTrigger value="youtube">
+              <TabsTrigger value="youtube" disabled>
                 <Youtube className="mr-2 h-4 w-4" /> YouTube
               </TabsTrigger>
             </TabsList>
@@ -223,13 +266,13 @@ export function CreateQuizForm() {
                             onClick={() => removeFile(idx)}
                             type="button"
                           >
-                            This isn't correct x
+                            ×
                           </Button>
                         </div>
                       ))}
                       <div className="pt-2 text-center">
                         <p className="text-muted-foreground text-xs">
-                          Up to 10 files, 20 MB total
+                          Supports PDF, DOCX, PPTX, TXT (Max 10MB)
                         </p>
                       </div>
                     </div>
@@ -237,189 +280,291 @@ export function CreateQuizForm() {
                 </CardContent>
               </Card>
             </TabsContent>
-            {/* Other Tabs Placeholders */}
+
             <TabsContent value="text">
-              <div className="rounded border p-10 text-center">
-                Text Input Coming Soon
-              </div>
-            </TabsContent>
-            <TabsContent value="link">
-              <div className="rounded border p-10 text-center">
-                Link Input Coming Soon
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Paste Text Content</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    placeholder="Paste your study notes, articles, or summary here..."
+                    className="min-h-[300px]"
+                    value={textInput}
+                    onChange={(e) => setTextInput(e.target.value)}
+                  />
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
-
-          <div className="flex justify-end">
-            {/* Error Summary if needed */}
-            <div className="text-red-500 text-sm">
-              {Object.keys(form.formState.errors).length > 0 &&
-                "Please fix errors on the right."}
-            </div>
-          </div>
         </div>
 
         {/* Right Column: Settings */}
         <div className="space-y-5">
-          {/* Visibility */}
-          <FormField
-            control={form.control}
-            name="visibility"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Visibility</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select visibility" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="private">Private</SelectItem>
-                    <SelectItem value="public">Public</SelectItem>
-                    <SelectItem value="shared">Shared</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Configuration</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Parsing Mode */}
+              <FormField
+                control={form.control}
+                name="parsingMode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Parsing Mode</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="fast">
+                          <div className="flex items-center">
+                            <Zap className="mr-2 h-4 w-4 text-yellow-500" />
+                            <span>Fast (Text Only)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="balanced">
+                          <div className="flex items-center">
+                            <Scale className="mr-2 h-4 w-4 text-blue-500" />
+                            <span>Balanced (Recommended)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="premium">
+                          <div className="flex items-center">
+                            <Crown className="mr-2 h-4 w-4 text-purple-500" />
+                            <span>Premium (Deep Analysis)</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
 
-          {/* Language */}
-          <FormField
-            control={form.control}
-            name="language"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Language of the quiz</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="auto">Auto detect</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="vi">Vietnamese</SelectItem>
-                    <SelectItem value="jp">Japanese</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              {/* Task */}
+              <FormField
+                control={form.control}
+                name="task"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Task</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="generate">Generate Quiz</SelectItem>
+                        <SelectItem value="extract">
+                          Extract Quiz (from existing)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
 
-          {/* Question Type */}
-          <FormField
-            control={form.control}
-            name="questionType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Question type</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="mixed">Mixed</SelectItem>
-                    <SelectItem value="multiple_choice">MCQs</SelectItem>
-                    <SelectItem value="true_false">True/False</SelectItem>
-                    <SelectItem value="fill_in_blank">Fill in Blank</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              {/* Visibility */}
+              <FormField
+                control={form.control}
+                name="visibility"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Visibility</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="private">Private</SelectItem>
+                        <SelectItem value="public">Public</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
 
-          {/* Number of Questions */}
-          <FormField
-            control={form.control}
-            name="numberOfQuestions"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Number of questions</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select count" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="5">5-10</SelectItem>
-                    <SelectItem value="10">10-15</SelectItem>
-                    <SelectItem value="20">20+</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              {/* Mode */}
+              <FormField
+                control={form.control}
+                name="mode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mode</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="quiz">
+                          Quiz (Immediate Feedback)
+                        </SelectItem>
+                        <SelectItem value="exam">
+                          Exam (End Feedback)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
 
-          {/* Difficulty */}
-          <FormField
-            control={form.control}
-            name="difficulty"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Difficulty</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select difficulty" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              {/* Language */}
+              <FormField
+                control={form.control}
+                name="language"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Language</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="english">English</SelectItem>
+                        <SelectItem value="vietnamese">Vietnamese</SelectItem>
+                        <SelectItem value="japanese">Japanese</SelectItem>
+                        <SelectItem value="auto">Auto Detect</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
 
-          {/* Custom Instructions */}
-          <FormField
-            control={form.control}
-            name="customInstructions"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Custom Instructions (optional)</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="e.g., 'Focus on definitions', 'Use simple language'"
-                    className="resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              {/* Difficulty */}
+              <FormField
+                control={form.control}
+                name="difficulty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Difficulty</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="easy">Easy</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="hard">Hard</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
 
-          <Button type="submit" className="w-full" disabled={uploading}>
-            {uploading ? "Uploading..." : "Start making quiz"}
-          </Button>
+              {/* Question Type */}
+              <FormField
+                control={form.control}
+                name="questionType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Question Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="mixed">Mixed</SelectItem>
+                        <SelectItem value="multiple_choice">
+                          Multiple Choice
+                        </SelectItem>
+                        <SelectItem value="true_false">True/False</SelectItem>
+                        <SelectItem value="fill_in_blank">
+                          Fill in Blank
+                        </SelectItem>
+                        <SelectItem value="short_answer">
+                          Short Answer
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              {/* Number of Questions */}
+              <FormField
+                control={form.control}
+                name="numberOfQuestions"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Questions Count</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="5">5 Questions</SelectItem>
+                        <SelectItem value="10">10 Questions</SelectItem>
+                        <SelectItem value="15">15 Questions</SelectItem>
+                        <SelectItem value="20">20 Questions</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              {/* Custom Instructions */}
+              <FormField
+                control={form.control}
+                name="customInstructions"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Custom Instructions</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="e.g. 'Focus on strict definitions'"
+                        className="h-20 resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full" disabled={uploading}>
+                {uploading ? "Uploading..." : "Generate Quiz"}
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </form>
     </Form>

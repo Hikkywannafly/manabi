@@ -1,222 +1,274 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.1.3";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
-// CORS Headers
-const corsHeaders = {
+// Import types and config
+import {
+  ENV_VARS,
+  ERROR_MESSAGES,
+  LOGGING_CONFIG,
+  PROGRESS_STEPS,
+} from "./config.ts";
+// Import Services
+import { AIService } from "./services/ai.service.ts";
+import { QuizService } from "./services/quiz.service.ts";
+import { StorageService } from "./services/storage.service.ts";
+import type { GenerationParams, RequestPayload } from "./types.ts";
+import { Logger } from "./utils/logger.ts";
+import { ProgressTracker } from "./utils/progress.ts";
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
 
+// ============================================================================
+// MAIN HANDLER
+// ============================================================================
+
+class QuizGenerationHandler {
+  private supabase;
+  private storageService: StorageService;
+  private aiService: AIService;
+  private quizService: QuizService;
+  private progressTracker: ProgressTracker;
+
+  constructor(
+    supabaseUrl: string,
+    supabaseKey: string,
+    openRouterApiKey: string,
+    quizId: string,
+    generationParams?: GenerationParams,
+  ) {
+    this.supabase = createClient(supabaseUrl, supabaseKey);
+    this.storageService = new StorageService(this.supabase);
+    this.aiService = new AIService(openRouterApiKey);
+    this.quizService = new QuizService(this.supabase);
+    this.progressTracker = new ProgressTracker(
+      this.supabase,
+      quizId,
+      generationParams,
+    );
+  }
+
+  async execute(
+    filePath: string | undefined,
+    textContent: string | undefined,
+    quizId: string,
+  ): Promise<{
+    success: boolean;
+    count: number;
+    title: string;
+    slug: string;
+  }> {
+    let shouldCleanupFile = false;
+
+    try {
+      let contentData: string;
+      let processedMimeType: string;
+
+      // Determine content source
+      if (textContent) {
+        // Direct text processing (no storage involved)
+        Logger.info("Using direct text content (no file download)");
+        contentData = textContent;
+        processedMimeType = "text/plain";
+
+        await this.progressTracker.update(
+          PROGRESS_STEPS.CONVERT.percent,
+          PROGRESS_STEPS.CONVERT.message,
+        );
+      } else if (filePath) {
+        // File-based processing (download from storage)
+        shouldCleanupFile = true; // Mark for cleanup
+
+        // Step 1: Download file
+        await this.progressTracker.update(
+          PROGRESS_STEPS.DOWNLOAD.percent,
+          PROGRESS_STEPS.DOWNLOAD.message,
+        );
+        const { data: fileBlob, mimeType } =
+          await this.storageService.downloadFile(filePath);
+
+        // Step 2: Process file based on type
+        await this.progressTracker.update(
+          PROGRESS_STEPS.CONVERT.percent,
+          PROGRESS_STEPS.CONVERT.message,
+        );
+
+        processedMimeType = mimeType;
+
+        // Check if file is DOCX
+        const isDocx =
+          mimeType.includes("wordprocessingml") || mimeType.includes("msword");
+
+        if (isDocx) {
+          contentData = await this.storageService.extractTextFromDocx(fileBlob);
+          processedMimeType = "text/plain";
+        } else {
+          contentData = await this.storageService.convertToBase64(fileBlob);
+        }
+      } else {
+        throw new Error("Either filePath or textContent must be provided");
+      }
+
+      // Step 3: Generate quiz with AI
+      await this.progressTracker.update(
+        PROGRESS_STEPS.ANALYZE.percent,
+        PROGRESS_STEPS.ANALYZE.message,
+      );
+      const aiResponse = await this.aiService.generateQuiz(
+        contentData,
+        processedMimeType,
+        this.progressTracker.generationParams,
+      );
+
+      // Step 4: Parse response
+      await this.progressTracker.update(
+        PROGRESS_STEPS.PARSE.percent,
+        PROGRESS_STEPS.PARSE.message,
+      );
+
+      // Step 5: Save to database
+      await this.progressTracker.update(
+        PROGRESS_STEPS.SAVE.percent,
+        PROGRESS_STEPS.SAVE.message,
+      );
+      await this.quizService.saveQuestions(quizId, aiResponse.questions);
+      const slug = await this.quizService.updateQuizMetadata(
+        quizId,
+        aiResponse.title,
+      );
+
+      // Step 6: Update status
+      await this.progressTracker.update(
+        PROGRESS_STEPS.UPDATE.percent,
+        PROGRESS_STEPS.UPDATE.message,
+      );
+      await this.quizService.updateStatus(quizId, "ready");
+
+      // Complete
+      await this.progressTracker.update(
+        PROGRESS_STEPS.COMPLETE.percent,
+        PROGRESS_STEPS.COMPLETE.message,
+        { title: aiResponse.title, slug },
+      );
+
+      return {
+        success: true,
+        count: aiResponse.questions.length,
+        title: aiResponse.title,
+        slug,
+      };
+    } finally {
+      // Auto-cleanup: Delete temporary file if it was uploaded
+      if (shouldCleanupFile && filePath) {
+        await this.storageService.deleteFile(filePath);
+      }
+    }
+  }
+}
+
+// ============================================================================
+// EDGE FUNCTION ENTRY POINT
+// ============================================================================
+
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: CORS_HEADERS });
   }
 
   try {
-    const {
-      action: _action,
+    Logger.info(`${LOGGING_CONFIG.emojis.rocket} Quiz generation started`);
+
+    // Parse and validate request
+    const payload: RequestPayload = await req.json();
+    const { filePath, textContent, quizId, generationParams } = payload;
+
+    if (!((filePath || textContent) && quizId)) {
+      throw new Error(
+        "Missing required fields: (filePath or textContent) and quizId",
+      );
+    }
+
+    Logger.info("Request payload", {
       filePath,
+      textContent: textContent ? "provided" : "none",
       quizId,
       generationParams,
-    } = await req.json();
-    // Expected Payload:
-    // {
-    //   action: 'generate_quiz',
-    //   filePath: 'uploads/abc.pdf', (path in bucket)
-    //   quizId: 'uuid',
-    //   generationParams: { difficulty, numberOfQuestions, ... }
-    // }
+    });
 
-    // Init Supabase Client
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    // Validate environment variables
+    const supabaseUrl = Deno.env.get(ENV_VARS.supabaseUrl);
+    const supabaseKey = Deno.env.get(ENV_VARS.supabaseKey);
+    const openRouterApiKey = Deno.env.get(ENV_VARS.openRouterApiKey);
 
     if (!(supabaseUrl && supabaseKey)) {
-      throw new Error("Missing Supabase environment variables");
+      throw new Error(ERROR_MESSAGES.missingSupabaseEnv);
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Init Gemini
-    const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!geminiApiKey) {
-      throw new Error("GEMINI_API_KEY is missing");
-    }
-    const genAI = new GoogleGenerativeAI(geminiApiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    // Helper to send Realtime Progress
-    const sendProgress = async (percentage: number, message: string) => {
-      // Option A: Update DB (Persistent Log)
-      await supabase
-        .from("quizzes")
-        .update({
-          generation_params: {
-            ...generationParams,
-            progress: percentage,
-            step: message,
-          },
-        })
-        .eq("id", quizId);
-
-      // Option B: Realtime Broadcast (Ephemeral - Better for UI bars)
-      const channel = supabase.channel(`quiz:${quizId}`);
-      await channel.send({
-        type: "broadcast",
-        event: "progress",
-        payload: { progress: percentage, message },
-      });
-      // cleanup handled by client unsubscription usually, or precise channel management
-    };
-
-    // --- STEP 1: DOWNLOAD FILE (10%) ---
-    await sendProgress(10, "Fetching file from storage...");
-
-    // Download file from 'uploads' bucket (or whatever bucket name used)
-    const { data: fileData, error: downloadError } = await supabase.storage
-      .from("uploads") // Adjust bucket name if needed
-      .download(filePath);
-
-    if (downloadError) {
-      throw new Error(`Download failed: ${downloadError.message}`);
+    if (!openRouterApiKey) {
+      throw new Error(ERROR_MESSAGES.missingOpenRouterKey);
     }
 
-    // Convert Blob to Base64/Bytes for Gemini
-    const arrayBuffer = await fileData.arrayBuffer();
-    const base64Data = btoa(
-      String.fromCharCode(...new Uint8Array(arrayBuffer)),
+    // Execute quiz generation
+    const handler = new QuizGenerationHandler(
+      supabaseUrl,
+      supabaseKey,
+      openRouterApiKey,
+      quizId,
+      generationParams,
     );
 
-    // Detect MimeType (simple check)
-    const mimeType = fileData.type || "application/pdf"; // Default logic
+    const result = await handler.execute(filePath, textContent, quizId);
 
-    // --- STEP 2: GENERATE CONTENT (40%) ---
-    await sendProgress(40, "Analyzing content with AI...");
+    Logger.celebrate("Quiz generation completed!");
+    Logger.success("Result", result);
 
-    const prompt = `
-      You are an expert educational content generator.
-      Task: Create a quiz based on the attached document.
-
-      Settings:
-      - Difficulty: ${generationParams?.difficulty || "Medium"}
-      - Number of Questions: ${generationParams?.numberOfQuestions || 5}
-      - Question Type: ${generationParams?.questionType || "Mixed"}
-
-      Output Format: JSON Array ONLY.
-      Schema:
-      [
-        {
-          "question_text": "string",
-          "question_type": "multiple_choice" | "true_false" | "fill_in_blank" | "short_answer",
-          "options": ["Option A", "Option B", "Option C", "Option D"] (or null if not MCQ),
-          "correct_answer": "string" (or index for MCQ like "0"),
-          "explanation": "string"
-        }
-      ]
-      IMPORTANT: Return ONLY the JSON array. No markdown code blocks.
-    `;
-
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          data: base64Data,
-          mimeType: mimeType,
-        },
-      },
-    ]);
-
-    const response = await result.response;
-    const text = response.text();
-
-    // --- STEP 3: PARSING & SAVING (80%) ---
-    await sendProgress(80, "Saving generated quiz...");
-
-    // Clean up markdown code blocks if present (Gemini sometimes adds ```json ... ```)
-    const cleanedText = text
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
-
-    interface QuestionData {
-      question_text: string;
-      question_type?: string;
-      options?: string[];
-      correct_answer: string;
-      explanation?: string;
-    }
-
-    let questions: QuestionData[];
-    try {
-      questions = JSON.parse(cleanedText);
-    } catch (_e) {
-      throw new Error("Failed to parse AI response as JSON");
-    }
-
-    if (!Array.isArray(questions)) {
-      throw new Error("AI response is not an array");
-    }
-
-    // Insert into DB
-    const questionsToInsert = questions.map(
-      (
-        q: {
-          question_text: string;
-          question_type?: string;
-          options?: string[];
-          correct_answer: string;
-          explanation?: string;
-        },
-        index: number,
-      ) => ({
-        quiz_id: quizId,
-        question_text: q.question_text,
-        question_type: q.question_type,
-        options: q.options ? JSON.stringify(q.options) : null, // Convert array to JSONB
-        correct_answer: String(q.correct_answer),
-        explanation: q.explanation,
-        order_index: index,
-      }),
-    );
-
-    const { error: insertError } = await supabase
-      .from("quiz_questions")
-      .insert(questionsToInsert);
-
-    if (insertError) throw new Error(`DB Insert Error: ${insertError.message}`);
-
-    // Update Quiz Status
-    await supabase
-      .from("quizzes")
-      .update({
-        status: "ready",
-        processing_state: "completed",
-      })
-      .eq("id", quizId);
-
-    await sendProgress(100, "Done!");
-
-    return new Response(
-      JSON.stringify({ success: true, count: questions.length }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify(result), {
+      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error(error);
+    Logger.boom("Quiz generation failed");
+    Logger.error("Error details", error);
 
-    // Update Quiz Status to Failed
-    // We need supabase client here too, might need to re-init if scope issue,
-    // but simplified try/catch assumes we can just return error
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    // Try to update quiz status to failed (best effort)
+    try {
+      const payload = await req
+        .clone()
+        .json()
+        .catch(() => ({}));
+      if (payload.quizId) {
+        const supabaseUrl = Deno.env.get(ENV_VARS.supabaseUrl);
+        const supabaseKey = Deno.env.get(ENV_VARS.supabaseKey);
+
+        if (supabaseUrl && supabaseKey) {
+          const supabase = createClient(supabaseUrl, supabaseKey);
+          const quizService = new QuizService(supabase);
+          await quizService.updateStatus(payload.quizId, "failed");
+        }
+      }
+    } catch (_updateError) {
+      // Ignore errors when updating status
+    }
 
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: errorMessage,
+        details: errorStack,
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
       },
     );
   }

@@ -11,10 +11,10 @@ export const quizCreationSchema = z.object({
     "short_answer",
   ]),
   numberOfQuestions: z.string(),
-  mode: z.enum(["quiz", "flashcard"]),
+  mode: z.enum(["quiz", "exam"]),
   difficulty: z.enum(["easy", "medium", "hard"]),
-  task: z.enum(["generate_quiz"]),
-  parsingMode: z.enum(["fast", "balanced", "deep"]),
+  task: z.enum(["generate", "extract"]),
+  parsingMode: z.enum(["fast", "balanced", "premium"]),
   customInstructions: z.string().optional(),
 });
 

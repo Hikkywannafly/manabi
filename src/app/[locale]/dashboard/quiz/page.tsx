@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DashboardPage } from "@/components/layouts";
 import { QuizList } from "@/features/quiz/components/quiz-list";
 
 export const metadata: Metadata = {
@@ -8,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function QuizPage() {
   return (
-    <div className="container mx-auto max-w-7xl py-8">
+    <DashboardPage title="Quizzes" description="Manage your study quizzes">
       <QuizList />
-    </div>
+    </DashboardPage>
   );
 }

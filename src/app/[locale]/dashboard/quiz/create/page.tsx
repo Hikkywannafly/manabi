@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DashboardPage } from "@/components/layouts";
 import { CreateQuizForm } from "@/features/quiz/components/create-quiz-form";
 
 export const metadata: Metadata = {
@@ -8,14 +9,11 @@ export const metadata: Metadata = {
 
 export default function CreateQuizPage() {
   return (
-    <div className="container mx-auto max-w-5xl space-y-8 py-8">
-      <div>
-        <h1 className="font-bold text-3xl tracking-tight">Generate Quiz</h1>
-        <p className="text-muted-foreground">
-          Quickly create a new quiz from your study materials!
-        </p>
-      </div>
+    <DashboardPage
+      title="Generate Quiz"
+      description="Quickly create a new quiz from your study materials!"
+    >
       <CreateQuizForm />
-    </div>
+    </DashboardPage>
   );
 }

@@ -2,15 +2,12 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Crown,
   Edit3,
   FileText,
   Image as ImageIcon,
   Link as LinkIcon,
-  Scale,
   Sparkles,
   Youtube,
-  Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -210,7 +207,7 @@ export function CreateQuizForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-1 gap-6 md:grid-cols-3"
+        className="grid grid-cols-1 gap-8 md:grid-cols-3"
       >
         {/* Left Column: Source Input */}
         <div className="space-y-6 md:col-span-2">
@@ -219,37 +216,77 @@ export function CreateQuizForm() {
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="mb-4 grid w-full grid-cols-5">
-              <TabsTrigger value="file">
+            <TabsList className="mb-6 grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 md:grid-cols-4">
+              <TabsTrigger
+                value="file"
+                className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
                 <FileText className="mr-2 h-4 w-4" /> File
               </TabsTrigger>
-              <TabsTrigger value="text">
+              <TabsTrigger
+                value="text"
+                className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
                 <Edit3 className="mr-2 h-4 w-4" /> Text
               </TabsTrigger>
-              <TabsTrigger value="link" disabled>
+              <TabsTrigger
+                value="link"
+                disabled
+                className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
                 <LinkIcon className="mr-2 h-4 w-4" /> Link
               </TabsTrigger>
-              <TabsTrigger value="image" disabled>
+              <TabsTrigger
+                value="drive"
+                disabled
+                className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                {/* Drive Icon placeholder or use existing */}
+                <FileText className="mr-2 h-4 w-4" /> Drive
+              </TabsTrigger>
+              <TabsTrigger
+                value="material"
+                disabled
+                className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <FileText className="mr-2 h-4 w-4" /> Material
+              </TabsTrigger>
+              <TabsTrigger
+                value="media"
+                disabled
+                className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <ImageIcon className="mr-2 h-4 w-4" /> Media
+              </TabsTrigger>
+              <TabsTrigger
+                value="image"
+                disabled
+                className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
                 <ImageIcon className="mr-2 h-4 w-4" /> Image
               </TabsTrigger>
-              <TabsTrigger value="youtube" disabled>
+              <TabsTrigger
+                value="youtube"
+                disabled
+                className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
                 <Youtube className="mr-2 h-4 w-4" /> YouTube
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="file" className="space-y-4">
-              <Card>
-                <CardContent className="pt-6">
+              <Card className="min-h-[320px] border-2 border-border border-dashed bg-secondary/50 shadow-none">
+                <CardContent className="flex h-full flex-col items-center justify-center p-6">
                   {files.length === 0 ? (
                     <FileUpload
                       onFilesSelected={(newFiles) => setFiles(newFiles)}
                     />
                   ) : (
-                    <div className="space-y-2">
+                    <div className="w-full space-y-2">
                       {files.map((file, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between rounded-md border bg-muted/20 p-3"
+                          className="flex items-center justify-between rounded-md border bg-background p-3"
                         >
                           <div className="flex items-center gap-3">
                             <FileText className="h-8 w-8 text-primary" />
@@ -282,14 +319,14 @@ export function CreateQuizForm() {
             </TabsContent>
 
             <TabsContent value="text">
-              <Card>
+              <Card className="min-h-[320px] border-2 border-border border-dashed bg-secondary/50 shadow-none">
                 <CardHeader>
                   <CardTitle>Paste Text Content</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Textarea
                     placeholder="Paste your study notes, articles, or summary here..."
-                    className="min-h-[300px]"
+                    className="min-h-[300px] resize-none border-none bg-transparent focus-visible:ring-0"
                     value={textInput}
                     onChange={(e) => setTextInput(e.target.value)}
                   />
@@ -297,83 +334,30 @@ export function CreateQuizForm() {
               </Card>
             </TabsContent>
           </Tabs>
+
+          {/* Submit Button Area */}
+          <div className="mt-8 flex justify-end">
+            <div className="flex flex-wrap items-center justify-end gap-4">
+              <p className="text-muted-foreground text-sm">
+                Use documents with accurate factual information for best
+                results.{" "}
+              </p>
+              <Button
+                type="submit"
+                disabled={uploading}
+                className="h-10 rounded-2xl px-4 font-semibold"
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                {uploading ? "Uploading..." : "Start making quiz"}
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Right Column: Settings */}
-        <div className="space-y-5">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Configuration</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Parsing Mode */}
-              <FormField
-                control={form.control}
-                name="parsingMode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Parsing Mode</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="fast">
-                          <div className="flex items-center">
-                            <Zap className="mr-2 h-4 w-4 text-yellow-500" />
-                            <span>Fast (Text Only)</span>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="balanced">
-                          <div className="flex items-center">
-                            <Scale className="mr-2 h-4 w-4 text-blue-500" />
-                            <span>Balanced (Recommended)</span>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="premium">
-                          <div className="flex items-center">
-                            <Crown className="mr-2 h-4 w-4 text-purple-500" />
-                            <span>Premium (Deep Analysis)</span>
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Task */}
-              <FormField
-                control={form.control}
-                name="task"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Task</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="generate">Generate Quiz</SelectItem>
-                        <SelectItem value="extract">
-                          Extract Quiz (from existing)
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
+        <div className="sticky top-20 h-fit space-y-5">
+          <Card className="border-none bg-transparent shadow-none">
+            <CardContent className="space-y-4 border-none bg-transparent p-0">
               {/* Visibility */}
               <FormField
                 control={form.control}
@@ -386,7 +370,7 @@ export function CreateQuizForm() {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full bg-secondary">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
@@ -399,48 +383,19 @@ export function CreateQuizForm() {
                 )}
               />
 
-              {/* Mode */}
-              <FormField
-                control={form.control}
-                name="mode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mode</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="quiz">
-                          Quiz (Immediate Feedback)
-                        </SelectItem>
-                        <SelectItem value="exam">
-                          Exam (End Feedback)
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
               {/* Language */}
               <FormField
                 control={form.control}
                 name="language"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Language</FormLabel>
+                    <FormLabel>Language of the quiz</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full bg-secondary">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
@@ -449,32 +404,6 @@ export function CreateQuizForm() {
                         <SelectItem value="vietnamese">Vietnamese</SelectItem>
                         <SelectItem value="japanese">Japanese</SelectItem>
                         <SelectItem value="auto">Auto Detect</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Difficulty */}
-              <FormField
-                control={form.control}
-                name="difficulty"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Difficulty</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="easy">Easy</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="hard">Hard</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormItem>
@@ -493,7 +422,7 @@ export function CreateQuizForm() {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full bg-secondary">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
@@ -521,23 +450,144 @@ export function CreateQuizForm() {
                 name="numberOfQuestions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Questions Count</FormLabel>
+                    <FormLabel>Number of questions</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full bg-secondary">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="5">5 Questions</SelectItem>
-                        <SelectItem value="10">10 Questions</SelectItem>
-                        <SelectItem value="15">15 Questions</SelectItem>
-                        <SelectItem value="20">20 Questions</SelectItem>
+                        <SelectItem value="5">5-10</SelectItem>
+                        <SelectItem value="10">10-15</SelectItem>
+                        <SelectItem value="20">20+</SelectItem>
                       </SelectContent>
                     </Select>
+                  </FormItem>
+                )}
+              />
+
+              {/* Mode */}
+              <FormField
+                control={form.control}
+                name="mode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mode</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full bg-secondary">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="quiz">Quiz</SelectItem>
+                        <SelectItem value="exam">Exam</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              {/* Difficulty */}
+              <FormField
+                control={form.control}
+                name="difficulty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Difficulty</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full bg-secondary">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="easy">Easy</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="hard">Hard</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              {/* Task */}
+              <FormField
+                control={form.control}
+                name="task"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Task</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full bg-secondary">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="generate">Generate Quiz</SelectItem>
+                        <SelectItem value="extract">
+                          Extract Quiz (from existing)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              {/* Parsing Mode */}
+              <FormField
+                control={form.control}
+                name="parsingMode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Parsing Mode</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full bg-secondary">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="fast">
+                          <div className="flex w-full items-center">
+                            <span>Fast (Text Only)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="balanced">
+                          <div className="flex w-full items-center">
+                            <span>Balanced (Recommended)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="premium">
+                          <div className="flex w-full items-center">
+                            <span>Premium (Deep Analysis)</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="mt-2 flex items-center gap-4 rounded-md border border-yellow-500 bg-yellow-100 p-4 text-yellow-900 dark:border-amber-500 dark:bg-amber-950 dark:text-amber-100">
+                      <p className="text-sm">
+                        Fast mode skips images and tables. Use Balanced mode if
+                        material has them, but processing will take longer.
+                      </p>
+                    </div>
                   </FormItem>
                 )}
               />
@@ -548,21 +598,17 @@ export function CreateQuizForm() {
                 name="customInstructions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Custom Instructions</FormLabel>
+                    <FormLabel>Custom Instructions (optional)</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="e.g. 'Focus on strict definitions'"
-                        className="h-20 resize-none"
+                        className="min-h-[80px] resize-none bg-secondary"
                         {...field}
                       />
                     </FormControl>
                   </FormItem>
                 )}
               />
-
-              <Button type="submit" className="w-full" disabled={uploading}>
-                {uploading ? "Uploading..." : "Generate Quiz"}
-              </Button>
             </CardContent>
           </Card>
         </div>

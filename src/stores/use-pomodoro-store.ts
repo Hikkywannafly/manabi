@@ -11,6 +11,9 @@ interface PomodoroState {
   currentSceneId: string;
   isDayMode: boolean;
 
+  // View State
+  activeView: "focus" | "timer";
+
   // Social State
   isLeaderboardOpen: boolean;
   isRoomSettingsOpen: boolean;
@@ -19,6 +22,7 @@ interface PomodoroState {
   // Actions
   setScene: (sceneId: string) => void;
   toggleDayMode: () => void;
+  setActiveView: (view: "focus" | "timer") => void;
 
   toggleLeaderboard: () => void;
   toggleRoomSettings: () => void;
@@ -34,6 +38,7 @@ export const usePomodoroStore = create<PomodoroState>()(
     (set) => ({
       currentSceneId: "bedroom",
       isDayMode: true,
+      activeView: "focus",
 
       isLeaderboardOpen: false,
       isRoomSettingsOpen: false,
@@ -41,6 +46,7 @@ export const usePomodoroStore = create<PomodoroState>()(
 
       setScene: (sceneId) => set({ currentSceneId: sceneId }),
       toggleDayMode: () => set((state) => ({ isDayMode: !state.isDayMode })),
+      setActiveView: (view) => set({ activeView: view }),
 
       toggleLeaderboard: () =>
         set((state) => ({ isLeaderboardOpen: !state.isLeaderboardOpen })),
@@ -62,6 +68,7 @@ export const usePomodoroStore = create<PomodoroState>()(
       partialize: (state) => ({
         currentSceneId: state.currentSceneId,
         isDayMode: state.isDayMode,
+        activeView: state.activeView,
       }),
     },
   ),

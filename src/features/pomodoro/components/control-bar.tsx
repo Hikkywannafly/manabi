@@ -9,8 +9,8 @@ import {
   Zap,
 } from "lucide-react";
 
-import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { MusicPlayer } from "./music-player";
 import { NightSwitch } from "./night-switch";
 import { SceneSelector } from "./scene-selector";
@@ -22,7 +22,8 @@ interface ControlBarProps {
 }
 
 export function ControlBar({ className }: ControlBarProps) {
-  const [activeTab, setActiveTab] = useState<"focus" | "timer">("focus");
+  const { activeView, setActiveView } = usePomodoroStore();
+
   return (
     <div
       className={cn(
@@ -76,8 +77,8 @@ export function ControlBar({ className }: ControlBarProps) {
           {/* Active tab indicator - dynamically positioned */}
           <div
             className={cn(
-              "absolute top-0 left-0 z-0 h-full rounded-md bg-linear-to-tr from-white/70 via-pink-100 to-pink-300 transition-transform duration-200",
-              activeTab === "focus"
+              "absolute top-0 left-0 z-0 h-full rounded-md bg-gradient-to-tr from-white/70 via-pink-100 to-pink-300 transition-all duration-300 ease-out",
+              activeView === "focus"
                 ? "translate-x-0"
                 : "translate-x-[calc(100%+0.25rem)]",
             )}
@@ -85,28 +86,31 @@ export function ControlBar({ className }: ControlBarProps) {
           />
           <button
             type="button"
-            onClick={() => setActiveTab("focus")}
-            className="relative z-10 flex cursor-pointer justify-center rounded-md px-2 py-1 font-semibold text-sm transition-all duration-200 sm:px-3"
+            onClick={() => setActiveView("focus")}
+            className="group relative z-10 flex cursor-pointer justify-center rounded-md px-2 py-1 font-semibold text-sm transition-all duration-300 hover:scale-110 sm:px-3"
           >
             <Zap
               className={cn(
-                "pb-px pl-1 text-[14px] transition-all duration-200 sm:text-[22px]",
-                activeTab === "focus" ? "text-black" : "text-white",
+                "pb-px pl-1 text-[14px] transition-all duration-300 sm:text-[22px]",
+                activeView === "focus"
+                  ? "text-black drop-shadow-sm"
+                  : "text-white group-hover:text-white/80",
               )}
             />
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab("timer")}
-            className="relative z-10 flex cursor-pointer justify-center rounded-md px-2 py-1 font-semibold text-sm transition-all duration-200 sm:px-3"
+            onClick={() => setActiveView("timer")}
+            className="group relative z-10 flex cursor-pointer justify-center rounded-md px-2 py-1 font-semibold text-sm transition-all duration-300 hover:scale-110 sm:px-3"
           >
             <Clock
               className={cn(
-                "pb-px pl-1 text-[14px] transition-all duration-200 sm:text-[22px]",
-                activeTab === "timer" ? "text-black" : "text-white",
+                "pb-px pl-1 text-[14px] transition-all duration-300 sm:text-[22px]",
+                activeView === "timer"
+                  ? "text-black drop-shadow-sm"
+                  : "text-white group-hover:text-white/80",
               )}
             />
-            {/* Maybe show time here? */}
           </button>
         </div>
       </div>

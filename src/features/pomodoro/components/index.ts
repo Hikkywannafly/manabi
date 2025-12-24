@@ -3,6 +3,7 @@ export * from "./analytics";
 export { BackgroundMusicPlayer } from "./background-music-player";
 export { BackgroundScene } from "./background-scene";
 export { ControlBar } from "./control-bar";
+export { DigitalClock } from "./digital-clock";
 // Phase 5: Focus Guard
 export { FocusGuard } from "./focus-guard";
 export { LeaderboardModal } from "./leaderboard-modal";

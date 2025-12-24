@@ -19,7 +19,7 @@ export function DashboardHeader() {
   return (
     <header className="w-full shrink-0 bg-background">
       <div className="px-4 xl:px-8">
-        <div className="container mx-auto max-w-8xl p-0">
+        <div className="container mx-auto max-w-7xl p-0">
           <div className="flex h-16 items-center justify-between">
             {/* Left Section: Sidebar Trigger + Search */}
             <div className="flex flex-1 items-center gap-4">

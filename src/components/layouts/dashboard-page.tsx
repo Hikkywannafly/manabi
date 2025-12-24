@@ -19,7 +19,7 @@ export function DashboardPage({
   return (
     <div className="flex flex-col">
       <div className="my-8 px-4 xl:px-8">
-        <div className="container mx-auto max-w-8xl p-0">
+        <div className="container mx-auto max-w-7xl p-0">
           <div className="relative">
             <div className="flex items-start justify-between">
               <div>

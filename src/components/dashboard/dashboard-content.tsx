@@ -3,7 +3,7 @@
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signOut } from "@/app/api/auth/actions";
-import { DashboardLayout } from "@/components/layouts";
+import { DashboardPage } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,10 +24,10 @@ export function DashboardContent() {
   };
 
   return (
-    <DashboardLayout
+    <DashboardPage
       title="Dashboard"
       description="Welcome back!"
-      actions={
+      headerAction={
         <Button variant="outline" onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           Sign Out
@@ -70,6 +70,6 @@ export function DashboardContent() {
           </div>
         </CardContent>
       </Card>
-    </DashboardLayout>
+    </DashboardPage>
   );
 }

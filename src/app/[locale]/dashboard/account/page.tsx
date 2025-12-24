@@ -1,4 +1,4 @@
-import { DashboardLayout } from "@/components/layouts/dashboard-layout";
+import { DashboardPage } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
 import { DeleteAccountCard } from "@/features/account/components/delete-account-card";
 import { ProfileBannerCard } from "@/features/account/components/profile-banner-card";
@@ -8,7 +8,7 @@ import { ProfilePrivacyCard } from "@/features/account/components/profile-privac
 
 export default function AccountPage() {
   return (
-    <DashboardLayout
+    <DashboardPage
       title="Account Settings"
       description="Manage account and website settings."
     >
@@ -24,6 +24,6 @@ export default function AccountPage() {
         </div>
         <DeleteAccountCard />
       </div>
-    </DashboardLayout>
+    </DashboardPage>
   );
 }

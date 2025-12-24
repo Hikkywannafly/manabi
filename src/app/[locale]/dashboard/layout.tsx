@@ -29,7 +29,7 @@ export default function DashboardLayout({
             className={`flex-1 ${
               isPomodoroPage
                 ? "overflow-hidden"
-                : "overflow-y-auto bg-background p-4 md:p-6 lg:p-8"
+                : "overflow-y-auto bg-background"
             }`}
           >
             {children}

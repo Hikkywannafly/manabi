@@ -2,7 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { DashboardLayout } from "@/components/layouts/dashboard-layout";
+import { DashboardPage } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
 import {
   Pagination,
@@ -90,10 +90,10 @@ export default function FlashcardsPage() {
   };
 
   return (
-    <DashboardLayout
+    <DashboardPage
       title="Flashcards"
       description="Manage and review your flashcards collection."
-      actions={
+      headerAction={
         <Button onClick={() => router.push("/dashboard/flashcards/create")}>
           <Plus className="mr-2 h-4 w-4" />
           Add Flashcard
@@ -136,6 +136,6 @@ export default function FlashcardsPage() {
           </Pagination>
         </div>
       </div>
-    </DashboardLayout>
+    </DashboardPage>
   );
 }

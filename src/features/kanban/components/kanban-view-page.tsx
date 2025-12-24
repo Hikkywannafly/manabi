@@ -1,15 +1,15 @@
-import { DashboardLayout } from "@/components/layouts/dashboard-layout";
+import { DashboardPage } from "@/components/layouts";
 import { KanbanBoard } from "./kanban-board";
 import NewTaskDialog from "./new-task-dialog";
 
 export default function KanbanViewPage() {
   return (
-    <DashboardLayout
+    <DashboardPage
       title="Kanban"
       description="Manage tasks by dnd"
-      actions={<NewTaskDialog />}
+      headerAction={<NewTaskDialog />}
     >
       <KanbanBoard />
-    </DashboardLayout>
+    </DashboardPage>
   );
 }

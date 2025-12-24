@@ -20,170 +20,172 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-border border-b bg-background/80 backdrop-blur-lg">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Logo size="sm" />
+      <div className="px-4 xl:px-8">
+        <div className="container mx-auto max-w-7xl p-0">
+          <div className="flex h-16 items-center justify-between">
+            {/* Logo */}
+            <Logo size="sm" />
 
-          {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-8 md:flex">
-            <Link
-              href="/features"
-              className="font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {t("features")}
-            </Link>
-            <Link
-              href="/pricing"
-              className="font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {t("pricing")}
-            </Link>
-            <Link
-              href="/faq"
-              className="font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {t("faq")}
-            </Link>
-            <Link
-              href="/blog"
-              className="font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {t("blog")}
-            </Link>
-          </nav>
-
-          {/* Right actions */}
-          <div className="flex items-center gap-4">
-            {/* Lofi music toggle */}
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="group relative"
-            >
-              <Headphones
-                className={`h-5 w-5 transition-all duration-300 ${
-                  isPlaying
-                    ? "animate-pulse text-primary"
-                    : "text-muted-foreground group-hover:text-primary"
-                }`}
-              />
-              {isPlaying && (
-                <span className="-top-1 -right-1 absolute h-2 w-2 animate-ping rounded-full bg-primary" />
-              )}
-            </Button>
-
-            {/* Theme toggle */}
-            <div className="hidden sm:block">
-              <ThemeToggle />
-            </div>
-
-            {/* Language switcher */}
-            <div className="hidden sm:block">
-              <LanguageSwitcher />
-            </div>
-
-            {/* Login Button */}
-            {!user ? (
-              <Link href="/login" className="hidden md:inline-flex">
-                <Button variant="outline" className="rounded-xl">
-                  {t("login")}
-                </Button>
+            {/* Desktop Navigation */}
+            <nav className="hidden items-center gap-8 md:flex">
+              <Link
+                href="/features"
+                className="font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                {t("features")}
               </Link>
-            ) : (
-              <div className="hidden md:flex md:items-center md:gap-4">
-                <UserDropdown variant="header" />
-                <Link href="/dashboard">
-                  <Button
-                    variant="gradient"
-                    className="rounded-xl"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Dashboard
+              <Link
+                href="/pricing"
+                className="font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                {t("pricing")}
+              </Link>
+              <Link
+                href="/faq"
+                className="font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                {t("faq")}
+              </Link>
+              <Link
+                href="/blog"
+                className="font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                {t("blog")}
+              </Link>
+            </nav>
+
+            {/* Right actions */}
+            <div className="flex items-center gap-4">
+              {/* Lofi music toggle */}
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="group relative"
+              >
+                <Headphones
+                  className={`h-5 w-5 transition-all duration-300 ${
+                    isPlaying
+                      ? "animate-pulse text-primary"
+                      : "text-muted-foreground group-hover:text-primary"
+                  }`}
+                />
+                {isPlaying && (
+                  <span className="-top-1 -right-1 absolute h-2 w-2 animate-ping rounded-full bg-primary" />
+                )}
+              </Button>
+
+              {/* Theme toggle */}
+              <div className="hidden sm:block">
+                <ThemeToggle />
+              </div>
+
+              {/* Language switcher */}
+              <div className="hidden sm:block">
+                <LanguageSwitcher />
+              </div>
+
+              {/* Login Button */}
+              {!user ? (
+                <Link href="/login" className="hidden md:inline-flex">
+                  <Button variant="outline" className="rounded-xl">
+                    {t("login")}
                   </Button>
                 </Link>
-              </div>
-            )}
+              ) : (
+                <div className="hidden md:flex md:items-center md:gap-4">
+                  <UserDropdown variant="header" />
+                  <Link href="/dashboard">
+                    <Button
+                      variant="gradient"
+                      className="rounded-xl"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              )}
 
-            {/* Mobile menu button */}
-            <Button
-              size="icon"
-              variant="ghost"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              <Menu className="h-5 w-5 text-foreground" />
-            </Button>
+              {/* Mobile menu button */}
+              <Button
+                size="icon"
+                variant="ghost"
+                className="md:hidden"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <Menu className="h-5 w-5 text-foreground" />
+              </Button>
+            </div>
           </div>
-        </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="mt-2 space-y-4 border-border border-t py-4 md:hidden">
-            <Link
-              href="/features"
-              className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {t("features")}
-            </Link>
-            <Link
-              href="/pricing"
-              className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {t("pricing")}
-            </Link>
-            <Link
-              href="/faq"
-              className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {t("faq")}
-            </Link>
-            <Link
-              href="/blog"
-              className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {t("blog")}
-            </Link>
-            <Separator className="bg-border" />
-            <div className="sm:hidden">
-              <ThemeToggle />
-            </div>
-            <div className="sm:hidden">
-              <LanguageSwitcher />
-            </div>
-            {!user ? (
-              <Link href="/login" className="md:hidden">
-                <Button
-                  variant="outline"
-                  className="w-full rounded-xl"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {t("login")}
-                </Button>
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <div className="mt-2 space-y-4 border-border border-t py-4 md:hidden">
+              <Link
+                href="/features"
+                className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t("features")}
               </Link>
-            ) : (
-              <div className="md:hidden">
-                <UserDropdown variant="header" />
-                <Link href="/dashboard">
+              <Link
+                href="/pricing"
+                className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t("pricing")}
+              </Link>
+              <Link
+                href="/faq"
+                className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t("faq")}
+              </Link>
+              <Link
+                href="/blog"
+                className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t("blog")}
+              </Link>
+              <Separator className="bg-border" />
+              <div className="sm:hidden">
+                <ThemeToggle />
+              </div>
+              <div className="sm:hidden">
+                <LanguageSwitcher />
+              </div>
+              {!user ? (
+                <Link href="/login" className="md:hidden">
                   <Button
-                    variant="gradient"
+                    variant="outline"
                     className="w-full rounded-xl"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Dashboard
+                    {t("login")}
                   </Button>
                 </Link>
-              </div>
-            )}
-          </div>
-        )}
+              ) : (
+                <div className="md:hidden">
+                  <UserDropdown variant="header" />
+                  <Link href="/dashboard">
+                    <Button
+                      variant="gradient"
+                      className="w-full rounded-xl"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

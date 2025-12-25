@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useQuizNavigationLogic } from "../../hooks/use-quiz-navigation-logic";
 import { useSubmitQuizAttempt } from "../../hooks/use-submit-quiz-attempt";
-import type { QuizTakeMode, QuizWithQuestions } from "../../types";
+import type { QuizResult, QuizTakeMode, QuizWithQuestions } from "../../types";
 import { QuizHeader } from "./quiz-header";
 import { QuizNavigation } from "./quiz-navigation";
 import { QuizQuestionComponent } from "./quiz-question";
@@ -21,17 +21,24 @@ interface QuizTakeContentProps {
 export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
   const router = useRouter();
   const questions = quiz.questions || [];
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [currentQuestionResult, setCurrentQuestionResult] = useState<{
-    isCorrect: boolean;
-    correctAnswer: string;
-  } | null>(null);
+
+  // Store feedback results for each question
+  const [questionResults, setQuestionResults] = useState<
+    Record<
+      string,
+      {
+        isCorrect: boolean;
+        correctAnswer: string;
+      }
+    >
+  >({});
 
   const {
     currentQuestionIndex,
     answers,
     isCompleted,
     setIsCompleted,
+    setAnswers,
     handleAnswerChange,
     handlePrevious,
     handleNext,
@@ -47,6 +54,13 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
     (a) => a.questionId === currentQuestion?.id,
   );
 
+  // Get feedback for current question
+  const currentQuestionResult = currentQuestion
+    ? questionResults[currentQuestion.id]
+    : null;
+
+  const showFeedback = mode === "test" && !!currentQuestionResult;
+
   // Handle answer selection
   const onAnswerSelect = useCallback(
     (optionId: string) => {
@@ -56,28 +70,99 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
 
       // In TEST mode, show immediate feedback
       if (mode === "test") {
-        const isCorrect = currentQuestion.correct_answer === optionId;
-        setCurrentQuestionResult({
-          isCorrect,
-          correctAnswer: currentQuestion.correct_answer || "",
-        });
-        setShowFeedback(true);
+        // Handle correct_answer comparison
+        // AI might return index ("0", "1") or option-id ("option-0", "option-1")
+        // or actual text for fill-in-blank/short-answer
+        let isCorrect = false;
+        const correctAnswer = currentQuestion.correct_answer || "";
+        let correctAnswerText = correctAnswer;
+
+        if (
+          currentQuestion.question_type === "fill_in_blank" ||
+          currentQuestion.question_type === "short_answer"
+        ) {
+          // For text-based questions, do case-insensitive trim comparison
+          isCorrect =
+            correctAnswer.trim().toLowerCase() ===
+            optionId.trim().toLowerCase();
+          correctAnswerText = correctAnswer; // Already text
+        } else {
+          // For multiple choice/true-false, check both formats
+          // If correct_answer is "0", convert to "option-0" for comparison
+          const normalizedCorrectAnswer = correctAnswer.startsWith("option-")
+            ? correctAnswer
+            : `option-${correctAnswer}`;
+          isCorrect = normalizedCorrectAnswer === optionId;
+
+          // Get the actual text of the correct answer for display
+          if (currentQuestion.options) {
+            try {
+              const parsedOptions =
+                typeof currentQuestion.options === "string"
+                  ? JSON.parse(currentQuestion.options)
+                  : currentQuestion.options;
+
+              if (Array.isArray(parsedOptions)) {
+                if (typeof parsedOptions[0] === "string") {
+                  // Array of strings
+                  const index = parseInt(correctAnswer, 10);
+                  if (!Number.isNaN(index) && parsedOptions[index]) {
+                    correctAnswerText = parsedOptions[index];
+                  }
+                } else {
+                  // Array of objects with id and text
+                  const correctOption = parsedOptions.find(
+                    (opt: any) => opt.id === normalizedCorrectAnswer,
+                  );
+                  if (correctOption) {
+                    correctAnswerText = correctOption.text;
+                  }
+                }
+              }
+            } catch (e) {
+              console.error("Error parsing options:", e);
+            }
+          }
+        }
+
+        // Store result for this question
+        setQuestionResults((prev) => ({
+          ...prev,
+          [currentQuestion.id]: {
+            isCorrect,
+            correctAnswer: correctAnswerText,
+          },
+        }));
       }
+      // In EXAM mode, just store the answer without feedback
     },
     [currentQuestion, handleAnswerChange, mode],
   );
 
-  // Handle next question
+  // Handle retry (clear answer and reset feedback)
+  const handleRetry = useCallback(() => {
+    if (!currentQuestion) return;
+
+    // Clear the answer for current question
+    setAnswers((prev) =>
+      prev.filter((a) => a.questionId !== currentQuestion.id),
+    );
+
+    // Clear feedback for this question
+    setQuestionResults((prev) => {
+      const newResults = { ...prev };
+      delete newResults[currentQuestion.id];
+      return newResults;
+    });
+  }, [currentQuestion, setAnswers]);
+
+  // Handle next question - DON'T reset feedback
   const onNext = useCallback(() => {
-    setShowFeedback(false);
-    setCurrentQuestionResult(null);
     handleNext();
   }, [handleNext]);
 
-  // Handle previous question
+  // Handle previous question - DON'T reset feedback
   const onPrevious = useCallback(() => {
-    setShowFeedback(false);
-    setCurrentQuestionResult(null);
     handlePrevious();
   }, [handlePrevious]);
 
@@ -131,26 +216,88 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
   // Show results
   if (isCompleted) {
     const totalTimeSpent = getTotalTimeSpent();
-    const correctCount = answers.filter((answer) => {
-      const question = questions.find((q) => q.id === answer.questionId);
-      return question?.correct_answer === answer.selectedOptionId;
-    }).length;
 
-    const result = {
-      score: (correctCount / questions.length) * 100,
+    // Calculate results thoroughly
+    const resolvedAnswers = answers
+      .map((answer) => {
+        const question = questions.find((q) => q.id === answer.questionId);
+        if (!question) return null;
+
+        const correctAnswer = question.correct_answer || "";
+        let isCorrect = false;
+
+        // Use the same comparison logic as onAnswerSelect
+        if (
+          question.question_type === "fill_in_blank" ||
+          question.question_type === "short_answer"
+        ) {
+          isCorrect =
+            correctAnswer.trim().toLowerCase() ===
+            answer.selectedOptionId.trim().toLowerCase();
+        } else {
+          const normalizedCorrectAnswer = correctAnswer.startsWith("option-")
+            ? correctAnswer
+            : `option-${correctAnswer}`;
+          isCorrect = normalizedCorrectAnswer === answer.selectedOptionId;
+        }
+
+        // Parse options
+        let options: any[] = [];
+        try {
+          const rawOptions =
+            typeof question.options === "string"
+              ? JSON.parse(question.options)
+              : question.options;
+
+          if (Array.isArray(rawOptions)) {
+            if (typeof rawOptions[0] === "string") {
+              options = rawOptions.map((text, idx) => ({
+                id: `option-${idx}`,
+                text,
+              }));
+            } else {
+              options = rawOptions;
+            }
+          }
+        } catch (e) {
+          console.error("Error parsing options for result:", e);
+        }
+
+        return {
+          questionId: answer.questionId,
+          questionText: question.question_text,
+          selectedOptionId: answer.selectedOptionId,
+          correctOptionId: correctAnswer.startsWith("option-")
+            ? correctAnswer
+            : `option-${correctAnswer}`,
+          isCorrect,
+          options,
+        };
+      })
+      .filter(Boolean) as QuizResult["answers"];
+
+    const correctCount = resolvedAnswers.filter((a) => a.isCorrect).length;
+    const score = (correctCount / questions.length) * 100;
+
+    // Determine performance level
+    let performanceLevel: QuizResult["performanceLevel"] = "Learning";
+    if (score >= 90) performanceLevel = "Excellent";
+    else if (score >= 75) performanceLevel = "Good";
+    else performanceLevel = "Needs Improvement";
+
+    const result: QuizResult = {
+      score,
       totalQuestions: questions.length,
       correctAnswers: correctCount,
       incorrectAnswers: questions.length - correctCount,
       timeSpent: totalTimeSpent,
-      answers: answers.map((answer) => {
-        const question = questions.find((q) => q.id === answer.questionId);
-        return {
-          questionId: answer.questionId,
-          selectedOptionId: answer.selectedOptionId,
-          correctOptionId: question?.correct_answer || "",
-          isCorrect: question?.correct_answer === answer.selectedOptionId,
-        };
-      }),
+      performanceLevel,
+      personalizedFeedback:
+        `Based on your score of ${Math.round(score)}%, you've shown a ${performanceLevel.toLowerCase()} understanding. ` +
+        (score < 70
+          ? "Focus on reviewing the incorrect answers to strengthen your knowledge."
+          : "Keep up the great work! You are master of this topic."),
+      answers: resolvedAnswers,
     };
 
     return (
@@ -183,6 +330,7 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
               showResult={showFeedback && mode === "test"}
               correctOptionId={currentQuestionResult?.correctAnswer}
               mode={mode}
+              questionType={currentQuestion.question_type ?? undefined}
             />
           )}
         </div>
@@ -197,6 +345,10 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
           onSubmit={handleSubmit}
           onRestartQuiz={handleRetake}
           mode={mode}
+          showFeedback={showFeedback && mode === "test"}
+          isCorrect={currentQuestionResult?.isCorrect}
+          correctAnswer={currentQuestionResult?.correctAnswer}
+          onRetry={handleRetry}
         />
       </div>
       {isSubmitting && (

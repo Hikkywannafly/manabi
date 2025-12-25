@@ -1,9 +1,10 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowRight, Plus, Search } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
 import { Button } from "@/components/ui/button";
@@ -15,37 +16,31 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/client";
-import type { Quiz } from "../types";
+import { QuizService } from "../services/quiz-service";
 
 export function QuizList() {
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const supabase = createClient();
 
-  useEffect(() => {
-    const fetchQuizzes = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("quizzes")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching quizzes:", error);
-      } else {
-        setQuizzes(data || []);
-      }
-      setLoading(false);
-    };
-
-    fetchQuizzes();
-  }, [supabase]);
+  const {
+    data: quizzes = [],
+    isLoading: loading,
+    isError,
+  } = useQuery({
+    queryKey: ["quizzes"],
+    queryFn: () => QuizService.getQuizzes(),
+  });
 
   const filteredQuizzes = quizzes.filter((q) =>
     q.title?.toLowerCase().includes(search.toLowerCase()),
   );
+
+  if (isError) {
+    return (
+      <div className="flex h-[300px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center text-destructive">
+        <p>Failed to load quizzes. Please try again.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

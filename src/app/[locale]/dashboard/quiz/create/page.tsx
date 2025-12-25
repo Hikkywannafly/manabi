@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { DashboardPage } from "@/components/layouts";
-import { CreateQuizForm } from "@/features/quiz/components/create-quiz-form";
+import { CreateQuizContainer } from "@/features/quiz/components/create-quiz-container";
 
 export const metadata: Metadata = {
   title: "Generate Quiz | Manabi",
@@ -8,12 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function CreateQuizPage() {
-  return (
-    <DashboardPage
-      title="Generate Quiz"
-      description="Quickly create a new quiz from your study materials!"
-    >
-      <CreateQuizForm />
-    </DashboardPage>
-  );
+  return <CreateQuizContainer />;
 }

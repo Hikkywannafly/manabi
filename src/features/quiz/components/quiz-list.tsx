@@ -134,11 +134,19 @@ export function QuizList() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-2 pt-4">
-                <Link href={`/dashboard/quiz/${quiz.id}`}>
-                  <Button size="sm" className="gap-1">
-                    Open <ArrowRight className="h-3 w-3" />
-                  </Button>
-                </Link>
+                {quiz.status === "ready" && (
+                  <Link
+                    href={
+                      quiz.slug
+                        ? `/dashboard/quiz/${quiz.id}/${quiz.slug}/take?mode=test`
+                        : `/dashboard/quiz/${quiz.id}/take?mode=test`
+                    }
+                  >
+                    <Button size="sm" variant="default" className="gap-1">
+                      Take Quiz <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  </Link>
+                )}
               </CardFooter>
             </Card>
           ))}

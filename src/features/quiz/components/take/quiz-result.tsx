@@ -17,7 +17,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import type { QuizResult } from "../../types";
@@ -28,11 +27,7 @@ interface QuizResultProps {
   onBackToQuizzes: () => void;
 }
 
-export function QuizResultComponent({
-  result,
-  onRetake,
-  onBackToQuizzes,
-}: QuizResultProps) {
+export function QuizResultComponent({ result }: QuizResultProps) {
   const percentage = Math.round(result.score);
 
   const getPerformanceColor = (level?: string) => {
@@ -181,21 +176,6 @@ export function QuizResultComponent({
             <AnswerList answers={result.answers.filter((a) => !a.isCorrect)} />
           </TabsContent>
         </Tabs>
-      </div>
-
-      {/* Actions */}
-      <div className="flex flex-wrap justify-center gap-4 pt-4">
-        <Button
-          onClick={onRetake}
-          variant="outline"
-          size="lg"
-          className="rounded-2xl"
-        >
-          Retake Quiz
-        </Button>
-        <Button onClick={onBackToQuizzes} size="lg" className="rounded-2xl">
-          Back to Quizzes
-        </Button>
       </div>
     </div>
   );

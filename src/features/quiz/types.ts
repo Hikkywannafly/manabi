@@ -6,3 +6,41 @@ export type QuizQuestion =
 export type QuizAttempt = Database["public"]["Tables"]["quiz_attempts"]["Row"];
 
 export type QuizStatus = Database["public"]["Enums"]["quiz_status"];
+export type QuestionType = Database["public"]["Enums"]["question_type"];
+
+// Quiz Taking Types
+export type QuizTakeMode = "exam" | "test";
+
+export interface QuizAnswer {
+  questionId: string;
+  selectedOptionId: string;
+  timeSpent: number;
+}
+
+export interface QuizResult {
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  timeSpent: number;
+  answers: Array<{
+    questionId: string;
+    selectedOptionId: string;
+    correctOptionId: string;
+    isCorrect: boolean;
+  }>;
+}
+
+export interface QuizQuestionOption {
+  id: string;
+  text: string;
+}
+
+// Extended types for quiz taking with joined data
+export interface QuizWithQuestions extends Quiz {
+  questions: QuizQuestion[];
+}
+
+export interface QuizQuestionWithOptions extends QuizQuestion {
+  parsedOptions: QuizQuestionOption[];
+}

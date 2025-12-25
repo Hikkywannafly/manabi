@@ -12,22 +12,24 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const isPomodoroPage = pathname?.includes("/pomodoro");
+  const isQuizTakePage =
+    pathname?.includes("/quiz/") && pathname?.includes("/take");
 
   return (
     <ErrorBoundary>
-      <div className="flex min-h-screen w-full">
+      <div className="flex h-screen w-full overflow-hidden">
         {/* App Sidebar */}
         <AppSidebar />
 
         {/* Main Content Area */}
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col overflow-hidden">
           {/* Dashboard Header - Hidden on Pomodoro page */}
           {!isPomodoroPage && <DashboardHeader />}
 
           {/* Main Content */}
           <main
             className={`flex-1 ${
-              isPomodoroPage
+              isPomodoroPage || isQuizTakePage
                 ? "overflow-hidden"
                 : "overflow-y-auto bg-background"
             }`}

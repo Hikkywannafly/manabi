@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Edit3,
   FileText,
@@ -22,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
 import { AIService } from "@/services/ai-service";
 import { type QuizCreationValues, quizCreationSchema } from "../schema";
+import { QuizService } from "../services/quiz-service";
 import { FileUpload } from "./file-upload";
 import { QuizLoading } from "./quiz-loading";
 import { QuizSettingsSidebar } from "./quiz-settings-sidebar";
@@ -36,7 +38,6 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [textInput, setTextInput] = useState("");
   const [activeTab, setActiveTab] = useState("file");
-  const [uploading, setUploading] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generationStatus, setGenerationStatus] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -70,35 +71,20 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
     };
   }, []);
 
-  const onSubmit = async (values: QuizCreationValues) => {
-    // Validation based on active tab
-    if (activeTab === "file" && files.length === 0) {
-      toast.error("Please upload at least one file.");
-      return;
-    }
-    if (activeTab === "text" && !textInput.trim()) {
-      toast.error("Please enter some text.");
-      return;
-    }
+  const queryClient = useQueryClient();
 
-    try {
-      setUploading(true);
-      setIsGenerating(true);
-      onGeneratingChange?.(true);
-      setGenerationStatus("Preparing content...");
-
+  const { mutate: createQuiz, isPending: isCreating } = useMutation({
+    mutationFn: async (values: QuizCreationValues) => {
+      // 1. Validation & Setup
       let filePath: string | undefined;
       let textContent: string | undefined;
 
-      // Handle Text Input (Direct - No Storage)
       if (activeTab === "text") {
         textContent = textInput.trim();
         setGenerationStatus("Processing text...");
       } else {
-        // Handle File Upload
         const file = files[0];
         setGenerationStatus("Uploading file...");
-
         const fileExt = file.name.split(".").pop();
         filePath = `${crypto.randomUUID()}.${fileExt}`;
 
@@ -110,16 +96,13 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
           throw new Error(`Upload failed: ${uploadError.message}`);
       }
 
-      setUploading(false);
       setGenerationStatus("Initializing AI Generation...");
 
-      // 2. Create Quiz Record (Draft/Generating)
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Default Title
       let title = "Generated Quiz";
       if (activeTab === "file" && files[0]) {
         const fileExt = files[0].name.split(".").pop();
@@ -128,50 +111,44 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
         title = "Text Content Quiz";
       }
 
-      const { data: quiz, error: quizError } = await supabase
-        .from("quizzes")
-        .insert({
-          owner_id: user.id,
-          title: title,
-          status: "generating",
-          source_type: activeTab === "file" ? "file" : "text",
-          source_content: filePath || "direct_text",
-          generation_params: values,
-        })
-        .select()
-        .single();
+      // 2. Create Quiz via Service
+      const quiz = await QuizService.createQuiz(
+        user.id,
+        title,
+        activeTab === "file" ? "file" : "text",
+        filePath || "direct_text",
+        values,
+      );
 
-      if (quizError)
-        throw new Error(`Quiz creation failed: ${quizError.message}`);
-
-      const quizId = quiz.id;
+      return { quiz, filePath, textContent };
+    },
+    onSuccess: async ({ quiz, filePath, textContent }, values) => {
+      // Invalidate list so it updates immediately
+      queryClient.invalidateQueries({ queryKey: ["quizzes"] });
 
       // 3. Subscribe to Progress
-      // Clear any existing subscription
       if (subscriptionRef.current) {
         subscriptionRef.current();
       }
 
       subscriptionRef.current = AIService.subscribeToProgress(
-        quizId,
+        quiz.id,
         (payload) => {
           setGenerationProgress(payload.progress);
           setGenerationStatus(payload.message);
 
           if (payload.progress === 100) {
             toast.success("Quiz generated successfully!");
-            // Unsubscribe on completion
             if (subscriptionRef.current) {
               subscriptionRef.current();
               subscriptionRef.current = null;
             }
 
-            // Redirect after a short delay
             setTimeout(() => {
               if (payload.data?.slug) {
-                router.push(`/dashboard/quiz/${quizId}/${payload.data.slug}`);
+                router.push(`/dashboard/quiz/${quiz.id}/${payload.data.slug}`);
               } else {
-                router.push(`/dashboard/quiz/${quizId}`);
+                router.push(`/dashboard/quiz/${quiz.id}`);
               }
             }, 1000);
           }
@@ -179,29 +156,45 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
       );
 
       // 4. Trigger AI Service
-      await AIService.generateContent(filePath, textContent, quizId, {
-        difficulty: (values.difficulty.charAt(0).toUpperCase() +
-          values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
-        numberOfQuestions: parseInt(values.numberOfQuestions, 10),
-        questionType: values.questionType,
-        language: values.language,
-        mode: values.mode,
-        parsingMode: values.parsingMode,
-        task: values.task,
-        customInstructions: values.customInstructions,
-      });
-    } catch (error: any) {
+      try {
+        await AIService.generateContent(filePath, textContent, quiz.id, {
+          difficulty: (values.difficulty.charAt(0).toUpperCase() +
+            values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
+          numberOfQuestions: parseInt(values.numberOfQuestions, 10),
+          questionType: values.questionType,
+          language: values.language,
+          mode: values.mode,
+          parsingMode: values.parsingMode,
+          task: values.task,
+          customInstructions: values.customInstructions,
+        });
+      } catch (error) {
+        console.error("AI Generation trigger failed", error);
+        toast.error("Failed to start AI generation");
+      }
+    },
+    onError: (error) => {
       console.error(error);
-      toast.error(error.message || "Something went wrong");
+      toast.error(error.message || "Failed to create quiz");
       setIsGenerating(false);
       onGeneratingChange?.(false);
       setGenerationStatus("");
-      // Clean up subscription on error
-      if (subscriptionRef.current) {
-        subscriptionRef.current();
-        subscriptionRef.current = null;
-      }
+    },
+  });
+
+  const onSubmit = (values: QuizCreationValues) => {
+    if (activeTab === "file" && files.length === 0) {
+      toast.error("Please upload at least one file.");
+      return;
     }
+    if (activeTab === "text" && !textInput.trim()) {
+      toast.error("Please enter some text.");
+      return;
+    }
+
+    setIsGenerating(true);
+    onGeneratingChange?.(true);
+    createQuiz(values);
   };
 
   const removeFile = (index: number) => {
@@ -325,11 +318,11 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
               </p>
               <Button
                 type="submit"
-                disabled={uploading}
+                disabled={isCreating}
                 className="h-10 rounded-2xl px-4 font-semibold"
               >
                 <Sparkles className="mr-2 h-4 w-4" />
-                {uploading ? "Uploading..." : "Start making quiz"}
+                {isCreating ? "Creating..." : "Start making quiz"}
               </Button>
             </div>
           </div>

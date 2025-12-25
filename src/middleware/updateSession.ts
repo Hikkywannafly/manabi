@@ -24,9 +24,15 @@ export async function updateSession(
     return response;
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch (error) {
+    console.error("Auth fetch error:", error);
+    // Continue as guest if auth check fails
+  }
 
   const isProtectedRoute = checkRouteType(
     pathnameWithoutLocale,

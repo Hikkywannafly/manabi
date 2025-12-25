@@ -10,35 +10,28 @@ import {
   Youtube,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
 import { AIService } from "@/services/ai-service";
 import { type QuizCreationValues, quizCreationSchema } from "../schema";
 import { FileUpload } from "./file-upload";
+import { QuizLoading } from "./quiz-loading";
+import { QuizSettingsSidebar } from "./quiz-settings-sidebar";
+import { SelectedFileList } from "./selected-file-list";
 
-export function CreateQuizForm() {
+interface CreateQuizFormProps {
+  onGeneratingChange?: (isGenerating: boolean) => void;
+}
+
+export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [textInput, setTextInput] = useState("");
@@ -65,6 +58,18 @@ export function CreateQuizForm() {
 
   const supabase = createClient();
 
+  // Subscription cleanup ref
+  const subscriptionRef = useRef<(() => void) | null>(null);
+
+  // Cleanup subscription on unmount
+  useEffect(() => {
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current();
+      }
+    };
+  }, []);
+
   const onSubmit = async (values: QuizCreationValues) => {
     // Validation based on active tab
     if (activeTab === "file" && files.length === 0) {
@@ -79,6 +84,7 @@ export function CreateQuizForm() {
     try {
       setUploading(true);
       setIsGenerating(true);
+      onGeneratingChange?.(true);
       setGenerationStatus("Preparing content...");
 
       let filePath: string | undefined;
@@ -141,22 +147,36 @@ export function CreateQuizForm() {
       const quizId = quiz.id;
 
       // 3. Subscribe to Progress
-      const _unsubscribe = AIService.subscribeToProgress(quizId, (payload) => {
-        setGenerationProgress(payload.progress);
-        setGenerationStatus(payload.message);
+      // Clear any existing subscription
+      if (subscriptionRef.current) {
+        subscriptionRef.current();
+      }
 
-        if (payload.progress === 100) {
-          toast.success("Quiz generated successfully!");
-          // Redirect after a short delay
-          setTimeout(() => {
-            if (payload.data?.slug) {
-              router.push(`/dashboard/quiz/${quizId}/${payload.data.slug}`);
-            } else {
-              router.push(`/dashboard/quiz/${quizId}`);
+      subscriptionRef.current = AIService.subscribeToProgress(
+        quizId,
+        (payload) => {
+          setGenerationProgress(payload.progress);
+          setGenerationStatus(payload.message);
+
+          if (payload.progress === 100) {
+            toast.success("Quiz generated successfully!");
+            // Unsubscribe on completion
+            if (subscriptionRef.current) {
+              subscriptionRef.current();
+              subscriptionRef.current = null;
             }
-          }, 1000);
-        }
-      });
+
+            // Redirect after a short delay
+            setTimeout(() => {
+              if (payload.data?.slug) {
+                router.push(`/dashboard/quiz/${quizId}/${payload.data.slug}`);
+              } else {
+                router.push(`/dashboard/quiz/${quizId}`);
+              }
+            }, 1000);
+          }
+        },
+      );
 
       // 4. Trigger AI Service
       await AIService.generateContent(filePath, textContent, quizId, {
@@ -174,7 +194,13 @@ export function CreateQuizForm() {
       console.error(error);
       toast.error(error.message || "Something went wrong");
       setIsGenerating(false);
+      onGeneratingChange?.(false);
       setGenerationStatus("");
+      // Clean up subscription on error
+      if (subscriptionRef.current) {
+        subscriptionRef.current();
+        subscriptionRef.current = null;
+      }
     }
   };
 
@@ -184,22 +210,7 @@ export function CreateQuizForm() {
 
   if (isGenerating) {
     return (
-      <div className="fade-in zoom-in flex min-h-[400px] animate-in flex-col items-center justify-center space-y-6 text-center duration-500">
-        <div className="relative">
-          <div className="h-24 w-24 animate-spin rounded-full border-4 border-primary/30 border-t-primary"></div>
-          <Sparkles className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-8 w-8 animate-pulse text-primary" />
-        </div>
-        <div className="w-full max-w-md space-y-2">
-          <h3 className="font-semibold text-xl">Generating your quiz...</h3>
-          <p className="text-muted-foreground text-sm">
-            {generationStatus || "Please wait..."}
-          </p>
-          <Progress value={generationProgress} className="h-2" />
-          <p className="text-right text-muted-foreground text-xs">
-            {generationProgress}%
-          </p>
-        </div>
-      </div>
+      <QuizLoading progress={generationProgress} status={generationStatus} />
     );
   }
 
@@ -282,37 +293,7 @@ export function CreateQuizForm() {
                       onFilesSelected={(newFiles) => setFiles(newFiles)}
                     />
                   ) : (
-                    <div className="w-full space-y-2">
-                      {files.map((file, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between rounded-md border bg-background p-3"
-                        >
-                          <div className="flex items-center gap-3">
-                            <FileText className="h-8 w-8 text-primary" />
-                            <div>
-                              <p className="font-medium text-sm">{file.name}</p>
-                              <p className="text-muted-foreground text-xs">
-                                {(file.size / 1024 / 1024).toFixed(2)} MB
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeFile(idx)}
-                            type="button"
-                          >
-                            ×
-                          </Button>
-                        </div>
-                      ))}
-                      <div className="pt-2 text-center">
-                        <p className="text-muted-foreground text-xs">
-                          Supports PDF, DOCX, PPTX, TXT (Max 10MB)
-                        </p>
-                      </div>
-                    </div>
+                    <SelectedFileList files={files} onRemove={removeFile} />
                   )}
                 </CardContent>
               </Card>
@@ -323,7 +304,7 @@ export function CreateQuizForm() {
                 <CardHeader>
                   <CardTitle>Paste Text Content</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="border-none">
                   <Textarea
                     placeholder="Paste your study notes, articles, or summary here..."
                     className="min-h-[300px] resize-none border-none bg-transparent focus-visible:ring-0"
@@ -355,263 +336,7 @@ export function CreateQuizForm() {
         </div>
 
         {/* Right Column: Settings */}
-        <div className="sticky top-20 h-fit space-y-5">
-          <Card className="border-none bg-transparent shadow-none">
-            <CardContent className="space-y-4 border-none bg-transparent p-0">
-              {/* Visibility */}
-              <FormField
-                control={form.control}
-                name="visibility"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Visibility</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-secondary">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="private">Private</SelectItem>
-                        <SelectItem value="public">Public</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Language */}
-              <FormField
-                control={form.control}
-                name="language"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Language of the quiz</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-secondary">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="english">English</SelectItem>
-                        <SelectItem value="vietnamese">Vietnamese</SelectItem>
-                        <SelectItem value="japanese">Japanese</SelectItem>
-                        <SelectItem value="auto">Auto Detect</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Question Type */}
-              <FormField
-                control={form.control}
-                name="questionType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Question Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-secondary">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="mixed">Mixed</SelectItem>
-                        <SelectItem value="multiple_choice">
-                          Multiple Choice
-                        </SelectItem>
-                        <SelectItem value="true_false">True/False</SelectItem>
-                        <SelectItem value="fill_in_blank">
-                          Fill in Blank
-                        </SelectItem>
-                        <SelectItem value="short_answer">
-                          Short Answer
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Number of Questions */}
-              <FormField
-                control={form.control}
-                name="numberOfQuestions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Number of questions</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-secondary">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="5">5-10</SelectItem>
-                        <SelectItem value="10">10-15</SelectItem>
-                        <SelectItem value="20">20+</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Mode */}
-              <FormField
-                control={form.control}
-                name="mode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mode</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-secondary">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="quiz">Quiz</SelectItem>
-                        <SelectItem value="exam">Exam</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Difficulty */}
-              <FormField
-                control={form.control}
-                name="difficulty"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Difficulty</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-secondary">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="easy">Easy</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="hard">Hard</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Task */}
-              <FormField
-                control={form.control}
-                name="task"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Task</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-secondary">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="generate">Generate Quiz</SelectItem>
-                        <SelectItem value="extract">
-                          Extract Quiz (from existing)
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Parsing Mode */}
-              <FormField
-                control={form.control}
-                name="parsingMode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Parsing Mode</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-secondary">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="fast">
-                          <div className="flex w-full items-center">
-                            <span>Fast (Text Only)</span>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="balanced">
-                          <div className="flex w-full items-center">
-                            <span>Balanced (Recommended)</span>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="premium">
-                          <div className="flex w-full items-center">
-                            <span>Premium (Deep Analysis)</span>
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <div className="mt-2 flex items-center gap-4 rounded-md border border-yellow-500 bg-yellow-100 p-4 text-yellow-900 dark:border-amber-500 dark:bg-amber-950 dark:text-amber-100">
-                      <p className="text-sm">
-                        Fast mode skips images and tables. Use Balanced mode if
-                        material has them, but processing will take longer.
-                      </p>
-                    </div>
-                  </FormItem>
-                )}
-              />
-
-              {/* Custom Instructions */}
-              <FormField
-                control={form.control}
-                name="customInstructions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Custom Instructions (optional)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="e.g. 'Focus on strict definitions'"
-                        className="min-h-[80px] resize-none bg-secondary"
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-        </div>
+        <QuizSettingsSidebar form={form} />
       </form>
     </Form>
   );

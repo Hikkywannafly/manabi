@@ -23,17 +23,27 @@ export interface QuizResult {
   correctAnswers: number;
   incorrectAnswers: number;
   timeSpent: number;
+  performanceLevel?: "Learning" | "Excellent" | "Good" | "Needs Improvement";
+  personalizedFeedback?: string;
   answers: Array<{
     questionId: string;
+    questionText: string;
     selectedOptionId: string;
     correctOptionId: string;
     isCorrect: boolean;
+    options: QuizQuestionOption[];
   }>;
 }
 
 export interface QuizQuestionOption {
   id: string;
   text: string;
+}
+
+export interface QuestionFeedback {
+  isCorrect: boolean;
+  correctAnswer: string;
+  userAnswer: string;
 }
 
 // Extended types for quiz taking with joined data

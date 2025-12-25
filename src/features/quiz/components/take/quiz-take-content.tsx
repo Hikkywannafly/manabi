@@ -166,7 +166,7 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
 
   // Show quiz interface
   return (
-    <div className="relative flex h-screen w-full flex-col overflow-hidden">
+    <div className="relative flex h-full w-full flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col items-center">
           <QuizHeader

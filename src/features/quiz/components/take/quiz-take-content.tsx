@@ -301,12 +301,30 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
     };
 
     return (
-      <div className="flex-1 p-6">
-        <QuizResultComponent
-          result={result}
-          onRetake={handleRetake}
-          onBackToQuizzes={handleBackToQuizzes}
-        />
+      <div className="relative flex h-full w-full flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
+          <div className="my-8 px-4 xl:px-8">
+            <div className="container mx-auto max-w-7xl p-0">
+              <QuizResultComponent
+                result={result}
+                onRetake={handleRetake}
+                onBackToQuizzes={handleBackToQuizzes}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex-shrink-0">
+          <QuizNavigation
+            currentQuestion={0}
+            totalQuestions={1}
+            answers={[]}
+            onPrevious={() => {}}
+            onNext={handleBackToQuizzes}
+            onSubmit={handleBackToQuizzes}
+            onRestartQuiz={handleRetake}
+            mode="exam"
+          />
+        </div>
       </div>
     );
   }

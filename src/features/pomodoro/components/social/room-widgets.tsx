@@ -3,6 +3,7 @@
 import { MessageSquare, Send, Share2, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
@@ -17,26 +18,196 @@ export function RoomWidgets() {
   const [messages, setMessages] = useState<
     { user: string; text: string; id: string }[]
   >([]);
+  const [members, setMembers] = useState<any[]>([]);
+  const [currentUserNickname, setCurrentUserNickname] = useState<string>("");
 
   // Ref to chat container for auto-scroll
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<any>(null);
 
-  // Subscribe to room updates (Chat & Presence)
+  // Get current user nickname
   useEffect(() => {
-    if (!(currentRoom && isOpen)) return;
+    const getCurrentUser = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("nickname")
+          .eq("id", user.id)
+          .single();
+        setCurrentUserNickname(
+          profile?.nickname || user.email?.split("@")[0] || "",
+        );
+      }
+    };
+    getCurrentUser();
+  }, []);
+
+  // Clear messages when room changes
+  useEffect(() => {
+    setMessages([]);
+  }, []);
+
+  // Fetch and subscribe to members
+  useEffect(() => {
+    const roomId = currentRoom?.id;
+    if (!roomId) return;
 
     const supabase = createClient();
+
+    // Initial fetch
+    const fetchMembers = async () => {
+      const { data, error } = await supabase
+        .from("room_users")
+        .select(`
+          user_id,
+          status,
+          profile:profiles(nickname, avatar_url)
+        `)
+        .eq("room_id", roomId);
+
+      if (data) {
+        setMembers(data);
+      }
+      if (error) {
+        console.error("Error fetching members:", error);
+      }
+    };
+
+    fetchMembers();
+
+    // Subscribe to realtime changes
     const channel = supabase
-      .channel(`room:${currentRoom.id}`)
-      .on("broadcast", { event: "chat" }, (payload) => {
-        setMessages((prev) => [...prev, payload.payload]);
-      })
+      .channel(`room_users:${roomId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "room_users",
+          filter: `room_id=eq.${roomId}`,
+        },
+        (_payload) => {
+          // Refetch members on any change
+          fetchMembers();
+        },
+      )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentRoom, isOpen]);
+  }, [currentRoom?.id]);
+
+  // Subscribe to room updates (Chat & Presence)
+  useEffect(() => {
+    const roomId = currentRoom?.id;
+    if (!roomId) return;
+
+    const supabase = createClient();
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+    let heartbeatInterval: NodeJS.Timeout;
+
+    const setupChannel = () => {
+      const channel = supabase
+        .channel(`room:${roomId}`, {
+          config: {
+            broadcast: { self: true }, // Receive own messages
+            presence: { key: "" },
+          },
+        })
+        .on("broadcast", { event: "chat" }, (payload) => {
+          setMessages((prev) => [...prev, payload.payload]);
+        })
+        .subscribe((status, err) => {
+          if (status === "SUBSCRIBED") {
+            reconnectAttempts = 0;
+
+            // Start heartbeat to keep connection alive
+            if (heartbeatInterval) clearInterval(heartbeatInterval);
+            heartbeatInterval = setInterval(() => {
+              if (channelRef.current) {
+                // Send a heartbeat ping
+                channelRef.current.send({
+                  type: "broadcast",
+                  event: "heartbeat",
+                  payload: { timestamp: Date.now() },
+                });
+              }
+            }, 30000); // Every 30 seconds
+          } else if (status === "CHANNEL_ERROR") {
+            console.error("❌ Chat channel error:", err);
+
+            // Try to reconnect
+            if (reconnectAttempts < maxReconnectAttempts) {
+              reconnectAttempts++;
+              setTimeout(() => {
+                supabase.removeChannel(channel);
+                setupChannel();
+              }, 1000 * reconnectAttempts);
+            }
+          } else if (status === "TIMED_OUT") {
+            console.warn("⏱️ Chat channel timed out, reconnecting...");
+            supabase.removeChannel(channel);
+            setupChannel();
+          } else if (status === "CLOSED") {
+            if (heartbeatInterval) clearInterval(heartbeatInterval);
+          }
+        });
+
+      channelRef.current = channel;
+      return channel;
+    };
+
+    const channel = setupChannel();
+
+    // Handle page visibility change (tab switching)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // Check if channel is still alive
+        if (channelRef.current) {
+          const currentChannel = channelRef.current;
+
+          // Try to send a test message to check connection
+          currentChannel
+            .send({
+              type: "broadcast",
+              event: "ping",
+              payload: { timestamp: Date.now() },
+            })
+            .then((response: string) => {
+              if (response !== "ok") {
+                console.warn("⚠️ Channel not responding, reconnecting...");
+                supabase.removeChannel(currentChannel);
+                setupChannel();
+              }
+            })
+            .catch(() => {
+              console.error("❌ Channel dead, reconnecting...");
+              supabase.removeChannel(currentChannel);
+              setupChannel();
+            });
+        } else {
+          setupChannel();
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+      channelRef.current = null;
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [currentRoom?.id]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -50,35 +221,65 @@ export function RoomWidgets() {
     e.preventDefault();
     if (!(message.trim() && currentRoom)) return;
 
+    // Check if channel exists and is subscribed
+    if (!channelRef.current) {
+      console.error("Channel not initialized");
+      toast.error("Chat not connected. Please refresh the page.");
+      return;
+    }
+
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    // Get nickname would require fetching profile or storing it in session/context
-    // For now we use "You" locally
+    if (!user) {
+      toast.error("You must be logged in to send messages");
+      return;
+    }
+
+    // Get user profile for nickname
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("nickname")
+      .eq("id", user.id)
+      .single();
+
     const newMessage = {
-      user: "You",
+      user: profile?.nickname || user?.email?.split("@")[0] || "User",
       text: message,
       id: Date.now().toString(),
+      timestamp: new Date().toISOString(),
     };
-    setMessages((prev) => [...prev, newMessage]);
 
-    // Broadcast message
-    await supabase.channel(`room:${currentRoom.id}`).send({
-      type: "broadcast",
-      event: "chat",
-      payload: {
-        user: user?.email?.split("@")[0] || "User",
-        text: message,
-        id: Date.now().toString(),
-      },
-    });
-
+    // Clear input immediately for better UX
+    const messageText = message;
     setMessage("");
+
+    try {
+      // Broadcast message using the existing channel
+      const response = await channelRef.current.send({
+        type: "broadcast",
+        event: "chat",
+        payload: newMessage,
+      });
+
+      // Check if send was successful
+      if (response !== "ok") {
+        console.warn("⚠️ Message send status:", response);
+        // Restore message if failed
+        setMessage(messageText);
+        toast.error("Failed to send message. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setMessage(messageText); // Restore message
+      toast.error("Failed to send message. Please check your connection.");
+    }
   };
 
-  const activeMembers = currentRoom?.room_users || [];
+  const activeMembers =
+    members.length > 0 ? members : currentRoom?.room_users || [];
 
   if (!currentRoom) return null;
 
@@ -139,16 +340,38 @@ export function RoomWidgets() {
                       No messages yet. Say hello! 👋
                     </div>
                   )}
-                  {messages.map((msg) => (
-                    <div key={msg.id} className="mb-2 flex flex-col">
-                      <span className="mb-0.5 text-[10px] text-white/50">
-                        {msg.user}
-                      </span>
-                      <div className="self-start rounded-xl rounded-tl-sm bg-white/10 p-2 text-sm text-white">
-                        {msg.text}
+                  {messages.map((msg) => {
+                    const isOwnMessage = msg.user === currentUserNickname;
+
+                    return (
+                      <div
+                        key={msg.id}
+                        className={cn(
+                          "mb-3 flex flex-col",
+                          isOwnMessage ? "items-end" : "items-start",
+                        )}
+                      >
+                        {/* Username - only show for others */}
+                        {!isOwnMessage && (
+                          <span className="mb-1 px-2 text-[10px] text-white/50">
+                            {msg.user}
+                          </span>
+                        )}
+
+                        {/* Message bubble */}
+                        <div
+                          className={cn(
+                            "max-w-[80%] break-words rounded-2xl px-3 py-2 text-sm",
+                            isOwnMessage
+                              ? "rounded-br-sm bg-blue-600 text-white"
+                              : "rounded-bl-sm bg-white/10 text-white",
+                          )}
+                        >
+                          {msg.text}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <form
                   onSubmit={handleSendMessage}
@@ -175,12 +398,13 @@ export function RoomWidgets() {
                     key={member.user_id}
                     className="flex items-center gap-3 rounded-lg p-2 hover:bg-white/5"
                   >
-                    <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-neutral-800 text-white text-xs">
+                    <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-800 text-white text-xs">
                       {member.profile?.avatar_url ? (
                         <Image
                           src={member.profile.avatar_url}
                           alt=""
                           fill
+                          sizes="32px"
                           className="rounded-full object-cover"
                         />
                       ) : (

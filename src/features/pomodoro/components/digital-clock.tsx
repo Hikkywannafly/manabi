@@ -56,14 +56,12 @@ export function DigitalClock({
           {/* Colon Separator */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0.3, 1, 0.3] }}
+            animate={{ opacity: 1 }}
             transition={{
               delay: 0.2,
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut",
+              duration: 0.4,
             }}
-            className="font-bold text-[8rem] text-white/50 leading-none sm:text-[10rem] md:text-[12rem]"
+            className="font-bold text-[8rem] text-white leading-none tracking-tighter drop-shadow-2xl sm:text-[10rem] md:text-[12rem]"
           >
             :
           </motion.div>

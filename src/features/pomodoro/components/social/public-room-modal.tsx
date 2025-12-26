@@ -160,13 +160,14 @@ export function PublicRoomModal({ isOpen, onClose }: PublicRoomModalProps) {
                       {room.room_users?.slice(0, 3).map((u, i) => (
                         <div
                           key={i}
-                          className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-2 border-[#0f0f0f] bg-neutral-800 text-white text-xs"
+                          className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#0f0f0f] bg-neutral-800 text-white text-xs"
                         >
                           {u.profile?.avatar_url ? (
                             <Image
                               src={u.profile.avatar_url}
                               alt=""
                               fill
+                              sizes="32px"
                               className="object-cover"
                             />
                           ) : (
@@ -175,7 +176,7 @@ export function PublicRoomModal({ isOpen, onClose }: PublicRoomModalProps) {
                         </div>
                       ))}
                       {(room.room_users?.length || 0) > 3 && (
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#0f0f0f] bg-neutral-800 text-white/50 text-xs">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-[#0f0f0f] bg-neutral-800 text-white/50 text-xs">
                           +{(room.room_users?.length || 0) - 3}
                         </div>
                       )}

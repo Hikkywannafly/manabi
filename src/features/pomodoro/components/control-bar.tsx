@@ -6,14 +6,17 @@ import {
   MessageCircle,
   StickyNote,
   Users,
+  X,
   Zap,
 } from "lucide-react";
+import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { MusicPlayer } from "./music-player";
 import { NightSwitch } from "./night-switch";
 import { SceneSelector } from "./scene-selector";
+import { RoomWidgets } from "./social";
 import { SoundManager } from "./sound-manager";
 import { WhiteNoiseMixer } from "./soundscape-mixer";
 
@@ -23,6 +26,7 @@ interface ControlBarProps {
 
 export function ControlBar({ className }: ControlBarProps) {
   const { activeView, setActiveView } = usePomodoroStore();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
     <div
@@ -66,9 +70,24 @@ export function ControlBar({ className }: ControlBarProps) {
         </div>
 
         {/* Chat */}
-        <div className="chat-toolbar-button relative flex h-[30px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg bg-black/20 px-2 hover:bg-black/50 sm:h-[40px] sm:rounded-xl sm:px-3">
-          <MessageCircle className="text-[20px] text-white" />
-        </div>
+        <button
+          type="button"
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className="chat-toolbar-button relative flex h-[30px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg bg-black/20 px-2 hover:bg-black/50 sm:h-[40px] sm:rounded-xl sm:px-3"
+          aria-label={isChatOpen ? "Close chat" : "Open chat"}
+        >
+          {isChatOpen ? (
+            <X className="text-[20px] text-red-500" />
+          ) : (
+            <MessageCircle className="text-[20px] text-white" />
+          )}
+        </button>
+
+        {/* Room Widgets - Controlled by chat button */}
+        <RoomWidgets
+          isOpen={isChatOpen}
+          onToggle={() => setIsChatOpen(!isChatOpen)}
+        />
       </div>
 
       {/* Floating Status Pill (Timer/Mode) */}

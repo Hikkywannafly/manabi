@@ -7,7 +7,9 @@ export const QuizService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("quizzes")
-      .select("*")
+      .select(
+        "id, title, status, generation_params, created_at, slug, owner_id",
+      )
       .order("created_at", { ascending: false });
 
     if (error) {

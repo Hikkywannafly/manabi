@@ -16,19 +16,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/auth-provider";
 import { QuizService } from "../services/quiz-service";
 
 export function QuizList() {
   const [search, setSearch] = useState("");
+  const { user, isLoading: authLoading } = useAuth();
 
   const {
     data: quizzes = [],
-    isLoading: loading,
+    isLoading: queryLoading,
     isError,
   } = useQuery({
-    queryKey: ["quizzes"],
+    queryKey: ["quizzes", user?.id],
     queryFn: () => QuizService.getQuizzes(),
+    enabled: !!user && !authLoading,
   });
+
+  const loading = authLoading || queryLoading;
 
   const filteredQuizzes = quizzes.filter((q) =>
     q.title?.toLowerCase().includes(search.toLowerCase()),

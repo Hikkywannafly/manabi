@@ -8,9 +8,9 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useReducer,
+  useState,
 } from "react";
-import { fetchProfile } from "@/lib/auth/profile";
+import { useProfile } from "@/hooks/queries/use-profile";
 import { getSupabaseClient } from "@/lib/supabase/client-singleton";
 import type { PartialProfile } from "@/types/db/profile";
 
@@ -28,68 +28,21 @@ export type AuthContextType = AuthState & {
   refreshProfile: () => Promise<void>;
 };
 
-type AuthAction =
-  | {
-      type: "SET_SESSION";
-      payload: { session: Session | null; user: User | null };
-    }
-  | { type: "SET_PROFILE"; payload: PartialProfile | null }
-  | { type: "SET_LOADING"; payload: boolean }
-  | { type: "SET_ERROR"; payload: Error | null }
-  | { type: "RESET" };
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 type AuthProviderProps = {
   children: ReactNode;
 };
 
-const initialState: AuthState = {
-  user: null,
-  session: null,
-  profile: null,
-  isLoading: true,
-  error: null,
-};
-
-function authReducer(state: AuthState, action: AuthAction): AuthState {
-  switch (action.type) {
-    case "SET_SESSION":
-      return {
-        ...state,
-        session: action.payload.session,
-        user: action.payload.user,
-      };
-    case "SET_PROFILE":
-      return {
-        ...state,
-        profile: action.payload,
-        error: null,
-      };
-    case "SET_LOADING":
-      return {
-        ...state,
-        isLoading: action.payload,
-      };
-    case "SET_ERROR":
-      return {
-        ...state,
-        error: action.payload,
-      };
-    case "RESET":
-      return {
-        ...initialState,
-        isLoading: false,
-      };
-    default:
-      return state;
-  }
-}
-
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoadingSession, setIsLoadingSession] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
   const supabase = useMemo(() => getSupabaseClient(), []);
 
+  // Initialize session
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -101,45 +54,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         if (abortController.signal.aborted) return;
 
-        dispatch({
-          type: "SET_SESSION",
-          payload: {
-            session: initialSession,
-            user: initialSession?.user ?? null,
-          },
-        });
-
-        if (initialSession?.user) {
-          try {
-            const profileData = await fetchProfile(
-              supabase,
-              initialSession.user.id,
-              abortController.signal,
-            );
-            if (!abortController.signal.aborted && profileData !== null) {
-              dispatch({ type: "SET_PROFILE", payload: profileData });
-            }
-          } catch (err) {
-            if (!abortController.signal.aborted) {
-              console.error("Error fetching initial profile:", err);
-              dispatch({
-                type: "SET_ERROR",
-                payload: err instanceof Error ? err : new Error(String(err)),
-              });
-            }
-          }
-        }
-      } catch (error) {
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+      } catch (err) {
         if (!abortController.signal.aborted) {
-          console.error("Error initializing auth:", error);
-          dispatch({
-            type: "SET_ERROR",
-            payload: error instanceof Error ? error : new Error(String(error)),
-          });
+          console.error("Error initializing auth:", err);
+          setError(err instanceof Error ? err : new Error(String(err)));
         }
       } finally {
         if (!abortController.signal.aborted) {
-          dispatch({ type: "SET_LOADING", payload: false });
+          setIsLoadingSession(false);
         }
       }
     };
@@ -150,89 +74,75 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [supabase]);
 
+  // Listen to auth state changes
   useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      dispatch({
-        type: "SET_SESSION",
-        payload: {
-          session: currentSession,
-          user: currentSession?.user ?? null,
-        },
-      });
-      // Only fetch profile on SIGNED_IN (profile auto-created by trigger)
-      // TOKEN_REFRESHED doesn't need profile refetch
-      if (currentSession?.user && event === "SIGNED_IN") {
-        try {
-          const profileData = await fetchProfile(
-            supabase,
-            currentSession.user.id,
-          );
-          if (profileData !== null) {
-            dispatch({ type: "SET_PROFILE", payload: profileData });
-          }
-        } catch (err) {
-          if (err instanceof Error && !err.message?.includes("AbortError")) {
-            console.error("Error fetching profile on auth change:", err);
-            dispatch({
-              type: "SET_ERROR",
-              payload: err,
-            });
-          }
-        }
-      } else if (!currentSession?.user) {
-        dispatch({ type: "SET_PROFILE", payload: null });
-      }
-
-      dispatch({ type: "SET_LOADING", payload: false });
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      setIsLoadingSession(false);
     });
 
     return () => subscription.unsubscribe();
   }, [supabase]);
 
+  // Use React Query for profile (with caching!)
+  const {
+    data: profile,
+    isLoading: isLoadingProfile,
+    refetch: refetchProfile,
+    error: profileError,
+  } = useProfile(user?.id);
+
+  // Handle sign out
   const handleSignOut = useCallback(async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      dispatch({ type: "RESET" });
-    } catch (error) {
-      console.error("Error signing out:", error);
-      dispatch({
-        type: "SET_ERROR",
-        payload: error instanceof Error ? error : new Error(String(error)),
-      });
-      throw error;
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) throw signOutError;
+      setSession(null);
+      setUser(null);
+      setError(null);
+    } catch (err) {
+      console.error("Error signing out:", err);
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      setError(errorObj);
+      throw errorObj;
     }
   }, [supabase]);
 
+  // Refresh profile manually
   const refreshProfile = useCallback(async () => {
-    if (!state.user?.id) return;
+    if (!user?.id) return;
+    await refetchProfile();
+  }, [user?.id, refetchProfile]);
 
-    try {
-      const profileData = await fetchProfile(supabase, state.user.id);
-      if (profileData !== null) {
-        dispatch({ type: "SET_PROFILE", payload: profileData });
-      }
-    } catch (err) {
-      // Only dispatch error if it's not an abort error
-      if (err instanceof Error && !err.message?.includes("AbortError")) {
-        dispatch({
-          type: "SET_ERROR",
-          payload: err,
-        });
-      }
-    }
-  }, [supabase, state.user?.id]);
+  // Combine loading states
+  const isLoading = isLoadingSession || (!!user && isLoadingProfile);
+
+  // Combine errors
+  const combinedError = error || (profileError as Error | null);
 
   const value = useMemo(
     () => ({
-      ...state,
-      isOnboardingCompleted: state.profile?.onboarding_completed === true,
+      user,
+      session,
+      profile: profile ?? null,
+      isLoading,
+      error: combinedError,
+      isOnboardingCompleted: profile?.onboarding_completed === true,
       signOut: handleSignOut,
       refreshProfile,
     }),
-    [state, handleSignOut, refreshProfile],
+    [
+      user,
+      session,
+      profile,
+      isLoading,
+      combinedError,
+      handleSignOut,
+      refreshProfile,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

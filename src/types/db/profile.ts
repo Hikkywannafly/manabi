@@ -106,12 +106,17 @@ export const ProfileSchema = z.object({
 });
 
 // Partial schema for fetching limited fields (used in AuthProvider)
+// Includes all essential fields for UI display (similar to StudyOn.app session)
 export const PartialProfileSchema = z.object({
   id: z.string().uuid(),
   nickname: z.string().min(1),
+  full_name: z.string().optional().nullable(),
   avatar_url: optionalUrl().nullable(),
+  banner_url: optionalUrl().nullable(),
   onboarding_completed: z.boolean(),
   status: z.enum(PROFILE_STATUS_VALUES),
+  timezone: z.string().optional().nullable(),
+  is_public: z.boolean().optional().nullable(),
 });
 
 export const FullProfileSchema = ProfileSchema.extend({

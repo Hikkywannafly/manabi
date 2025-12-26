@@ -103,14 +103,40 @@ export const QuizService = {
     let correctCount = 0;
     const answersLog = answers.map((answer) => {
       const question = questions.find((q) => q.id === answer.questionId);
-      const isCorrect =
-        question?.correct_answer === answer.selectedOptionIds[0];
+      if (!question) {
+        return { ...answer, isCorrect: false, correctOptionId: null };
+      }
+
+      const selectedId = answer.selectedOptionIds[0] || "";
+      const correctId = question.correct_answer || "";
+      let isCorrect = false;
+
+      // Robust comparison logic matching client-side
+      if (
+        question.question_type === "fill_in_blank" ||
+        question.question_type === "short_answer"
+      ) {
+        // Text-based: Case-insensitive trim check
+        isCorrect =
+          selectedId.trim().toLowerCase() === correctId.trim().toLowerCase();
+      } else {
+        // Choice-based: Normalize "0" to "option-0" if needed
+        const normalizedCorrect = correctId.startsWith("option-")
+          ? correctId
+          : `option-${correctId}`;
+        const normalizedSelected = selectedId.startsWith("option-")
+          ? selectedId
+          : selectedId; // Assuming client sends correct format, but good to keep in mind
+
+        isCorrect = normalizedCorrect === normalizedSelected;
+      }
+
       if (isCorrect) correctCount++;
 
       return {
         questionId: answer.questionId,
-        selectedOptionId: answer.selectedOptionIds[0],
-        correctOptionId: question?.correct_answer,
+        selectedOptionId: selectedId,
+        correctOptionId: correctId, // Store raw correct ID
         isCorrect,
         timeSpent: answer.timeSpent,
       };

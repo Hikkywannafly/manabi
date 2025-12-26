@@ -23,7 +23,12 @@ export interface QuizResult {
   correctAnswers: number;
   incorrectAnswers: number;
   timeSpent: number;
-  performanceLevel?: "Learning" | "Excellent" | "Good" | "Needs Improvement";
+  performanceLevel?:
+    | "Learning"
+    | "Excellent"
+    | "Good"
+    | "Average"
+    | "Needs Improvement";
   personalizedFeedback?: string;
   answers: Array<{
     questionId: string;

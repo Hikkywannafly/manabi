@@ -25,7 +25,9 @@ export async function fetchProfile(
   try {
     let query = supabase
       .from("profiles")
-      .select("id, nickname, avatar_url, onboarding_completed, status")
+      .select(
+        "id, nickname, full_name, avatar_url, banner_url, onboarding_completed, status, timezone, is_public",
+      )
       .eq("id", userId);
 
     // Add abort signal if provided

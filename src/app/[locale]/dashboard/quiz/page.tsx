@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function QuizPage() {
   return (
-    <DashboardPage title="Quizzes" description="Manage your study quizzes">
+    <DashboardPage>
       <QuizList />
     </DashboardPage>
   );

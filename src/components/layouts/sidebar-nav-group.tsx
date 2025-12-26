@@ -1,7 +1,6 @@
 "use client";
 
 import { IconChevronRight } from "@tabler/icons-react";
-import Link from "next/link";
 import {
   Collapsible,
   CollapsibleContent,
@@ -15,6 +14,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { Link } from "@/i18n/routing";
 import type { NavItem } from "@/types";
 import { Icons } from "../icons";
 

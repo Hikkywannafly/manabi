@@ -1,39 +1,18 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { formatDistanceToNow } from "date-fns";
-import { ArrowRight, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/auth-provider";
-import { QuizService } from "../services/quiz-service";
+import { useQuizzes } from "../hooks/use-quizzes";
+import { QuizCard } from "./quiz-card";
 
 export function QuizList() {
   const [search, setSearch] = useState("");
-  const { user, isLoading: authLoading } = useAuth();
 
-  const {
-    data: quizzes = [],
-    isLoading: queryLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["quizzes", user?.id],
-    queryFn: () => QuizService.getQuizzes(),
-    enabled: !!user && !authLoading,
-  });
-
-  const loading = authLoading || queryLoading;
+  const { data: quizzes = [], isLoading, isError } = useQuizzes();
 
   const filteredQuizzes = quizzes.filter((q) =>
     q.title?.toLowerCase().includes(search.toLowerCase()),
@@ -71,7 +50,7 @@ export function QuizList() {
         </div>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-32 animate-pulse rounded-xl bg-muted" />
@@ -97,63 +76,7 @@ export function QuizList() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredQuizzes.map((quiz) => (
-            <Card
-              key={quiz.id}
-              className="group relative transition-all hover:shadow-md"
-            >
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="line-clamp-2 h-14 font-semibold text-lg">
-                    {quiz.title}
-                  </CardTitle>
-                  {/* Status Badge */}
-                  {quiz.status !== "ready" && (
-                    <Badge
-                      variant={
-                        quiz.status === "failed" ? "destructive" : "secondary"
-                      }
-                    >
-                      {quiz.status}
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="pb-2">
-                <div className="text-muted-foreground text-sm">
-                  {/* Placeholder for question count/difficulty */}
-                  <span>
-                    {(quiz.generation_params as any)?.difficulty || "Medium"}
-                  </span>
-                  <span className="mx-2">•</span>
-                  <span>
-                    {(quiz.generation_params as any)?.numberOfQuestions || "?"}{" "}
-                    questions
-                  </span>
-                  <span className="mx-2">•</span>
-                  <span>
-                    {quiz.created_at &&
-                      formatDistanceToNow(new Date(quiz.created_at), {
-                        addSuffix: true,
-                      })}
-                  </span>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-end gap-2 pt-4">
-                {quiz.status === "ready" && (
-                  <Link
-                    href={
-                      quiz.slug
-                        ? `/dashboard/quiz/${quiz.id}/${quiz.slug}/take?mode=test`
-                        : `/dashboard/quiz/${quiz.id}/take?mode=test`
-                    }
-                  >
-                    <Button size="sm" variant="default" className="gap-1">
-                      Take Quiz <ArrowRight className="h-3 w-3" />
-                    </Button>
-                  </Link>
-                )}
-              </CardFooter>
-            </Card>
+            <QuizCard key={quiz.id} quiz={quiz} />
           ))}
         </div>
       )}

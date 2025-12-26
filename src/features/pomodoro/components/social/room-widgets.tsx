@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, Send, Share2, X } from "lucide-react";
+import { Send, Share2, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -10,9 +10,13 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useRoomStore } from "@/stores/use-room-store";
 
-export function RoomWidgets() {
+interface RoomWidgetsProps {
+  isOpen?: boolean;
+  onToggle?: () => void;
+}
+
+export function RoomWidgets({ isOpen = false, onToggle }: RoomWidgetsProps) {
   const { currentRoom } = useRoomStore();
-  const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"chat" | "members">("chat");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<
@@ -319,7 +323,7 @@ export function RoomWidgets() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsOpen(false)}
+              onClick={onToggle}
               className="h-6 w-6 rounded-full text-white/50 hover:bg-white/10"
             >
               <X className="h-4 w-4" />
@@ -435,23 +439,6 @@ export function RoomWidgets() {
           </div>
         </div>
       )}
-
-      {/* Toggle Button */}
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          "flex h-12 w-12 items-center justify-center rounded-full shadow-2xl transition-all duration-300",
-          isOpen
-            ? "rotate-90 bg-white text-black"
-            : "bg-gradient-to-tr from-blue-600 to-indigo-600 text-white hover:scale-110",
-        )}
-      >
-        {isOpen ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <MessageSquare className="h-6 w-6" />
-        )}
-      </Button>
     </div>
   );
 }

@@ -27,12 +27,7 @@ function formatDuration(seconds: number) {
   return `${secs}s`;
 }
 
-function getGrade(score: number) {
-  if (score >= 90) return { label: "Excellent", color: "text-green-600" };
-  if (score >= 70) return { label: "Good", color: "text-blue-600" };
-  if (score >= 50) return { label: "Average", color: "text-yellow-600" };
-  return { label: "Needs Improvement", color: "text-red-600" };
-}
+import { getQuizPerformance } from "../../utils";
 
 export function QuizResultsContent({
   quiz,
@@ -42,12 +37,13 @@ export function QuizResultsContent({
   const totalAttempts = attempts.length;
   const bestScore =
     totalAttempts > 0 ? Math.max(...attempts.map((a) => a.score)) : 0;
-  const averageScore =
+
+  const averageScoreRaw =
     totalAttempts > 0
-      ? Math.round(
-          attempts.reduce((acc, a) => acc + a.score, 0) / totalAttempts,
-        )
+      ? attempts.reduce((acc, a) => acc + a.score, 0) / totalAttempts
       : 0;
+  const averageScore = Math.round(averageScoreRaw);
+
   const totalTimeSeconds = attempts.reduce(
     (acc, a) => acc + (a.duration_seconds || 0),
     0,
@@ -61,9 +57,14 @@ export function QuizResultsContent({
       ? `${totalTimeHours}h ${totalTimeMinutes}m`
       : `${totalTimeMinutes}m`;
 
+  const bestPerformance = getQuizPerformance(bestScore);
+  const averagePerformance = getQuizPerformance(averageScore);
+
   return (
     <div className="py-4">
       {/* Stats Grid */}
+      {/* display quizz name */}
+      <h2 className="mb-8 font-semibold text-2xl">{quiz.title}</h2>
       <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card className="border-none bg-secondary/50 shadow-none">
           <CardHeader className="p-6 pb-2">
@@ -83,8 +84,10 @@ export function QuizResultsContent({
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 pt-0">
-            <div className={`font-bold text-2xl ${getGrade(bestScore).color}`}>
-              {bestScore}%
+            <div
+              className={`font-bold text-2xl ${bestPerformance.config.color}`}
+            >
+              {Math.round(bestScore)}%
             </div>
           </CardContent>
         </Card>
@@ -97,7 +100,7 @@ export function QuizResultsContent({
           </CardHeader>
           <CardContent className="p-6 pt-0">
             <div
-              className={`font-bold text-2xl ${getGrade(averageScore).color}`}
+              className={`font-bold text-2xl ${averagePerformance.config.color}`}
             >
               {averageScore}%
             </div>
@@ -128,19 +131,19 @@ export function QuizResultsContent({
             {attempts.map((attempt, index) => {
               const isBest = attempt.score === bestScore && bestScore > 0;
               const isLatest = index === 0;
-              const grade = getGrade(attempt.score);
+              const performance = getQuizPerformance(attempt.score);
 
               // Calculate correct answers
-              const totalQuestions =
-                (attempt.answers_log as any[])?.length || 0;
-              const correctAnswers =
-                (attempt.answers_log as any[])?.filter((a: any) => a.isCorrect)
-                  .length || 0;
+              const logs = (attempt.answers_log as any[]) || [];
+              const totalQuestions = logs.length;
+              const correctAnswers = logs.filter(
+                (a: any) => a.isCorrect,
+              ).length;
 
               return (
                 <Link
                   key={attempt.id}
-                  href={`/dashboard/quiz/${quiz.id}/results/${attempt.id}`}
+                  href={`/dashboard/quiz/${quiz.id}/${quiz.slug || "view"}/results/${attempt.id}`}
                   className="block p-6 transition-colors hover:bg-muted/50"
                 >
                   <div className="flex items-center justify-between">
@@ -156,8 +159,10 @@ export function QuizResultsContent({
                             Attempt {totalAttempts - index}
                           </span>
                         )}
-                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold text-foreground text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                          {grade.label}
+                        <span
+                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${performance.config.bg} ${performance.config.color} ${performance.config.border}`}
+                        >
+                          {performance.level}
                         </span>
                       </div>
                       <div className="flex items-center gap-6 text-muted-foreground text-sm">
@@ -183,7 +188,9 @@ export function QuizResultsContent({
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`font-bold text-2xl ${grade.color}`}>
+                      <div
+                        className={`font-bold text-2xl ${performance.config.color}`}
+                      >
                         {Math.round(attempt.score)}%
                       </div>
                       {isBest && (

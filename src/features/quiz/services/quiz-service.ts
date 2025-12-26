@@ -145,4 +145,31 @@ export const QuizService = {
       answers: answersLog,
     };
   },
+
+  async getQuizHistory(quizId: string) {
+    const supabase = createClient();
+
+    // 1. Fetch quiz info with specific fields
+    const { data: quiz, error: quizError } = await supabase
+      .from("quizzes")
+      .select("id, title, slug, generation_params, created_at, status")
+      .eq("id", quizId)
+      .single();
+
+    if (quizError) throw quizError;
+
+    // 2. Fetch all attempts for this quiz
+    const { data: attempts, error: attemptsError } = await supabase
+      .from("quiz_attempts")
+      .select("id, score, duration_seconds, completed_at, answers_log")
+      .eq("quiz_id", quizId)
+      .order("completed_at", { ascending: false });
+
+    if (attemptsError) throw attemptsError;
+
+    return {
+      quiz: quiz as Quiz,
+      attempts: attempts || [],
+    };
+  },
 };

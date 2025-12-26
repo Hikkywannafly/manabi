@@ -15,6 +15,7 @@ interface RoomState {
   joinRoom: (roomId: string) => Promise<void>;
   leaveRoom: () => Promise<void>;
   initializePersonalRoom: () => Promise<void>;
+  restoreCurrentRoom: () => Promise<void>;
   updateRoomProfile: (settings: Partial<StudyRoom>) => Promise<void>;
   setRoomUsers: (users: RoomUser[]) => void;
 }
@@ -80,8 +81,27 @@ export const useRoomStore = create<RoomState>((set, get) => ({
       const fullRoom = await roomService.getRoom(room.id);
       set({ currentRoom: fullRoom, isLoading: false });
     } catch (error: any) {
-      console.error("Failed to init personal room:", error);
       set({ error: error.message, isLoading: false });
+    }
+  },
+
+  restoreCurrentRoom: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      // Check if user is currently in any room
+      const currentRoomData = await roomService.getCurrentUserRoom();
+
+      if (currentRoomData) {
+        // User is in a room, restore it
+        const fullRoom = await roomService.getRoom(currentRoomData.room_id);
+        set({ currentRoom: fullRoom, isLoading: false });
+      } else {
+        // User not in any room, initialize personal room
+        await get().initializePersonalRoom();
+      }
+    } catch (_error: any) {
+      // Fallback to personal room
+      await get().initializePersonalRoom();
     }
   },
 

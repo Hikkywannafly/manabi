@@ -162,6 +162,26 @@ export const roomService = {
     if (error) console.error("Error leaving all rooms:", error);
   },
 
+  async getCurrentUserRoom() {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data, error } = await supabase
+      .from("room_users")
+      .select("room_id")
+      .eq("user_id", user.id)
+      .single();
+
+    if (error) {
+      // User not in any room
+      return null;
+    }
+    return data;
+  },
+
   async getRoom(roomId: string) {
     const supabase = createClient();
     const { data, error } = await supabase

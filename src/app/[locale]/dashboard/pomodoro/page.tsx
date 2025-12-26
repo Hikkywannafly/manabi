@@ -24,16 +24,12 @@ export default function PomodoroPage() {
     setOpen(false);
   }, [setOpen]);
 
-  // Auto-create/join personal room
+  // Auto-restore current room or create/join personal room
   useEffect(() => {
     if (!currentRoom) {
-      // Just call initializePersonalRoom, it handles checks and creation
       const initRoom = async () => {
-        // We can add a small delay or check if we have checked auth yet,
-        // but initializePersonalRoom checks auth too.
-        // We just need to make sure we don't loop. currentRoom check prevents loop.
-        const { initializePersonalRoom } = useRoomStore.getState();
-        await initializePersonalRoom();
+        const { restoreCurrentRoom } = useRoomStore.getState();
+        await restoreCurrentRoom();
       };
       initRoom();
     }

@@ -12,100 +12,181 @@ export type Product = {
 };
 
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
+// Overview section
 export const navItems: NavItem[] = [
   {
     title: "Dashboard",
-    url: "/dashboard/overview",
-    icon: "dashboard",
+    url: "/dashboard",
+    icon: "layoutPanelLeft",
     isActive: false,
-    shortcut: ["d", "d"],
-    items: [], // Empty array as there are no child items for Dashboard
+    items: [],
   },
   {
-    title: "Product",
-    url: "/dashboard/product",
-    icon: "product",
-    shortcut: ["p", "p"],
+    title: "Explore",
+    url: "/dashboard/explore",
+    icon: "library",
     isActive: false,
-    items: [], // No child items
-  },
-  {
-    title: "Account",
-    url: "/dashboard/account", // Placeholder as there is no direct link for the parent
-    icon: "billing",
-    isActive: false,
-    // items: [
-    //   {
-    //     title: "Profile",
-    //     url: "/dashboard/profile",
-    //     icon: "userPen",
-    //     shortcut: ["m", "m"],
-    //   },
-    //   {
-    //     title: "Login",
-    //     shortcut: ["l", "l"],
-    //     url: "/",
-    //     icon: "login",
-    //   },
-    // ],
-  },
-  {
-    title: "Kanban",
-    url: "/dashboard/kanban",
-    icon: "kanban",
-    shortcut: ["k", "k"],
-    isActive: false,
-    items: [], // No child items
+    items: [],
   },
 ];
 
-// Content Creation section items for the sidebar
+// Content Creation section
 export const contentNavItems: NavItem[] = [
+  {
+    title: "Materials",
+    url: "/dashboard/material",
+    icon: "page", // Using 'page' (IconFile) for file icon
+    isActive: false,
+    items: [],
+  },
   {
     title: "Quizzes",
     url: "/dashboard/quiz",
-    icon: "post",
+    icon: "book",
     isActive: false,
     items: [],
   },
   {
     title: "Flashcards",
-    url: "/dashboard/flashcards",
-    icon: "page",
+    url: "/dashboard/flashcard",
+    icon: "bookOpen",
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Collections",
+    url: "/dashboard/collections",
+    icon: "folder",
     isActive: false,
     items: [],
   },
 ];
 
-// Study Tools section items for the sidebar
+// Study Tools section
 export const studyToolsNavItems: NavItem[] = [
   {
     title: "Notes",
     url: "/dashboard/notes",
-    icon: "post",
+    icon: "stickyNote",
     isActive: false,
     items: [],
   },
   {
-    title: "Mind Map",
-    url: "/dashboard/mind-map",
-    icon: "brain",
+    title: "Reader",
+    url: "/dashboard/reader",
+    icon: "book",
     isActive: false,
     items: [],
   },
   {
     title: "Tutors",
-    url: "/dashboard/tutors",
-    icon: "user",
+    url: "/dashboard/tutor",
+    icon: "graduationCap",
     isActive: false,
     items: [],
   },
   {
     title: "Pomodoro",
     url: "/dashboard/pomodoro",
-    icon: "clock",
+    icon: "timer",
     isActive: false,
     items: [],
+  },
+];
+
+// Planning & Organization section
+export const planningNavItems: NavItem[] = [
+  {
+    title: "Planner",
+    url: "/dashboard/planner",
+    icon: "calendar",
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Kanban Board",
+    url: "/dashboard/kanban",
+    icon: "kanban",
+    isActive: false,
+    items: [],
+  },
+];
+
+// Social & Progress section
+export const socialNavItems: NavItem[] = [
+  {
+    title: "Study Groups",
+    url: "/dashboard/study-groups",
+    icon: "users",
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Achievements",
+    url: "/dashboard/achievements",
+    icon: "trophy",
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Statistics",
+    url: "/dashboard/statistics",
+    icon: "chartLine",
+    isActive: false,
+    items: [],
+  },
+];
+
+// Account section
+export const accountNavItems: NavItem[] = [
+  {
+    title: "Billing",
+    url: "/dashboard/billing",
+    icon: "billing",
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Settings",
+    url: "/dashboard/settings",
+    icon: "settings", // IconSettings
+    isActive: false,
+    items: [],
+  },
+  {
+    title: "Feedback",
+    url: "/dashboard/feedback",
+    icon: "messageCircle",
+    isActive: false,
+    items: [],
+  },
+];
+
+// Community section (Using external links, icons might need special handling if not in Icons map, assuming standard icons for now)
+export const communityNavItems: NavItem[] = [
+  {
+    title: "Discord",
+    url: "https://discord.gg/RfQR684HC2",
+    icon: "discord",
+    isActive: false,
+    items: [],
+    external: true, // Assuming NavItem supports this or we handle it
+  },
+  {
+    title: "Facebook",
+    url: "https://www.facebook.com/people/StudyOn/61571297076889/",
+    icon: "facebook",
+    isActive: false,
+    items: [],
+    external: true,
+  },
+  {
+    title: "Reddit",
+    url: "https://www.reddit.com/r/studyon/",
+    icon: "reddit",
+    isActive: false,
+    items: [],
+    external: true,
   },
 ];
 

@@ -2,7 +2,10 @@ import {
   IconAlertTriangle,
   IconArrowRight,
   IconBrain,
+  IconBrandDiscord,
+  IconBrandFacebook,
   IconBrandGithub,
+  IconBrandReddit,
   IconBrandTwitter,
   IconCheck,
   IconChevronLeft,
@@ -34,6 +37,23 @@ import {
   IconUserX,
   IconX,
 } from "@tabler/icons-react";
+
+import {
+  Book,
+  BookOpen,
+  Calendar,
+  ChartLine,
+  Folder,
+  GraduationCap,
+  LayoutPanelLeft,
+  Library,
+  MessageCircle,
+  StickyNote,
+  Timer,
+  Trophy,
+  Users,
+  WandSparkles,
+} from "lucide-react";
 
 export type Icon = React.ComponentType<IconProps>;
 
@@ -71,4 +91,23 @@ export const Icons = {
   github: IconBrandGithub,
   twitter: IconBrandTwitter,
   check: IconCheck,
+  // Brand Icons
+  discord: IconBrandDiscord,
+  facebook: IconBrandFacebook,
+  reddit: IconBrandReddit,
+  // Lucide Icons
+  layoutPanelLeft: LayoutPanelLeft,
+  library: Library,
+  folder: Folder,
+  book: Book,
+  bookOpen: BookOpen,
+  stickyNote: StickyNote,
+  graduationCap: GraduationCap,
+  timer: Timer,
+  calendar: Calendar,
+  users: Users,
+  trophy: Trophy,
+  chartLine: ChartLine,
+  messageCircle: MessageCircle,
+  wandSparkles: WandSparkles,
 };

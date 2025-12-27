@@ -36,11 +36,11 @@ export default function AppSidebar() {
       <SidebarHeader>
         <Logo
           size="md"
-          className="transition-[gap] duration-300 ease-in-out group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:gap-2"
+          className=""
           textClassName={cn(
             "transition-[max-width,opacity] duration-300 ease-in-out",
             "group-data-[collapsible=icon]:inline-block group-data-[collapsible=icon]:max-w-[200px] group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:opacity-0",
-            "group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:max-w-[200px] group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:opacity-100",
+            "group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:max-w-[200px] group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:opacity-100 group-data-[collapsible=icon]:group-data-[mini=true]:group-hover/sidebar-container:delay-100",
           )}
         />
       </SidebarHeader>

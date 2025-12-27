@@ -104,7 +104,15 @@ export const QuizService = {
     const answersLog = answers.map((answer) => {
       const question = questions.find((q) => q.id === answer.questionId);
       if (!question) {
-        return { ...answer, isCorrect: false, correctOptionId: null };
+        return {
+          questionId: answer.questionId,
+          questionText: "Unknown Question",
+          selectedOptionId: "",
+          correctOptionId: "",
+          isCorrect: false,
+          timeSpent: answer.timeSpent,
+          options: [],
+        };
       }
 
       const selectedId = answer.selectedOptionIds[0] || "";
@@ -126,23 +134,63 @@ export const QuizService = {
           : `option-${correctId}`;
         const normalizedSelected = selectedId.startsWith("option-")
           ? selectedId
-          : selectedId; // Assuming client sends correct format, but good to keep in mind
+          : selectedId;
 
         isCorrect = normalizedCorrect === normalizedSelected;
       }
 
       if (isCorrect) correctCount++;
 
+      // Provide options for the result view
+      let options: any[] = [];
+      try {
+        const rawOptions =
+          typeof question.options === "string"
+            ? JSON.parse(question.options)
+            : question.options;
+
+        if (Array.isArray(rawOptions)) {
+          if (typeof rawOptions[0] === "string") {
+            options = rawOptions.map((text, idx) => ({
+              id: `option-${idx}`,
+              text,
+            }));
+          } else {
+            options = rawOptions;
+          }
+        }
+      } catch (e) {
+        console.error("Error parsing options for result:", e);
+      }
+
       return {
         questionId: answer.questionId,
+        questionText: question.question_text || "",
         selectedOptionId: selectedId,
         correctOptionId: correctId, // Store raw correct ID
         isCorrect,
         timeSpent: answer.timeSpent,
+        options,
       };
     });
 
     const score = (correctCount / questions.length) * 100;
+
+    // Use a lighter version of answers log for DB to save space if needed,
+    // but strict typing suggests we might want to store it all if the DB column type is JSONB.
+    // For now, we store the detailed log to enable full history review.
+
+    // We need to strip 'options' and 'questionText' if we want to save space in DB,
+    // but the UI 'QuizHistory' likely relies on fetching this from questions table again
+    // OR we store it in attempt. Let's store a simplified version in DB and return the FULL version to the client.
+
+    const dbAnswersLog = answersLog.map((a) => ({
+      questionId: a.questionId,
+      selectedOptionId: a.selectedOptionId,
+      correctOptionId: a.correctOptionId,
+      isCorrect: a.isCorrect,
+      timeSpent: a.timeSpent,
+    }));
 
     const { data, error } = await supabase
       .from("quiz_attempts")
@@ -151,7 +199,7 @@ export const QuizService = {
         user_id: userId,
         score,
         duration_seconds: totalTimeSpent,
-        answers_log: answersLog,
+        answers_log: dbAnswersLog,
         completed_at: new Date().toISOString(),
       })
       .select()
@@ -168,7 +216,9 @@ export const QuizService = {
       correctAnswers: correctCount,
       incorrectAnswers: questions.length - correctCount,
       timeSpent: totalTimeSpent,
-      answers: answersLog,
+      answers: answersLog, // Return the full log including options/text for immediate display
+      performanceLevel: "Learning", // Fallback, will be recalculated/overwritten by client helper
+      personalizedFeedback: "",
     };
   },
 

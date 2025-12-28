@@ -21,7 +21,7 @@ export function DashboardContent() {
 
   if (isLoading) {
     return (
-      <DashboardPage title="Dashboard">
+      <DashboardPage>
         <div className="space-y-4">
           {/* Simple skeleton loading state */}
           <Skeleton className="h-20 w-full" />

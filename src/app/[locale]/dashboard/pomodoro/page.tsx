@@ -10,6 +10,7 @@ import { DigitalClock } from "@/features/pomodoro/components/digital-clock";
 import { LeaderboardModal } from "@/features/pomodoro/components/leaderboard-modal";
 import { PomodoroHeader } from "@/features/pomodoro/components/pomodoro-header";
 import { PomodoroTimer } from "@/features/pomodoro/components/pomodoro-timer";
+import { PomodoroTitleUpdater } from "@/features/pomodoro/components/pomodoro-title-updater";
 import { TaskInput } from "@/features/pomodoro/components/task-input";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { useRoomStore } from "@/stores/use-room-store";
@@ -37,6 +38,9 @@ export default function PomodoroPage() {
 
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-black">
+      {/* Title Updater */}
+      <PomodoroTitleUpdater />
+
       {/* Persistent Music Player */}
       <BackgroundMusicPlayer />
 

@@ -61,6 +61,7 @@ export function usePomodoroTimer() {
 
     if (mode === "focus") {
       incrementSessionCount();
+      const nextCount = sessionCount + 1;
 
       // Increment active task pomodoro count
       const { activeTaskId, incrementTaskPomodoro } = useTaskStore.getState();
@@ -68,14 +69,17 @@ export function usePomodoroTimer() {
         incrementTaskPomodoro(activeTaskId);
       }
 
-      // Flow: Focus -> Short -> Focus -> Short -> Focus -> Long
-      const nextCount = sessionCount + 1;
-      if (nextCount % 3 === 0) {
+      // Flow: Focus -> Short -> Focus -> Short -> Focus -> Short -> Focus -> Long
+      if (nextCount > 0 && nextCount % 4 === 0) {
         changeMode("longBreak");
       } else {
         changeMode("shortBreak");
       }
     } else {
+      if (mode === "longBreak") {
+        const { resetSessionCount } = useTimerStore.getState();
+        resetSessionCount();
+      }
       changeMode("focus");
     }
 

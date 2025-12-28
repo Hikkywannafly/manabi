@@ -52,11 +52,11 @@ export function PomodoroHeader() {
               onClick={toggleStreak}
             >
               <div className="flex items-center gap-2">
-                <div className="flex flex-col text-left">
-                  <span className="font-bold text-white/90 text-xs uppercase">
+                <div className="flex items-baseline gap-2 text-left">
+                  <span className="font-bold text-sm text-white/90 uppercase">
                     Streak
                   </span>
-                  <div className="font-black font-title text-white text-xl">
+                  <div className="font-black font-title text-sm text-white">
                     {currentStreakCount}
                   </div>
                 </div>

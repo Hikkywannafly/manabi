@@ -20,6 +20,7 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
     start,
     pause,
     resume,
+    skip,
     changeMode,
   } = usePomodoroTimer();
   const { tasks, activeTaskId } = useTaskStore();
@@ -153,9 +154,10 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
         <Button
           variant="ghost"
           size="icon"
+          onClick={skip}
           className={cn(
             "size-10 rounded-full text-white/70 transition-all hover:bg-white/10 hover:text-white",
-            state !== "running" && "pointer-events-none opacity-50",
+            state === "idle" && "pointer-events-none opacity-50",
           )}
           title="Skip"
         >

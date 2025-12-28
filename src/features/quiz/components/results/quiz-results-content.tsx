@@ -5,15 +5,7 @@ import { Calendar, Clock, Target, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Quiz } from "../../types";
-
-interface QuizAttempt {
-  id: string;
-  score: number;
-  duration_seconds: number;
-  completed_at: string;
-  answers_log: any[];
-}
+import type { Quiz, QuizAttempt } from "../../types";
 
 interface QuizResultsContentProps {
   quiz: Quiz;

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import type { Database } from "@/types/supabase";
 import type { TimerMode } from "../types";
 
 export interface PomodoroSessionDB {
@@ -10,6 +11,20 @@ export interface PomodoroSessionDB {
   duration_minutes: number;
   created_at?: string;
 }
+
+type DBPomodoroMode = Database["public"]["Enums"]["pomodoro_mode"];
+
+const toDBMode = (mode: TimerMode): DBPomodoroMode => {
+  if (mode === "shortBreak") return "short_break";
+  if (mode === "longBreak") return "long_break";
+  return mode;
+};
+
+const fromDBMode = (mode: string): TimerMode => {
+  if (mode === "short_break") return "shortBreak";
+  if (mode === "long_break") return "longBreak";
+  return mode as TimerMode;
+};
 
 /**
  * Save a completed session to the database
@@ -23,7 +38,7 @@ export async function saveSession(
       .from("pomodoro_sessions")
       .insert({
         user_id: session.user_id,
-        mode: session.mode,
+        mode: toDBMode(session.mode),
         start_time: session.start_time,
         end_time: session.end_time,
         duration_minutes: session.duration_minutes,
@@ -32,7 +47,12 @@ export async function saveSession(
       .single();
 
     if (error) throw error;
-    return data;
+    if (!data) return null;
+
+    return {
+      ...data,
+      mode: fromDBMode(data.mode),
+    };
   } catch (error) {
     console.error("Failed to save session:", error);
     throw error;
@@ -64,7 +84,10 @@ export async function getSessionsByDate(
       .order("start_time", { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map((s) => ({
+      ...s,
+      mode: fromDBMode(s.mode),
+    }));
   } catch (error) {
     console.error("Failed to fetch sessions:", error);
     throw error;

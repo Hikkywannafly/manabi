@@ -16,25 +16,43 @@ export type Database = {
     Tables: {
       achievements: {
         Row: {
+          category: string | null;
+          code: string | null;
           created_at: string;
           description: string;
           icon: string;
           id: string;
+          rarity: string | null;
+          sort_order: number | null;
           title: string;
+          total_steps: number | null;
+          xp_reward: number | null;
         };
         Insert: {
+          category?: string | null;
+          code?: string | null;
           created_at?: string;
           description: string;
           icon: string;
           id?: string;
+          rarity?: string | null;
+          sort_order?: number | null;
           title: string;
+          total_steps?: number | null;
+          xp_reward?: number | null;
         };
         Update: {
+          category?: string | null;
+          code?: string | null;
           created_at?: string;
           description?: string;
           icon?: string;
           id?: string;
+          rarity?: string | null;
+          sort_order?: number | null;
           title?: string;
+          total_steps?: number | null;
+          xp_reward?: number | null;
         };
         Relationships: [];
       };
@@ -402,7 +420,7 @@ export type Database = {
           duration_minutes: number;
           end_time: string;
           id: string;
-          mode: string;
+          mode: Database["public"]["Enums"]["pomodoro_mode"];
           start_time: string;
           user_id: string;
         };
@@ -411,7 +429,7 @@ export type Database = {
           duration_minutes: number;
           end_time: string;
           id?: string;
-          mode: string;
+          mode: Database["public"]["Enums"]["pomodoro_mode"];
           start_time: string;
           user_id: string;
         };
@@ -420,7 +438,7 @@ export type Database = {
           duration_minutes?: number;
           end_time?: string;
           id?: string;
-          mode?: string;
+          mode?: Database["public"]["Enums"]["pomodoro_mode"];
           start_time?: string;
           user_id?: string;
         };
@@ -465,6 +483,7 @@ export type Database = {
           total_following: number | null;
           total_posts: number | null;
           total_study_minutes: number | null;
+          total_xp: number | null;
           twitter_url: string | null;
           updated_at: string | null;
           website_url: string | null;
@@ -500,6 +519,7 @@ export type Database = {
           total_following?: number | null;
           total_posts?: number | null;
           total_study_minutes?: number | null;
+          total_xp?: number | null;
           twitter_url?: string | null;
           updated_at?: string | null;
           website_url?: string | null;
@@ -535,6 +555,7 @@ export type Database = {
           total_following?: number | null;
           total_posts?: number | null;
           total_study_minutes?: number | null;
+          total_xp?: number | null;
           twitter_url?: string | null;
           updated_at?: string | null;
           website_url?: string | null;
@@ -876,18 +897,21 @@ export type Database = {
         Row: {
           achievement_id: string;
           id: string;
+          progress_snapshot: number | null;
           unlocked_at: string;
           user_id: string;
         };
         Insert: {
           achievement_id: string;
           id?: string;
+          progress_snapshot?: number | null;
           unlocked_at?: string;
           user_id: string;
         };
         Update: {
           achievement_id?: string;
           id?: string;
+          progress_snapshot?: number | null;
           unlocked_at?: string;
           user_id?: string;
         };
@@ -1088,6 +1112,10 @@ export type Database = {
       };
       increment_user_stats: {
         Args: { minutes: number; row_date: string; row_user_id: string };
+        Returns: undefined;
+      };
+      increment_user_xp: {
+        Args: { x_amount: number; x_user_id: string };
         Returns: undefined;
       };
       increment_xp: { Args: { amount: number }; Returns: undefined };

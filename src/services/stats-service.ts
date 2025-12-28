@@ -130,8 +130,8 @@ export const statsService = {
       const { error } = await supabase
         .from("user_stats")
         .update({
-          focus_minutes: existingStats.focus_minutes + minutes,
-          sessions_count: existingStats.sessions_count + 1,
+          focus_minutes: (existingStats.focus_minutes || 0) + minutes,
+          sessions_count: (existingStats.sessions_count || 0) + 1,
         })
         .eq("id", existingStats.id);
 

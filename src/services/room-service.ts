@@ -3,25 +3,25 @@ import { createClient } from "@/lib/supabase/client";
 export type StudyRoom = {
   id: string;
   name: string;
-  slug?: string;
-  about?: string;
-  owner_id: string;
-  is_public: boolean;
-  enable_chat: boolean;
-  lock_room: boolean;
-  discoverable: boolean;
+  slug?: string | null;
+  about?: string | null;
+  owner_id: string | null;
+  is_public: boolean | null;
+  enable_chat: boolean | null;
+  lock_room: boolean | null;
+  discoverable: boolean | null;
   created_at: string;
   owner?: {
     nickname: string;
-    avatar_url?: string;
-  };
+    avatar_url?: string | null;
+  } | null;
   room_users?: {
     user_id: string;
-    status: string;
+    status: string | null;
     profile?: {
       nickname: string;
-      avatar_url: string;
-    };
+      avatar_url?: string | null;
+    } | null;
   }[];
 };
 
@@ -33,8 +33,8 @@ export type RoomUser = {
   joined_at: string;
   profile?: {
     nickname: string;
-    avatar_url: string;
-  };
+    avatar_url?: string | null;
+  } | null;
 };
 
 export const roomService = {
@@ -80,14 +80,18 @@ export const roomService = {
     if (settings.name !== undefined) updateData.name = settings.name;
     if (settings.slug !== undefined) updateData.slug = settings.slug;
     if (settings.about !== undefined) updateData.about = settings.about;
-    if (settings.is_public !== undefined)
+    if (settings.is_public !== undefined) {
       updateData.is_public = settings.is_public;
-    if (settings.enable_chat !== undefined)
+    }
+    if (settings.enable_chat !== undefined) {
       updateData.enable_chat = settings.enable_chat;
-    if (settings.lock_room !== undefined)
+    }
+    if (settings.lock_room !== undefined) {
       updateData.lock_room = settings.lock_room;
-    if (settings.discoverable !== undefined)
+    }
+    if (settings.discoverable !== undefined) {
       updateData.discoverable = settings.discoverable;
+    }
 
     const { data, error } = await supabase
       .from("study_rooms")

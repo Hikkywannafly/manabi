@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-provider";
 import { achievementService } from "@/services/achievement-service";
+import { AchievementNotification } from "../components/achievement-notification";
 
 export function useAchievementNotifier() {
   const { user } = useAuth();
@@ -16,11 +17,22 @@ export function useAchievementNotifier() {
 
       // Notify for unlocked achievements
       unlocked.forEach((ach) => {
-        toast.success(`Achievement Unlocked: ${ach.title}!`, {
-          description: `You earned ${ach.xp_reward} XP. ${ach.description}`,
-          duration: 5000,
-          // icon: ach.icon // If sonner supports custom icon or we put it in description
-        });
+        toast.custom(
+          (t) => <AchievementNotification achievement={ach} t={t} />,
+          {
+            duration: 5000,
+            // Force the toast container itself to be full screen transparency to allow centering
+            // Note: Sonner renders toasts in a list, so this might be tricky.
+            // A better way is to move the Position logic to the Toaster for this specific ID, but that's hard.
+            // Instead, we rely on the Component using `fixed inset-0` which we ALREADY did.
+            // The issue is likely Sonner's container constricting it or `position: fixed` being relative to a transform.
+
+            // Let's try to unstyle the toast wrapper completely
+            unstyled: true,
+            className:
+              "w-full h-full flex items-center justify-center pointer-events-none",
+          },
+        );
       });
 
       // Notify for near misses (Optional: limit frequency or only show for Epic/Legendary)

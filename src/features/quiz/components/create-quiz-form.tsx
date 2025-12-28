@@ -145,10 +145,15 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
             }
 
             setTimeout(() => {
+              const modeParam = values.mode === "exam" ? "exam" : "test";
               if (payload.data?.slug) {
-                router.push(`/dashboard/quiz/${quiz.id}/${payload.data.slug}`);
+                router.push(
+                  `/dashboard/quiz/${quiz.id}/${payload.data.slug}/take?mode=${modeParam}`,
+                );
               } else {
-                router.push(`/dashboard/quiz/${quiz.id}`);
+                router.push(
+                  `/dashboard/quiz/${quiz.id}/take?mode=${modeParam}`,
+                );
               }
             }, 1000);
           }

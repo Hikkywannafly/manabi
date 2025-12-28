@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useAchievementNotifier } from "@/features/achievements/hooks/use-achievement-notifier";
 import { useQuizNavigationLogic } from "../../hooks/use-quiz-navigation-logic";
 import { useSubmitQuizAttempt } from "../../hooks/use-submit-quiz-attempt";
 import type { QuizResult, QuizTakeMode, QuizWithQuestions } from "../../types";
@@ -21,6 +22,7 @@ interface QuizTakeContentProps {
 
 export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
   const router = useRouter();
+  const { checkAchievements } = useAchievementNotifier();
   const questions = quiz.questions || [];
 
   // Store server result
@@ -194,11 +196,21 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
       setServerResult(serverResultData);
       setIsCompleted(true);
       toast.success("Quiz submitted successfully!");
+
+      // Check for achievements
+      checkAchievements();
     } catch (error: any) {
       console.error("Failed to submit quiz:", error);
       toast.error("Failed to submit quiz. Please try again.");
     }
-  }, [answers, quiz.id, submitAttempt, setIsCompleted, getTotalTimeSpent]);
+  }, [
+    answers,
+    quiz.id,
+    submitAttempt,
+    setIsCompleted,
+    getTotalTimeSpent, // Check for achievements
+    checkAchievements,
+  ]);
 
   const handleBackToQuizzes = useCallback(() => {
     router.push("/dashboard/quiz");

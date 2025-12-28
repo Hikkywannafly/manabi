@@ -52,7 +52,6 @@ export function DashboardContent() {
 
   return (
     <DashboardPage
-      title="Dashboard"
       headerAction={<div />} // Header hidden by default in DashboardPage if no action, we can customize
     >
       <div className="flex flex-col">

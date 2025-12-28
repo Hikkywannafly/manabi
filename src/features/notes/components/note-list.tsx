@@ -1,20 +1,16 @@
 "use client";
 
 import { Plus, Search, StickyNote } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNoteStore } from "@/stores/use-note-store";
+import { useNotes } from "../hooks/use-notes";
 import { NoteCard } from "./note-card";
 import { NoteEditor } from "./note-editor";
 
 export function NoteList() {
   const [search, setSearch] = useState("");
-  const { notes, isLoading, fetchNotes, addNote } = useNoteStore();
-
-  useEffect(() => {
-    fetchNotes();
-  }, [fetchNotes]);
+  const { notes, isLoading, createNote } = useNotes();
 
   const filteredNotes = notes.filter(
     (n) =>
@@ -26,7 +22,7 @@ export function NoteList() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-bold text-3xl tracking-tight">Notes</h1>
-        <Button onClick={() => addNote()}>
+        <Button onClick={() => createNote({})}>
           <Plus className="mr-2 h-4 w-4" /> Add Note
         </Button>
       </div>
@@ -62,7 +58,7 @@ export function NoteList() {
               : "Start capturing your thoughts and ideas today."}
           </p>
           {!search && (
-            <Button variant="outline" onClick={() => addNote()}>
+            <Button variant="outline" onClick={() => createNote({})}>
               Create your first note
             </Button>
           )}

@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useNoteStore } from "@/stores/use-note-store";
+import { useNotes } from "../hooks/use-notes";
 import { RichTextEditor } from "./editor/rich-text-editor";
 
 interface NoteEditorContentProps {
@@ -118,8 +119,12 @@ function NoteEditorContent({
 }
 
 export function NoteEditor() {
-  const { notes, selectedNoteId, isOpen, setIsOpen, updateNote } =
-    useNoteStore();
+  // UI State from Zustand
+  const { selectedNoteId, isOpen, setIsOpen } = useNoteStore();
+
+  // Data from React Query
+  const { notes, updateNote } = useNotes();
+
   const note = notes.find((n) => n.id === selectedNoteId);
 
   return (

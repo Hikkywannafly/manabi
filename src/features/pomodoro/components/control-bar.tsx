@@ -1,21 +1,13 @@
 "use client";
 
-import {
-  Clock,
-  Gift,
-  MessageCircle,
-  StickyNote,
-  Users,
-  X,
-  Zap,
-} from "lucide-react";
+import { Clock, Gift, MessageCircle, Users, X, Zap } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
-import { useNoteStore } from "@/stores/use-note-store";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { MusicPlayer } from "./music-player";
 import { NightSwitch } from "./night-switch";
+import { NotesButton } from "./notes-button";
 import { SceneSelector } from "./scene-selector";
 import { RoomWidgets } from "./social";
 import { SoundManager } from "./sound-manager";
@@ -27,7 +19,6 @@ interface ControlBarProps {
 
 export function ControlBar({ className }: ControlBarProps) {
   const { activeView, setActiveView } = usePomodoroStore();
-  const { setIsOpen } = useNoteStore();
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
@@ -53,14 +44,7 @@ export function ControlBar({ className }: ControlBarProps) {
           <NightSwitch />
 
           {/* Notes */}
-          <button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            className="notes-toolbar-button flex h-[30px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg border-none bg-black/20 px-2 hover:bg-black/50 sm:h-[40px] sm:rounded-xl sm:px-3"
-            aria-label="Open notes panel"
-          >
-            <StickyNote className="pointer-events-none text-[20px] text-white" />
-          </button>
+          <NotesButton />
         </div>
       </div>
 

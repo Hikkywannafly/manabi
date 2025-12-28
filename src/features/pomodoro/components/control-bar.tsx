@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
+import { useNoteStore } from "@/stores/use-note-store";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { MusicPlayer } from "./music-player";
 import { NightSwitch } from "./night-switch";
@@ -26,6 +27,7 @@ interface ControlBarProps {
 
 export function ControlBar({ className }: ControlBarProps) {
   const { activeView, setActiveView } = usePomodoroStore();
+  const { setIsOpen } = useNoteStore();
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
@@ -51,9 +53,14 @@ export function ControlBar({ className }: ControlBarProps) {
           <NightSwitch />
 
           {/* Notes */}
-          <div className="notes-toolbar-button flex h-[30px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg bg-black/20 px-2 hover:bg-black/50 sm:h-[40px] sm:rounded-xl sm:px-3">
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className="notes-toolbar-button flex h-[30px] cursor-pointer flex-row items-center justify-center gap-1 rounded-lg border-none bg-black/20 px-2 hover:bg-black/50 sm:h-[40px] sm:rounded-xl sm:px-3"
+            aria-label="Open notes panel"
+          >
             <StickyNote className="pointer-events-none text-[20px] text-white" />
-          </div>
+          </button>
         </div>
       </div>
 

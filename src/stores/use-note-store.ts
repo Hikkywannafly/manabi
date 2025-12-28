@@ -11,7 +11,11 @@ interface NoteState {
   setIsOpen: (open: boolean) => void;
   setSelectedNoteId: (id: string | null) => void;
   fetchNotes: () => Promise<void>;
-  addNote: (title?: string, content?: string) => Promise<Note>;
+  addNote: (
+    title?: string,
+    content?: string,
+    isPinned?: boolean,
+  ) => Promise<Note>;
   updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
   togglePin: (id: string) => Promise<void>;
@@ -37,14 +41,26 @@ export const useNoteStore = create<NoteState>((set, get) => ({
     }
   },
 
-  addNote: async (title, content) => {
+  addNote: async (title, content, isPinned) => {
     try {
-      const newNote = await noteService.createNote({ title, content });
-      set((state) => ({
-        notes: [newNote, ...state.notes],
-        selectedNoteId: newNote.id,
-        isOpen: true,
-      }));
+      const newNote = await noteService.createNote({
+        title,
+        content,
+        is_pinned: isPinned,
+      });
+      set((state) => {
+        const updatedNotes = [newNote, ...state.notes].sort((a, b) => {
+          if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1;
+          return (
+            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+          );
+        });
+        return {
+          notes: updatedNotes,
+          selectedNoteId: newNote.id,
+          isOpen: true,
+        };
+      });
       return newNote;
     } catch (error: any) {
       console.error("Failed to add note:", error.message || error);

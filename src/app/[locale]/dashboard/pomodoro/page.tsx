@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { useSidebar } from "@/components/ui/sidebar";
+import { NotesPanel } from "@/features/notes/components/notes-panel";
 import { BackgroundMusicPlayer } from "@/features/pomodoro/components/background-music-player";
 import { BackgroundScene } from "@/features/pomodoro/components/background-scene";
 import { ControlBar } from "@/features/pomodoro/components/control-bar";
@@ -87,6 +88,7 @@ export default function PomodoroPage() {
       <div className="relative z-20">
         <ControlBar />
       </div>
+      <NotesPanel />
     </div>
   );
 }

@@ -35,7 +35,7 @@ export function NoteCard({ note }: NoteCardProps) {
       )}
       onClick={handleEdit}
     >
-      <div className="space-y-3 p-4">
+      <div className="space-y-3 px-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="line-clamp-1 flex-1 font-semibold text-lg">
             {note.title || "Untitled Note"}
@@ -91,7 +91,7 @@ export function NoteCard({ note }: NoteCardProps) {
       </div>
 
       {note.is_pinned && (
-        <div className="absolute top-0 right-0 p-1">
+        <div className="absolute top-1 right-1 p-2">
           <div className="h-1.5 w-1.5 rounded-full bg-primary" />
         </div>
       )}

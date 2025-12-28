@@ -10,7 +10,9 @@ export interface Note {
   updated_at: string;
 }
 
-export type CreateNoteInput = Partial<Pick<Note, "title" | "content">>;
+export type CreateNoteInput = Partial<
+  Pick<Note, "title" | "content" | "is_pinned">
+>;
 export type UpdateNoteInput = Partial<
   Omit<Note, "id" | "user_id" | "created_at">
 >;
@@ -42,7 +44,7 @@ export const noteService = {
         user_id: user.id,
         title: input.title || "",
         content: input.content || "",
-        is_pinned: false,
+        is_pinned: input.is_pinned ?? false,
       })
       .select()
       .single();

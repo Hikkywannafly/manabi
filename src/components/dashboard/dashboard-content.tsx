@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/auth-provider";
 import { LeaderboardWidget } from "@/features/dashboard/components/leaderboard-widget";
 import { MissionsWidget } from "@/features/dashboard/components/missions-widget";
+import { RecentAchievementsWidget } from "@/features/dashboard/components/recent-achievements-widget";
 import { RecentNotesWidget } from "@/features/dashboard/components/recent-notes-widget";
 import { StatsGrid } from "@/features/dashboard/components/stats-grid";
 import { StudyHoursWidget } from "@/features/dashboard/components/study-hours-widget";
@@ -16,7 +17,7 @@ import { useDashboardStats } from "@/features/dashboard/hooks/use-dashboard-stat
 
 export function DashboardContent() {
   const { user } = useAuth();
-  const { stats, missions, notes, leaderboard, isLoading } =
+  const { stats, missions, notes, leaderboard, recentAchievements, isLoading } =
     useDashboardStats();
 
   if (isLoading) {
@@ -50,6 +51,10 @@ export function DashboardContent() {
     level: 1,
   };
 
+  // Simple next level calculation: Level * 1000 XP
+  // This should match your backend logic or be returned from the API
+  const nextLevelXp = statsData.level * 1000;
+
   return (
     <DashboardPage
       headerAction={<div />} // Header hidden by default in DashboardPage if no action, we can customize
@@ -64,6 +69,7 @@ export function DashboardContent() {
               }
               level={statsData.level}
               xp={statsData.xp}
+              nextLevelXp={nextLevelXp}
             />
 
             <StatsGrid
@@ -81,12 +87,10 @@ export function DashboardContent() {
                   <StudyHoursWidget />
                 </div>
 
-                {/* Empty State Banner (Flashcards) - Optional, mimicking HTML */}
-                <div className="rounded-lg border border-muted-foreground/30 border-dashed bg-secondary p-4 text-center shadow-sm">
-                  <p className="text-muted-foreground text-sm">
-                    No flashcard sets are due for review right now.
-                  </p>
-                </div>
+                {/* Recent Achievements - replaces empty flashcards banner */}
+                <RecentAchievementsWidget
+                  achievements={recentAchievements.data || []}
+                />
 
                 <MissionsWidget missions={missions.data || []} />
               </div>

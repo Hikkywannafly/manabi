@@ -20,6 +20,18 @@ export type LeaderboardUser = Pick<
   "id" | "full_name" | "avatar_url" | "xp" | "level"
 >;
 
+export type RecentAchievement = {
+  id: string;
+  unlocked_at: string;
+  achievement: {
+    title: string;
+    description: string;
+    icon: string;
+    rarity: string;
+    xp_reward: number;
+  } | null; // Supabase join can be null if not found (though inner join usually implies existence, but let's be safe)
+};
+
 export const DashboardService = {
   async getStats(userId: string): Promise<DashboardStats> {
     const supabase = createClient();
@@ -100,5 +112,35 @@ export const DashboardService = {
       .limit(5);
 
     return (data as LeaderboardUser[]) || [];
+  },
+
+  async getRecentAchievements(userId: string): Promise<RecentAchievement[]> {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("user_achievements")
+      .select(`
+        id,
+        unlocked_at,
+        achievement:achievements (
+          title,
+          description,
+          icon,
+          rarity,
+          xp_reward
+        )
+      `)
+      .eq("user_id", userId)
+      .order("unlocked_at", { ascending: false })
+      .limit(3);
+
+    return (
+      (data?.map((item) => ({
+        ...item,
+        // Handle Supabase returning an array for the relation
+        achievement: Array.isArray(item.achievement)
+          ? item.achievement[0]
+          : item.achievement,
+      })) as RecentAchievement[]) || []
+    );
   },
 };

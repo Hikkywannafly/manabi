@@ -30,15 +30,23 @@ export function useDashboardStats() {
     queryFn: () => DashboardService.getLeaderboard(),
   });
 
+  const achievementsQuery = useQuery({
+    queryKey: ["dashboard-achievements-recent", user?.id],
+    queryFn: () => DashboardService.getRecentAchievements(user?.id ?? ""),
+    enabled: !!user,
+  });
+
   return {
     stats: statsQuery,
     missions: missionsQuery,
     notes: notesQuery,
     leaderboard: leaderboardQuery,
+    recentAchievements: achievementsQuery,
     isLoading:
       statsQuery.isLoading ||
       missionsQuery.isLoading ||
       notesQuery.isLoading ||
-      leaderboardQuery.isLoading,
+      leaderboardQuery.isLoading ||
+      achievementsQuery.isLoading,
   };
 }

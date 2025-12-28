@@ -2,6 +2,8 @@
 
 import { Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -14,7 +16,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-provider";
 import type { AchievementRarity } from "@/services/achievement-service";
 import { useAchievementStore } from "@/stores/use-achievement-store";
+import { useAchievementNotifier } from "../hooks/use-achievement-notifier";
 import { AchievementList } from "./achievement-list";
+import { AchievementNotification } from "./achievement-notification";
 import { AchievementStats } from "./achievement-stats";
 
 export function AchievementsView() {
@@ -30,20 +34,20 @@ export function AchievementsView() {
   >("ALL");
   const [activeTab, setActiveTab] = useState<string>("ALL");
 
+  const { checkAchievements } = useAchievementNotifier();
+
   useEffect(() => {
     if (user?.id) {
       fetchAchievements(user.id);
+      // Check for unlockable achievements on mount (syncs "2/1 locked" issues)
+      checkAchievements();
     }
-  }, [user?.id, fetchAchievements]);
+  }, [user?.id, fetchAchievements, checkAchievements]);
 
   const filteredAchievements = useMemo(() => {
     return achievements.filter((ach) => {
       // 1. Tab Filter
       if (activeTab !== "ALL" && ach.category.toUpperCase() !== activeTab) {
-        // Note: Tab values are uppercase in my logical mapping usually, but let's check values.
-        // DB Category: 'Study', 'Social' (Title Case).
-        // Tab value: 'STUDY' (if using shadcn tabs usually value is whatever we set).
-        // Let's match case insensitive.
         if (ach.category.toUpperCase() !== activeTab) return false;
       }
 
@@ -73,14 +77,50 @@ export function AchievementsView() {
     });
   }, [achievements, activeTab, searchQuery, selectedRarity, selectedStatus]);
 
+  const handleTestNotification = () => {
+    toast.custom(
+      (t) => (
+        <AchievementNotification
+          achievement={{
+            id: "test",
+            code: "TEST",
+            title: "Test Achievement",
+            description: "This is what a Legendary unlock looks like!",
+            icon: "🏆",
+            category: "Special",
+            rarity: "Legendary",
+            xp_reward: 500,
+            total_steps: 1,
+            sort_order: 0,
+          }}
+          t={t}
+        />
+      ),
+      {
+        duration: 5000,
+        unstyled: true,
+        className:
+          "w-full h-full flex items-center justify-center pointer-events-none",
+      },
+    );
+  };
+
+  // ... (existing state)
+
   return (
     <div className="flex flex-col space-y-6">
       <div className="flex flex-col space-y-2">
-        <h1 className="font-bold text-3xl tracking-tight">Achievements</h1>
-        <p className="text-muted-foreground">
-          Complete challenges and unlock rewards as you progress in your
-          learning journey
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-bold text-3xl tracking-tight">Achievements</h1>
+            <p className="text-muted-foreground">
+              Complete challenges and unlock rewards as you progress
+            </p>
+          </div>
+          <Button onClick={handleTestNotification} variant="outline">
+            Test Notification
+          </Button>
+        </div>
       </div>
 
       <AchievementStats achievements={achievements} />

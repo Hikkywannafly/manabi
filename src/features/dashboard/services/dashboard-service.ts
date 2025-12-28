@@ -59,7 +59,7 @@ export const DashboardService = {
         .from("profiles")
         .select("current_streak, xp, level")
         .eq("id", userId)
-        .single(),
+        .maybeSingle(),
     ]);
 
     return {

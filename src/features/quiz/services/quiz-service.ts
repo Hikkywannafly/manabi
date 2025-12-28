@@ -237,7 +237,7 @@ export const QuizService = {
     // 2. Fetch all attempts for this quiz
     const { data: attempts, error: attemptsError } = await supabase
       .from("quiz_attempts")
-      .select("id, score, duration_seconds, completed_at, answers_log")
+      .select("*")
       .eq("quiz_id", quizId)
       .order("completed_at", { ascending: false });
 

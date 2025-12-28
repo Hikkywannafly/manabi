@@ -10,6 +10,7 @@ export { LeaderboardModal } from "./leaderboard-modal";
 export { MusicPlayer } from "./music-player";
 export { MusicSelector } from "./music-selector";
 export { NightSwitch } from "./night-switch";
+export { NotesButton } from "./notes-button";
 export { PomodoroHeader } from "./pomodoro-header";
 export { PomodoroTimer } from "./pomodoro-timer";
 export { SceneSelector } from "./scene-selector";

@@ -3,12 +3,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { useSidebar } from "@/components/ui/sidebar";
-import { NotesPanel } from "@/features/notes/components/notes-panel";
 import { BackgroundMusicPlayer } from "@/features/pomodoro/components/background-music-player";
 import { BackgroundScene } from "@/features/pomodoro/components/background-scene";
 import { ControlBar } from "@/features/pomodoro/components/control-bar";
 import { DigitalClock } from "@/features/pomodoro/components/digital-clock";
 import { LeaderboardModal } from "@/features/pomodoro/components/leaderboard-modal";
+import { NotesPanel } from "@/features/pomodoro/components/notes-panel";
 import { PomodoroHeader } from "@/features/pomodoro/components/pomodoro-header";
 import { PomodoroTimer } from "@/features/pomodoro/components/pomodoro-timer";
 import { PomodoroTitleUpdater } from "@/features/pomodoro/components/pomodoro-title-updater";

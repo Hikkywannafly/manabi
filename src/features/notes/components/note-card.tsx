@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useNoteStore } from "@/stores/use-note-store";
+import { useNotes } from "../hooks/use-notes";
 import type { Note } from "../services/note-service";
 
 interface NoteCardProps {
@@ -19,8 +20,11 @@ interface NoteCardProps {
 }
 
 export function NoteCard({ note }: NoteCardProps) {
-  const { togglePin, deleteNote, setSelectedNoteId, setIsOpen } =
-    useNoteStore();
+  // UI State from Zustand
+  const { setSelectedNoteId, setIsOpen } = useNoteStore();
+
+  // Data operations from React Query
+  const { togglePin, deleteNote } = useNotes();
 
   const handleEdit = () => {
     setSelectedNoteId(note.id);
@@ -50,7 +54,7 @@ export function NoteCard({ note }: NoteCardProps) {
               )}
               onClick={(e) => {
                 e.stopPropagation();
-                togglePin(note.id);
+                togglePin(note.id, !note.is_pinned);
               }}
             >
               <Pin

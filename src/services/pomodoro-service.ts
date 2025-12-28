@@ -27,8 +27,14 @@ export const pomodoroService = {
     const { data, error } = await supabase
       .from("pomodoro_sessions")
       .insert({
-        user_id: user.id, // Ensure this matches schema expectation (auth.uid() referencing profiles logic handled by trigger or assumes user exists in profiles)
+        user_id: user.id,
         ...session,
+        mode:
+          session.mode === "shortBreak"
+            ? "short_break"
+            : session.mode === "longBreak"
+              ? "long_break"
+              : session.mode,
       })
       .select()
       .single();

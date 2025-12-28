@@ -40,7 +40,7 @@ export function RoomPresence({ roomId, className }: RoomPresenceProps) {
       // Get user profile
       const { data: profile } = await supabase
         .from("profiles")
-        .select("username, avatar_url")
+        .select("nickname, avatar_url")
         .eq("id", user.id)
         .single();
 
@@ -65,7 +65,7 @@ export function RoomPresence({ roomId, className }: RoomPresenceProps) {
               const presence = presences[0] as any;
               users.push({
                 user_id: key,
-                username: presence.username || "Anonymous",
+                username: presence.username || presence.nickname || "Anonymous",
                 avatar_url: presence.avatar_url,
                 status: presence.status || "idle",
                 presence_ref: presence.presence_ref,
@@ -86,7 +86,7 @@ export function RoomPresence({ roomId, className }: RoomPresenceProps) {
             // Track current user's presence
             await presenceChannel.track({
               user_id: user.id,
-              username: profile?.username || "Anonymous",
+              nickname: profile?.nickname || "Anonymous",
               avatar_url: profile?.avatar_url,
               status: "idle",
               online_at: new Date().toISOString(),

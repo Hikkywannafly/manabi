@@ -66,8 +66,8 @@ export function SessionChart({
         };
 
         if (session.mode === "focus") current.focus++;
-        else if (session.mode === "shortBreak") current.shortBreak++;
-        else if (session.mode === "longBreak") current.longBreak++;
+        else if (session.mode === "short_break") current.shortBreak++;
+        else if (session.mode === "long_break") current.longBreak++;
 
         dailyMap.set(date, current);
       });

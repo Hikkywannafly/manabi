@@ -1,0 +1,8 @@
+# Project Rules
+
+## Supabase Configuration
+- **Project ID:** `ypucruskxgsoojudylwy`
+- **Region:** `ap-southeast-1`
+
+## MCP Usage
+- Always use the above Project ID when calling Supabase MCP tools (list_tables, execute_sql, etc.) unless specified otherwise.

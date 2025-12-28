@@ -31,23 +31,25 @@ export async function completeOnboarding(data: OnboardingData) {
     const onboardingAnswers = { ...data.answers };
     delete onboardingAnswers.nickname;
 
-    // Update profile (profile already exists from trigger)
-    const profileUpdates: Partial<Profile> = {
+    // Use upsert to handle cases where trigger failed or latency issues
+    // We only provide fields we want to set/update
+    const profileData = {
+      id: user.id, // Required for upsert to know PK
       nickname: nickname,
-      full_name: data.full_name,
+      full_name: data.full_name || user.user_metadata?.full_name,
       onboarding_completed: true,
       onboarding_completed_at: new Date().toISOString(),
       metadata: {
         onboarding_answers: onboardingAnswers,
       },
+      updated_at: new Date().toISOString(),
     };
 
     const { error: profileError, data: profile } = await supabase
       .from("profiles")
-      .update(profileUpdates)
-      .eq("id", user.id)
+      .upsert(profileData)
       .select()
-      .single();
+      .maybeSingle(); // Safely handle single result result
 
     if (profileError) {
       console.error("Profile update error:", profileError);
@@ -78,18 +80,26 @@ export async function skipOnboarding() {
   }
 
   try {
-    // Profile already exists from trigger, just mark onboarding as completed
-    const profileUpdates: Partial<Profile> = {
+    // Fallback nickname if creating new profile
+    const nickname =
+      user.user_metadata?.name ||
+      user.user_metadata?.full_name ||
+      user.email?.split("@")[0] ||
+      "User";
+
+    const profileData = {
+      id: user.id,
+      nickname: nickname, // Required if inserting
       onboarding_completed: true,
       onboarding_completed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     const { error: profileError, data: profile } = await supabase
       .from("profiles")
-      .update(profileUpdates)
-      .eq("id", user.id)
+      .upsert(profileData)
       .select()
-      .single();
+      .maybeSingle();
 
     if (profileError) {
       console.error("Profile update error:", profileError);

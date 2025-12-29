@@ -97,6 +97,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               size="sm"
               pressed={editor.isActive("bold")}
               onPressedChange={() => editor.chain().focus().toggleBold().run()}
+              onMouseDown={(e) => e.preventDefault()}
               className="h-8 w-8 p-0"
             >
               <Bold className="h-4 w-4" />
@@ -113,6 +114,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               onPressedChange={() =>
                 editor.chain().focus().toggleItalic().run()
               }
+              onMouseDown={(e) => e.preventDefault()}
               className="h-8 w-8 p-0"
             >
               <Italic className="h-4 w-4" />
@@ -129,6 +131,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               onPressedChange={() =>
                 editor.chain().focus().toggleUnderline().run()
               }
+              onMouseDown={(e) => e.preventDefault()}
               className="h-8 w-8 p-0"
             >
               <Underline className="h-4 w-4" />
@@ -147,6 +150,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               onPressedChange={() =>
                 editor.chain().focus().toggleBulletList().run()
               }
+              onMouseDown={(e) => e.preventDefault()}
               className="h-8 w-8 p-0"
             >
               <List className="h-4 w-4" />
@@ -163,6 +167,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               onPressedChange={() =>
                 editor.chain().focus().toggleOrderedList().run()
               }
+              onMouseDown={(e) => e.preventDefault()}
               className="h-8 w-8 p-0"
             >
               <ListOrdered className="h-4 w-4" />
@@ -179,6 +184,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               onPressedChange={() =>
                 editor.chain().focus().toggleTaskList().run()
               }
+              onMouseDown={(e) => e.preventDefault()}
               className="h-8 w-8 p-0"
             >
               <CheckSquare className="h-4 w-4" />
@@ -199,6 +205,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                 editor.isActive("link") && "bg-accent text-accent-foreground",
               )}
               onClick={addLink}
+              onMouseDown={(e) => e.preventDefault()}
             >
               <Link className="h-4 w-4" />
             </Button>
@@ -212,6 +219,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => editor.chain().focus().undo().run()}
+            onMouseDown={(e) => e.preventDefault()}
             disabled={!editor.can().undo()}
           >
             <Undo className="h-4 w-4" />
@@ -221,6 +229,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => editor.chain().focus().redo().run()}
+            onMouseDown={(e) => e.preventDefault()}
             disabled={!editor.can().redo()}
           >
             <Redo className="h-4 w-4" />

@@ -18,7 +18,7 @@ export function Logo({
   const sizes = {
     sm: {
       container: "h-8 w-8",
-      icon: "h-4 w-4",
+      icon: "h-6 w-6",
       text: "text-xl",
     },
     md: {

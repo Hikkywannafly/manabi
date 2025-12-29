@@ -420,7 +420,7 @@ export type Database = {
           duration_minutes: number;
           end_time: string;
           id: string;
-          mode: Database["public"]["Enums"]["pomodoro_mode"];
+          mode: string;
           start_time: string;
           user_id: string;
         };
@@ -429,7 +429,7 @@ export type Database = {
           duration_minutes: number;
           end_time: string;
           id?: string;
-          mode: Database["public"]["Enums"]["pomodoro_mode"];
+          mode: string;
           start_time: string;
           user_id: string;
         };
@@ -438,7 +438,7 @@ export type Database = {
           duration_minutes?: number;
           end_time?: string;
           id?: string;
-          mode?: Database["public"]["Enums"]["pomodoro_mode"];
+          mode?: string;
           start_time?: string;
           user_id?: string;
         };
@@ -1090,6 +1090,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      complete_user_mission: {
+        Args: { p_mission_id: string; p_user_id: string; p_xp_reward: number };
+        Returns: undefined;
+      };
       get_global_leaderboard: {
         Args: never;
         Returns: {

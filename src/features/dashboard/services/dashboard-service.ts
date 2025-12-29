@@ -12,7 +12,9 @@ export type DashboardStats = {
 
 export type DashboardMission =
   Database["public"]["Tables"]["missions"]["Row"] & {
-    progress: number; // mocked for now or calculated
+    progress: number; // percentage
+    current_value?: number; // actual count
+    status?: "IN_PROGRESS" | "COMPLETED" | "CLAIMED";
   };
 
 export type LeaderboardUser = Pick<
@@ -72,22 +74,18 @@ export const DashboardService = {
     };
   },
 
-  async getMissions(_userId: string): Promise<DashboardMission[]> {
-    const supabase = createClient();
-    // Assuming we have a way to track user mission progress, but for now fetching active missions
-    // In a real app, we'd join with a `user_missions` table.
-    // For now, fetching all active missions and mocking progress.
-    const { data } = await supabase
-      .from("missions")
-      .select("*")
-      .eq("is_active", true)
-      .limit(3);
+  async getMissions(userId: string): Promise<DashboardMission[]> {
+    const { MissionService } = await import("@/services/mission-service");
 
-    if (!data) return [];
+    // Get missions with real progress from MissionService
+    const missions = await MissionService.getUserMissions(userId);
 
-    return data.map((mission) => ({
-      ...mission,
-      progress: 0, // Mock progress for now as requested
+    // Map to DashboardMission format
+    return missions.map((um) => ({
+      ...um.mission,
+      progress: um.progress_percentage,
+      current_value: um.current_value,
+      status: um.status,
     }));
   },
 

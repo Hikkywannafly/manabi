@@ -133,10 +133,9 @@ export function RichTextEditor({
             .tiptap a:hover {
               opacity: 0.8;
             }
-            .tiptap h1 { font-size: 2.25rem; font-weight: 800; margin-top: 1.5rem; margin-bottom: 1rem; color: white; line-height: 1.2; }
-            .tiptap h2 { font-size: 1.75rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.75rem; color: white; line-height: 1.3; }
-            .tiptap h3 { font-size: 1.5rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: white; line-height: 1.4; }
-            .tiptap p, .tiptap li { color: white; }
+            .tiptap h1 { font-size: 2.25rem; font-weight: 800; margin-top: 1.5rem; margin-bottom: 1rem; line-height: 1.2; }
+            .tiptap h2 { font-size: 1.75rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.75rem; line-height: 1.3; }
+            .tiptap h3 { font-size: 1.5rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; line-height: 1.4; }
             .tiptap h1:first-child, .tiptap h2:first-child, .tiptap h3:first-child, .tiptap p:first-child { margin-top: 0; }
             .tiptap h1:last-child, .tiptap h2:last-child, .tiptap h3:last-child, .tiptap p:last-child { margin-bottom: 0; }
           `}</style>

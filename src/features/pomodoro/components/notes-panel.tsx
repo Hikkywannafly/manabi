@@ -2,6 +2,16 @@
 
 import { Plus, Search, StickyNote, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -136,12 +146,16 @@ export function NotesPanel() {
     }
   };
 
-  const handleDeleteNote = async (id: string) => {
+  const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
+
+  const handleDeleteNote = async () => {
+    if (!noteToDelete) return;
     try {
-      await deleteNote(id);
-      if (selectedNoteId === id) {
+      await deleteNote(noteToDelete);
+      if (selectedNoteId === noteToDelete) {
         setSelectedNoteId(null);
       }
+      setNoteToDelete(null);
     } catch (error) {
       console.error("Failed to delete note:", error);
     }
@@ -149,7 +163,7 @@ export function NotesPanel() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="!max-w-[1400px] h-[90vh] w-[90vw] overflow-hidden rounded-2xl border border-white/10 bg-black/90 p-0 text-white">
+      <DialogContent className="!max-w-[1400px] h-[90vh] w-[90vw] overflow-hidden rounded-2xl border border-white/10 bg-black/90 p-0 text-white [&>button]:hidden">
         <DialogTitle className="sr-only">Notes Management Panel</DialogTitle>
         <div className="flex h-full w-full overflow-hidden">
           {/* Sidebar */}
@@ -246,7 +260,7 @@ export function NotesPanel() {
                       variant="ghost"
                       size="icon"
                       className="h-9 w-9 rounded-xl bg-red-500/10 text-red-400 transition-all hover:bg-red-500/20 hover:text-red-300"
-                      onClick={() => handleDeleteNote(selectedNote.id)}
+                      onClick={() => setNoteToDelete(selectedNote.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -295,6 +309,34 @@ export function NotesPanel() {
           </div>
         </div>
       </DialogContent>
+
+      <AlertDialog
+        open={!!noteToDelete}
+        onOpenChange={(open) => !open && setNoteToDelete(null)}
+      >
+        <AlertDialogContent className="border-white/10 bg-black/95 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-black text-2xl tracking-tight">
+              Delete this note?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
+              This action cannot be undone. This will permanently delete your
+              note and remove it from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6">
+            <AlertDialogCancel className="rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteNote}
+              className="rounded-xl bg-red-500 font-bold text-white hover:bg-red-600"
+            >
+              Delete Note
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

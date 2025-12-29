@@ -5,13 +5,15 @@ export interface Note {
   user_id: string;
   title: string | null;
   content: string | null;
+  cue: string | null;
+  summary: string | null;
   is_pinned: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export type CreateNoteInput = Partial<
-  Pick<Note, "title" | "content" | "is_pinned">
+  Pick<Note, "title" | "content" | "cue" | "summary" | "is_pinned">
 >;
 export type UpdateNoteInput = Partial<
   Omit<Note, "id" | "user_id" | "created_at">
@@ -44,6 +46,8 @@ export const noteService = {
         user_id: user.id,
         title: input.title || "",
         content: input.content || "",
+        cue: input.cue || "",
+        summary: input.summary || "",
         is_pinned: input.is_pinned ?? false,
       })
       .select()

@@ -45,3 +45,9 @@ export const OPENROUTER_CONFIG = {
   maxTokens: 4000,
   temperature: 0.7,
 } as const;
+
+export const STORAGE_CONFIG = {
+  bucket: "uploads",
+  defaultMimeType: "application/octet-stream",
+  maxFileSize: 10 * 1024 * 1024, // 10MB
+} as const;

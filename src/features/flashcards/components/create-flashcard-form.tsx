@@ -24,6 +24,7 @@ import { useMissionNotifier } from "@/features/missions/hooks/use-mission-notifi
 import { FileUpload } from "@/features/quiz/components/file-upload";
 import { SelectedFileList } from "@/features/quiz/components/selected-file-list";
 import { createClient } from "@/lib/supabase/client";
+import { AIService } from "@/services/ai-service";
 
 import {
   type FlashcardCreationValues,
@@ -140,35 +141,58 @@ export function CreateFlashcardForm({
 
       return { deck, filePath, textContent };
     },
-    onSuccess: async (
-      { deck, filePath: _filePath, textContent: _textContent },
-      _values,
-    ) => {
+    onSuccess: async ({ deck, filePath, textContent }, values) => {
       // Invalidate list
       queryClient.invalidateQueries({ queryKey: ["decks"] });
 
-      // 3. Subscribe to Progress (TODO: implement like quiz)
-      // For now, simulate progress
-      setGenerationProgress(50);
-      setGenerationStatus("Generating flashcards...");
+      // 3. Subscribe to Progress
+      if (subscriptionRef.current) {
+        subscriptionRef.current();
+      }
 
-      // 4. Trigger AI Service (TODO: create generate-flashcards edge function)
+      subscriptionRef.current = AIService.subscribeToDeckProgress(
+        deck.id,
+        (payload) => {
+          setGenerationProgress(payload.progress);
+          setGenerationStatus(payload.message);
+
+          if (payload.progress === 100) {
+            toast.success("Flashcards generated successfully!");
+
+            // Check achievements and missions
+            checkAchievements();
+            checkMissions();
+
+            if (subscriptionRef.current) {
+              subscriptionRef.current();
+              subscriptionRef.current = null;
+            }
+
+            setTimeout(() => {
+              router.push(`/dashboard/flashcards/${deck.id}`);
+            }, 1000);
+          }
+        },
+      );
+
+      // 4. Trigger AI Service
       try {
-        // Placeholder - will implement edge function
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        // Parse number of cards
+        const cardRange = values.numberOfCards;
+        let numberOfCards = 10; // default
+        if (cardRange !== "auto") {
+          const [min, max] = cardRange.split("-").map(Number);
+          numberOfCards = max || min || 10;
+        }
 
-        setGenerationProgress(100);
-        setGenerationStatus("Complete!");
-
-        toast.success("Flashcards generated successfully!");
-
-        // Check achievements and missions
-        checkAchievements();
-        checkMissions();
-
-        setTimeout(() => {
-          router.push(`/dashboard/flashcards/${deck.id}`);
-        }, 1000);
+        await AIService.generateFlashcards(filePath, textContent, deck.id, {
+          difficulty: (values.difficulty.charAt(0).toUpperCase() +
+            values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
+          numberOfCards,
+          language: values.language,
+          parsingMode: values.parsingMode,
+          customInstructions: values.customInstructions,
+        });
       } catch (error) {
         console.error("AI Generation trigger failed", error);
         toast.error("Failed to start AI generation");

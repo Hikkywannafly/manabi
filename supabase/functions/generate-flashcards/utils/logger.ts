@@ -26,7 +26,7 @@ export class Logger {
     );
   }
 
-  static warning(message: string, data?: unknown) {
+  static warn(message: string, data?: unknown) {
     if (!LOGGING_CONFIG.enabled) return;
     console.warn(
       `${LOGGING_CONFIG.emojis.warning} ${Logger.prefix} ${message}`,

@@ -1,9 +1,11 @@
+import { use } from "react";
 import { FlashcardViewPage } from "@/features/flashcards/components/view/flashcard-view-page";
 
 export default function ViewFlashcardDeckPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <FlashcardViewPage deckId={params.id} />;
+  const { id } = use(params);
+  return <FlashcardViewPage deckId={id} />;
 }

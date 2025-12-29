@@ -14,3 +14,10 @@ export type FlashcardGenerationParams = {
 export type DeckInsert = Database["public"]["Tables"]["decks"]["Insert"];
 export type FlashcardInsert =
   Database["public"]["Tables"]["flashcards"]["Insert"];
+
+export type FlashcardReview =
+  Database["public"]["Tables"]["flashcard_reviews"]["Row"];
+
+export type FlashcardWithReview = Flashcard & {
+  flashcard_reviews?: FlashcardReview[];
+};

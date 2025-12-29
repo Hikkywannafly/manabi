@@ -34,7 +34,6 @@ export function LoadingCardGrid() {
         <div className="my-8 grid w-full max-w-md grid-cols-4 gap-4">
           {CARDS.map((emoji, index) => (
             <button
-              // biome-ignore lint/suspicious/noArrayIndexKey: card order is static and index is stable identifier
               key={index}
               type="button"
               className="relative aspect-[2/3] w-full cursor-pointer transition-transform duration-500 ease-in-out [perspective:1000px] [transform-style:preserve-3d]"

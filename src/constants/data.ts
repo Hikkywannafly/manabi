@@ -48,7 +48,7 @@ export const contentNavItems: NavItem[] = [
   },
   {
     title: "Flashcards",
-    url: "/dashboard/flashcard",
+    url: "/dashboard/flashcards",
     icon: "bookOpen",
     isActive: false,
     items: [],

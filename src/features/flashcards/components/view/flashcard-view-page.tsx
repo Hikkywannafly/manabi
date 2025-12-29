@@ -1,20 +1,21 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import {
-  BookOpen,
-  ChartColumn,
-  CircleCheckBig,
-  Loader2,
-  Play,
-  ThumbsDown,
-  ThumbsUp,
-} from "lucide-react";
-import Link from "next/link";
+import { Loader2, MoreVertical } from "lucide-react";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 import { useFlashcards } from "../../hooks/use-flashcards";
 import { FlashcardService } from "../../services/flashcard-service";
+import { FlashcardNavigation } from "./flashcard-navigation";
+import { FlashcardViewer } from "./flashcard-viewer";
 
 interface FlashcardViewPageProps {
   deckId: string;
@@ -27,9 +28,7 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
   });
 
   const { data: cards, isLoading: isCardsLoading } = useFlashcards(deckId);
-  const [activeTab, setActiveTab] = useState<"all" | "easy" | "good" | "hard">(
-    "all",
-  );
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const isLoading = isDeckLoading || isCardsLoading;
 
@@ -41,167 +40,124 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
     );
   }
 
-  if (!cards) return <div>No cards found</div>;
+  if (!(cards && deck)) return <div>Deck not found</div>;
 
-  // Process Stats (Simplified logic)
-  // Logic:
-  // - status 'review' + high ease -> Easy
-  // - status 'review' -> Good
-  // - status 'learning' -> Hard
-  // - no review -> New (Counted as Hard/Again or separate? HTML doesn't have 'New')
-  // We'll group New into 'Hard/Again' or just ignore for stats?
-  // Let's group New into 'Hard/Again' for this UI since typically you need to learn them.
-
-  const processedCards = cards.map((c) => {
-    const review = c.flashcard_reviews?.[0];
-    let rating: "easy" | "good" | "hard" = "hard";
-
-    if (review) {
-      if (review.status === "review") {
-        if ((review.ease_factor || 2.5) > 2.5) rating = "easy";
-        else rating = "good";
-      } else {
-        rating = "hard";
-      }
-    } else {
-      rating = "hard"; // New cards
-    }
-    return { ...c, rating };
-  });
-
-  const stats = {
-    total: cards.length,
-    easy: processedCards.filter((c) => c.rating === "easy").length,
-    good: processedCards.filter((c) => c.rating === "good").length,
-    hard: processedCards.filter((c) => c.rating === "hard").length,
-  };
-
-  const filteredCards = processedCards.filter((c) => {
-    if (activeTab === "all") return true;
-    return c.rating === activeTab;
-  });
+  const currentCard = cards[currentIndex];
 
   return (
-    <div className="container mx-auto space-y-8 p-4 py-8">
-      {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="font-bold text-3xl">
-            {deck?.title || "Flashcard Deck"}
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            {deck?.description || "No description provided."}
-          </p>
-        </div>
-        <Link href={`/dashboard/flashcards/${deckId}/study`}>
-          <Button size="lg" className="rounded-2xl">
-            <Play className="mr-2 size-4" /> Start Study
-          </Button>
-        </Link>
-      </div>
+    <div className="relative flex h-full w-full flex-col overflow-hidden">
+      {/* Main Content (Scrollable) */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="flex flex-col items-center">
+          {/* Header Section matching QuizHeader */}
+          <div className="w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+            <div className="prose prose-sm md:prose-lg mx-auto max-w-none text-center font-medium text-base text-muted-foreground sm:text-lg">
+              <p>{deck.title}</p>
+            </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="flex flex-col items-center rounded-lg bg-secondary p-4">
-          <ChartColumn className="mb-2 size-8 text-primary" />
-          <p className="font-medium text-sm">Total Cards</p>
-          <p className="font-bold text-2xl text-primary">{stats.total}</p>
-        </div>
-        <div className="flex flex-col items-center rounded-lg bg-secondary p-4">
-          <CircleCheckBig className="mb-2 size-8 text-blue-500" />
-          <p className="font-medium text-sm">Easy Cards</p>
-          <p className="font-bold text-2xl text-blue-500">{stats.easy}</p>
-        </div>
-        <div className="flex flex-col items-center rounded-lg bg-secondary p-4">
-          <ThumbsUp className="mb-2 size-8 text-green-500" />
-          <p className="font-medium text-sm">Good Cards</p>
-          <p className="font-bold text-2xl text-green-500">{stats.good}</p>
-        </div>
-        <div className="flex flex-col items-center rounded-lg bg-secondary p-4">
-          <ThumbsDown className="mb-2 size-8 text-amber-500" />
-          <p className="font-medium text-sm">Hard/New Cards</p>
-          <p className="font-bold text-2xl text-amber-500">{stats.hard}</p>
-        </div>
-      </div>
-
-      {/* Cards List */}
-      <div className="rounded-lg border border-border p-2 sm:p-4">
-        <h2 className="mb-4 font-semibold text-lg">Cards List</h2>
-        <div className="w-full">
-          {/* Tabs */}
-          <div className="mb-4 flex h-auto flex-wrap items-center justify-start space-y-1 rounded-md bg-muted p-1 text-muted-foreground">
-            <button
-              type="button"
-              onClick={() => setActiveTab("all")}
-              data-state={activeTab === "all" ? "active" : "inactive"}
-              className="flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-sm px-3 py-1.5 font-medium text-sm ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-            >
-              <BookOpen className="size-4" />
-              All ({stats.total})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("easy")}
-              data-state={activeTab === "easy" ? "active" : "inactive"}
-              className="flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-sm px-3 py-1.5 font-medium text-sm ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-            >
-              <CircleCheckBig className="size-4 text-blue-500" />
-              Easy ({stats.easy})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("good")}
-              data-state={activeTab === "good" ? "active" : "inactive"}
-              className="flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-sm px-3 py-1.5 font-medium text-sm ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-            >
-              <ThumbsUp className="size-4 text-green-500" />
-              Good ({stats.good})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("hard")}
-              data-state={activeTab === "hard" ? "active" : "inactive"}
-              className="flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-sm px-3 py-1.5 font-medium text-sm ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-            >
-              <ThumbsDown className="size-4 text-amber-500" />
-              Hard/New ({stats.hard})
-            </button>
-          </div>
-
-          {/* List Content */}
-          <div className="space-y-2">
-            {filteredCards.map((card) => (
+            {/* Progress Bar */}
+            <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-3 sm:gap-4 md:flex-nowrap">
               <div
-                key={card.id}
-                className="group overflow-hidden rounded-lg border"
+                role="progressbar"
+                className="relative h-4 w-full flex-1 overflow-hidden rounded-full bg-secondary"
               >
-                <div className="flex flex-col">
-                  <div className="flex items-center justify-between bg-secondary/50 px-4 py-4">
-                    <div className="flex w-full items-center gap-4">
-                      {getIconForRating(card.rating)}
-                      <div className="flex-1">
-                        <p className="font-medium">{card.front}</p>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Always show back or maybe on hover/expand? HTML suggests accordion. I'll just show it statically for now or use details */}
-                  <div className="border-t bg-background px-4 py-2 text-muted-foreground text-sm">
-                    {card.back}
-                  </div>
-                </div>
+                <div
+                  className="size-full flex-1 bg-primary transition-all"
+                  style={{
+                    transform: `translateX(-${100 - ((currentIndex + 1) / cards.length) * 100}%)`,
+                  }}
+                />
               </div>
-            ))}
+              <div className="shrink-0 text-right font-semibold text-lg sm:text-xl">
+                {currentIndex + 1} / {cards.length}
+              </div>
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="size-10 rounded-2xl"
+                    >
+                      <MoreVertical className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Edit Details</DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive">
+                      Delete Deck
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          </div>
+
+          {/* Flashcard Viewer */}
+          <div className="flex w-full justify-center px-4">
+            {currentCard ? (
+              <div className="w-full max-w-3xl">
+                <FlashcardViewer card={currentCard} />
+              </div>
+            ) : (
+              <div className="flex h-64 w-full items-center justify-center rounded-xl border bg-muted/20">
+                <p className="text-muted-foreground">No cards available</p>
+              </div>
+            )}
+          </div>
+
+          {/* Cards List (Below viewer) */}
+          <div className="container mx-auto max-w-4xl space-y-4 p-4 pt-8 pb-20">
+            <h3 className="font-semibold text-xl">
+              Cards in this deck ({cards.length})
+            </h3>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {cards.map((card, i) => (
+                <button
+                  type="button"
+                  key={card.id}
+                  className={`flex cursor-pointer flex-col justify-between rounded-lg border bg-card p-4 text-left shadow-sm transition-colors ${i === currentIndex ? "border-primary ring-1 ring-primary" : "hover:border-primary/50"}`}
+                  onClick={() => setCurrentIndex(i)}
+                >
+                  <div className="mb-4">
+                    <span className="mb-2 block font-medium text-muted-foreground text-xs uppercase">
+                      Term
+                    </span>
+                    <p className="line-clamp-3 font-medium">{card.front}</p>
+                  </div>
+                  <Separator className="my-2" />
+                  <div>
+                    <span className="mb-2 block font-medium text-muted-foreground text-xs uppercase">
+                      Definition
+                    </span>
+                    <p className="line-clamp-3 text-muted-foreground text-sm">
+                      {card.back}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Bottom Navigation (Fixed) */}
+      <div className="flex-shrink-0">
+        <FlashcardNavigation
+          currentIndex={currentIndex}
+          totalCards={cards.length}
+          onPrevious={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+          onNext={() =>
+            setCurrentIndex((prev) => Math.min(cards.length - 1, prev + 1))
+          }
+          onShuffle={() => {
+            // Shuffle logic (placeholder)
+          }}
+          onFlipOrder={() => {
+            // Flip logic placeholder
+          }}
+        />
       </div>
     </div>
   );
-}
-
-function getIconForRating(rating: string) {
-  if (rating === "easy")
-    return <CircleCheckBig className="!text-blue-500 size-5 shrink-0" />;
-  if (rating === "good")
-    return <ThumbsUp className="!text-green-500 size-5 shrink-0" />;
-  return <ThumbsDown className="!text-amber-500 size-5 shrink-0" />; // Hard/Again
 }

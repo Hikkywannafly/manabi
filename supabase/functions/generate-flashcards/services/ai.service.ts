@@ -56,40 +56,50 @@ export class AIService {
   }
 
   private buildSystemPrompt(params?: FlashcardGenerationParams): string {
-    const difficulty = params?.difficulty || "Medium";
-    const language = params?.language || "english";
-
     return `You are an expert educational content creator specializing in flashcard generation.
 
-Your task is to create high-quality flashcards from the provided content.
+    Your task is to create high-quality flashcards from the provided content.
 
-FLASHCARD GUIDELINES:
-- Front: Ask a clear, concise question or show a term/concept
-- Back: Provide a complete, accurate answer or definition
-- Difficulty: ${difficulty} level
-- Language: ${language}
-- Each flashcard should test ONE specific concept
-- Use simple, clear language
-- Avoid ambiguous questions
+    FLASHCARD GUIDELINES:
+    - Front: Ask a clear, concise question or show a term/concept.
+    - Back: Provide a comprehensive and well-structured answer.
 
-OUTPUT FORMAT (JSON only):
-{
-  "title": "Deck title based on content topic",
-  "flashcards": [
+    IMPORTANT - ANSWER FORMAT (Back):
+    The "back" of the card must be detailed and structured. IF appropriate for the content, use the following structure:
+    1. Direct Answer/Definition: A concise summary often 1-2 sentences.
+    2. Explanation/Details: Bullet points or paragraphs explaining the "why", "how", or key characteristics.
+
+    EXAMPLE:
+    Front: "What is the core difference between PaaS and IaaS?"
+    Back: "PaaS provides a complete development environment (code & data focus), while IaaS provides virtualized infrastructure (OS & hardware control).
+
+    PaaS (Platform as a Service):
+    - Users focus on code/data, no infrastructure management.
+    - Example: Railway, Heroku.
+
+    IaaS (Infrastructure as a Service):
+    - Users control OS, runtime, and apps.
+    - Benefits: Pay-as-you-go, Self-Service, Automation.
+    - Example: AWS EC2, DigitalOcean Droplets."
+
+    OUTPUT FORMAT (JSON only):
     {
-      "front": "Question or term",
-      "back": "Answer or definition"
+      "title": "Deck title based on content topic",
+      "flashcards": [
+        {
+          "front": "Question or term",
+          "back": "Rich text answer"
+        }
+      ]
     }
-  ]
-}
 
-${
-  params?.customInstructions
-    ? `CUSTOM INSTRUCTIONS: ${params.customInstructions}`
-    : ""
-}
+    ${
+      params?.customInstructions
+        ? `CUSTOM INSTRUCTIONS: ${params.customInstructions}`
+        : ""
+    }
 
-IMPORTANT: Return ONLY valid JSON, no markdown formatting, no explanatory text.`;
+    IMPORTANT: Return ONLY valid JSON, no markdown formatting, no explanatory text.`;
   }
 
   private buildUserPrompt(

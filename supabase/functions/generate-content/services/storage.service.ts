@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+import * as mammoth from "https://esm.sh/mammoth@1.8.0";
 import { ERROR_MESSAGES, STORAGE_CONFIG } from "../config.ts";
 import { Logger } from "../utils/logger.ts";
 
@@ -53,9 +54,6 @@ export class StorageService {
     Logger.info("Extracting text from DOCX...");
 
     try {
-      // Import mammoth dynamically
-      const mammoth = await import("https://esm.sh/mammoth@1.8.0");
-
       const arrayBuffer = await blob.arrayBuffer();
       const result = await mammoth.extractRawText({ arrayBuffer });
 

@@ -58,7 +58,7 @@ export function StatsGrid({
         </div>
         <Link
           className="font-medium text-primary text-sm hover:underline"
-          href="/dashboard/flashcard/create"
+          href="/dashboard/flashcards/create"
         >
           Create Flashcards
         </Link>

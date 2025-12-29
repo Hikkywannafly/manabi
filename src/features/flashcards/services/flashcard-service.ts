@@ -19,7 +19,7 @@ export const FlashcardService = {
       title,
       source_type: sourceType,
       source_content: sourceContent,
-      generation_params: generationParams as unknown as Record<string, unknown>,
+      generation_params: generationParams as any,
       status: "generating",
       visibility: "private",
     };

@@ -77,6 +77,24 @@ export const achievementService = {
       .select("*", { count: "exact", head: true })
       .eq("owner_id", userId);
 
+    // Stats: Created Decks
+    const { count: createdDecksCount } = await supabase
+      .from("decks")
+      .select("*", { count: "exact", head: true })
+      .eq("owner_id", userId);
+
+    // Stats: Total Flashcards Created
+    const { data: userDecks } = await supabase
+      .from("decks")
+      .select("id")
+      .eq("owner_id", userId);
+
+    const deckIds = (userDecks || []).map((d) => d.id);
+    const { count: flashcardsCount } = await supabase
+      .from("flashcards")
+      .select("*", { count: "exact", head: true })
+      .in("deck_id", deckIds.length > 0 ? deckIds : [""]);
+
     // Stats: Study Minutes & Streaks (From profiles or aggregated)
     // For now assuming these columns exist on profiles from migration
     const { data: _profile } = await supabase
@@ -106,10 +124,23 @@ export const achievementService = {
           currentSteps = quizCount || 0;
           break;
 
-        // Creation
+        // Creation - Quizzes
         case "FIRST_QUIZ_CREATOR":
         case "QUIZ_CREATOR_1":
           currentSteps = createdQuizzesCount || 0;
+          break;
+
+        // Creation - Flashcard Decks
+        case "FIRST_DECK_CREATOR":
+        case "DECK_CREATOR_10":
+        case "DECK_CREATOR_50":
+          currentSteps = createdDecksCount || 0;
+          break;
+
+        // Creation - Flashcards
+        case "FLASHCARD_CREATOR_100":
+        case "FLASHCARD_CREATOR_500":
+          currentSteps = flashcardsCount || 0;
           break;
 
         // Default Logic

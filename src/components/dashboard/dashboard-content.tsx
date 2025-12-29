@@ -17,7 +17,7 @@ import { useDashboardStats } from "@/features/dashboard/hooks/use-dashboard-stat
 
 export function DashboardContent() {
   const { user } = useAuth();
-  const { stats, missions, notes, leaderboard, recentAchievements, isLoading } =
+  const { stats, missions, notes, recentAchievements, isLoading } =
     useDashboardStats();
 
   if (isLoading) {
@@ -99,7 +99,7 @@ export function DashboardContent() {
                 <WrappedBanner />
                 <StudyTimeWidget />
                 <RecentNotesWidget notes={notes.data || []} />
-                <LeaderboardWidget users={leaderboard.data || []} />
+                <LeaderboardWidget />
               </div>
             </div>
           </div>

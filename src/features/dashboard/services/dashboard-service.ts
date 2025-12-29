@@ -101,15 +101,37 @@ export const DashboardService = {
     return data || [];
   },
 
-  async getLeaderboard() {
+  async getLeaderboard(
+    timeframe: "daily" | "weekly" | "alltime" = "weekly",
+  ): Promise<LeaderboardUser[]> {
     const supabase = createClient();
-    const { data } = await supabase
-      .from("profiles")
-      .select("id, full_name, avatar_url, xp, level")
-      .order("xp", { ascending: false })
-      .limit(5);
 
-    return (data as LeaderboardUser[]) || [];
+    // Map timeframe to RPC function
+    const rpcFunctionMap = {
+      daily: "get_daily_xp_leaderboard",
+      weekly: "get_weekly_xp_leaderboard",
+      alltime: "get_alltime_xp_leaderboard",
+    };
+
+    const { data, error } = await supabase.rpc(
+      rpcFunctionMap[timeframe] as any,
+    );
+
+    if (error) {
+      console.error(`Failed to fetch ${timeframe} leaderboard:`, error);
+      return [];
+    }
+
+    // Map RPC result to LeaderboardUser type
+    return (
+      data?.map((item: any) => ({
+        id: item.user_id,
+        full_name: item.full_name,
+        avatar_url: item.avatar_url,
+        level: item.level,
+        xp: item.total_xp_earned,
+      })) || []
+    );
   },
 
   async getRecentAchievements(userId: string): Promise<RecentAchievement[]> {

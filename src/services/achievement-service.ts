@@ -75,7 +75,7 @@ export const achievementService = {
     const { count: createdQuizzesCount } = await supabase
       .from("quizzes")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", userId); // Note: verify 'created_by' exists, if not use 'user_id' or check schema
+      .eq("owner_id", userId);
 
     // Stats: Study Minutes & Streaks (From profiles or aggregated)
     // For now assuming these columns exist on profiles from migration
@@ -107,6 +107,7 @@ export const achievementService = {
           break;
 
         // Creation
+        case "FIRST_QUIZ_CREATOR":
         case "QUIZ_CREATOR_1":
           currentSteps = createdQuizzesCount || 0;
           break;

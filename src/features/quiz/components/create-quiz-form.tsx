@@ -14,12 +14,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useAchievementNotifier } from "@/features/achievements/hooks/use-achievement-notifier";
+import { useMissionNotifier } from "@/features/missions/hooks/use-mission-notifier";
 import { createClient } from "@/lib/supabase/client";
 import { AIService } from "@/services/ai-service";
 import { type QuizCreationValues, quizCreationSchema } from "../schema";
@@ -35,6 +36,8 @@ interface CreateQuizFormProps {
 
 export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
   const router = useRouter();
+  const { checkMissions } = useMissionNotifier();
+  const { checkAchievements } = useAchievementNotifier();
   const [files, setFiles] = useState<File[]>([]);
   const [textInput, setTextInput] = useState("");
   const [activeTab, setActiveTab] = useState("file");
@@ -139,6 +142,10 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
 
           if (payload.progress === 100) {
             toast.success("Quiz generated successfully!");
+
+            // Check for achievements and missions
+            checkAchievements();
+            checkMissions();
             if (subscriptionRef.current) {
               subscriptionRef.current();
               subscriptionRef.current = null;

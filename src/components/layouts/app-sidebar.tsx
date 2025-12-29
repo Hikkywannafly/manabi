@@ -35,8 +35,8 @@ export default function AppSidebar() {
       {/* Use standard padding to align with sidebar items */}
       <SidebarHeader>
         <Logo
-          size="md"
-          className=""
+          size="sm"
+          className="w-max"
           textClassName={cn(
             "transition-[max-width,opacity] duration-300 ease-in-out",
             "group-data-[collapsible=icon]:inline-block group-data-[collapsible=icon]:max-w-[200px] group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:opacity-0",

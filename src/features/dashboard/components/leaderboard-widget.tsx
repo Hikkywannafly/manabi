@@ -1,20 +1,35 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Trophy } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import type { LeaderboardUser } from "../services/dashboard-service";
+import { DashboardService } from "../services/dashboard-service";
 
-interface LeaderboardWidgetProps {
-  users: LeaderboardUser[];
-}
+export function LeaderboardWidget() {
+  const [activeTab, setActiveTab] = useState<"daily" | "weekly" | "alltime">(
+    "weekly",
+  );
 
-export function LeaderboardWidget({ users }: LeaderboardWidgetProps) {
+  // Fetch leaderboard data based on active tab
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ["leaderboard", activeTab],
+    queryFn: () => DashboardService.getLeaderboard(activeTab),
+  });
+
   return (
     <div className="rounded-lg border bg-secondary p-4 shadow-sm">
-      <Tabs defaultValue="weekly" className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) =>
+          setActiveTab(value as "daily" | "weekly" | "alltime")
+        }
+        className="w-full"
+      >
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Trophy className="size-5 text-yellow-500" />
@@ -23,32 +38,27 @@ export function LeaderboardWidget({ users }: LeaderboardWidgetProps) {
             </h2>
           </div>
           <TabsList className="h-10 shrink-0">
-            {/* Only implementing Weekly for now as per data service */}
             <TabsTrigger value="daily">Daily</TabsTrigger>
             <TabsTrigger value="weekly">Weekly</TabsTrigger>
-            <TabsTrigger value="monthly">Monthly</TabsTrigger>
-            <TabsTrigger value="allTime">All</TabsTrigger>
+            <TabsTrigger value="alltime">All</TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="daily" className="mt-0 space-y-2">
-          {renderLeaderboardList(users)}
+          {renderLeaderboardList(users, isLoading)}
         </TabsContent>
         <TabsContent value="weekly" className="mt-0 space-y-2">
-          {renderLeaderboardList(users)}
+          {renderLeaderboardList(users, isLoading)}
         </TabsContent>
-        <TabsContent value="monthly" className="mt-0 space-y-2">
-          {renderLeaderboardList(users)}
-        </TabsContent>
-        <TabsContent value="allTime" className="mt-0 space-y-2">
-          {renderLeaderboardList(users)}
+        <TabsContent value="alltime" className="mt-0 space-y-2">
+          {renderLeaderboardList(users, isLoading)}
         </TabsContent>
       </Tabs>
     </div>
   );
 }
 
-function renderLeaderboardList(users: LeaderboardUser[]) {
+function renderLeaderboardList(users: LeaderboardUser[], isLoading: boolean) {
   const getRankIconColor = (index: number) => {
     switch (index) {
       case 0:
@@ -61,6 +71,14 @@ function renderLeaderboardList(users: LeaderboardUser[]) {
         return "text-muted-foreground";
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="py-8 text-center text-muted-foreground text-sm">
+        Loading...
+      </div>
+    );
+  }
 
   if (users.length === 0) {
     return (

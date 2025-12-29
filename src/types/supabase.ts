@@ -1094,6 +1094,26 @@ export type Database = {
         Args: { p_mission_id: string; p_user_id: string; p_xp_reward: number };
         Returns: undefined;
       };
+      get_alltime_xp_leaderboard: {
+        Args: never;
+        Returns: {
+          avatar_url: string;
+          full_name: string;
+          level: number;
+          total_xp_earned: number;
+          user_id: string;
+        }[];
+      };
+      get_daily_xp_leaderboard: {
+        Args: never;
+        Returns: {
+          avatar_url: string;
+          full_name: string;
+          level: number;
+          total_xp_earned: number;
+          user_id: string;
+        }[];
+      };
       get_global_leaderboard: {
         Args: never;
         Returns: {
@@ -1114,6 +1134,16 @@ export type Database = {
           user_id: string;
         }[];
       };
+      get_weekly_xp_leaderboard: {
+        Args: never;
+        Returns: {
+          avatar_url: string;
+          full_name: string;
+          level: number;
+          total_xp_earned: number;
+          user_id: string;
+        }[];
+      };
       increment_user_stats: {
         Args: { minutes: number; row_date: string; row_user_id: string };
         Returns: undefined;
@@ -1122,7 +1152,15 @@ export type Database = {
         Args: { x_amount: number; x_user_id: string };
         Returns: undefined;
       };
-      increment_xp: { Args: { amount: number }; Returns: undefined };
+      increment_xp: {
+        Args: {
+          p_amount: number;
+          p_source_id?: string;
+          p_source_type?: Database["public"]["Enums"]["xp_source_type"];
+          p_user_id: string;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       achievement_category:

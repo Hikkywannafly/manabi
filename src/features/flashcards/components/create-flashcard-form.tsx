@@ -169,7 +169,9 @@ export function CreateFlashcardForm({
             }
 
             setTimeout(() => {
-              router.push(`/dashboard/flashcards/${deck.id}`);
+              router.push(
+                `/dashboard/flashcards/${deck.id}/${deck.slug || "view"}`,
+              );
             }, 1000);
           }
         },

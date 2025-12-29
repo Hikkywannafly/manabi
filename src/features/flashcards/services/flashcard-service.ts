@@ -19,9 +19,17 @@ export const FlashcardService = {
   ): Promise<Deck> {
     const supabase = createClient();
 
+    const slug = title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
     const deckData: DeckInsert = {
       owner_id: userId,
       title,
+      slug,
       source_type: sourceType,
       source_content: sourceContent,
       generation_params: generationParams as any,

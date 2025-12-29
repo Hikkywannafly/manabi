@@ -1,11 +1,19 @@
-import { use } from "react";
-import { FlashcardViewPage } from "@/features/flashcards/components/view/flashcard-view-page";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 
-export default function ViewFlashcardDeckPage({
+export default async function Page({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }) {
-  const { id } = use(params);
-  return <FlashcardViewPage deckId={id} />;
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: deck } = await supabase
+    .from("decks")
+    .select("slug")
+    .eq("id", id)
+    .single();
+
+  redirect(`/dashboard/flashcards/${id}/${deck?.slug || "view"}`);
 }

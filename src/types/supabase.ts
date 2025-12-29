@@ -112,6 +112,7 @@ export type Database = {
           mastery_percentage: number | null;
           owner_id: string;
           settings: Json | null;
+          slug: string | null;
           source_content: string | null;
           source_type: string | null;
           status: Database["public"]["Enums"]["deck_status"] | null;
@@ -129,6 +130,7 @@ export type Database = {
           mastery_percentage?: number | null;
           owner_id: string;
           settings?: Json | null;
+          slug?: string | null;
           source_content?: string | null;
           source_type?: string | null;
           status?: Database["public"]["Enums"]["deck_status"] | null;
@@ -146,6 +148,7 @@ export type Database = {
           mastery_percentage?: number | null;
           owner_id?: string;
           settings?: Json | null;
+          slug?: string | null;
           source_content?: string | null;
           source_type?: string | null;
           status?: Database["public"]["Enums"]["deck_status"] | null;
@@ -326,8 +329,10 @@ export type Database = {
         Row: {
           content: string | null;
           created_at: string | null;
+          cue: string | null;
           id: string;
           is_pinned: boolean | null;
+          summary: string | null;
           title: string | null;
           updated_at: string | null;
           user_id: string;
@@ -335,8 +340,10 @@ export type Database = {
         Insert: {
           content?: string | null;
           created_at?: string | null;
+          cue?: string | null;
           id?: string;
           is_pinned?: boolean | null;
+          summary?: string | null;
           title?: string | null;
           updated_at?: string | null;
           user_id: string;
@@ -344,8 +351,10 @@ export type Database = {
         Update: {
           content?: string | null;
           created_at?: string | null;
+          cue?: string | null;
           id?: string;
           is_pinned?: boolean | null;
+          summary?: string | null;
           title?: string | null;
           updated_at?: string | null;
           user_id?: string;

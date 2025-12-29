@@ -18,7 +18,7 @@ export function RecentNotesWidget({ notes }: RecentNotesWidgetProps) {
               <StickyNote className="size-5" />
               Recent Notes
             </span>
-            <Link href="/dashboard/notes/create">
+            <Link href="/dashboard/notes">
               <Button size="sm" className="h-9 rounded-2xl px-3 text-sm">
                 Create Note
               </Button>

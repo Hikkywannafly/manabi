@@ -1,36 +1,84 @@
 "use client";
 
-import { type Flashcard, FlashcardItem } from "./flashcard-item";
+import { Plus, Search } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
-interface FlashcardListProps {
-  flashcards: Flashcard[];
-  onView: (id: string) => void;
-  onEdit: (id: string) => void;
-}
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useDecks } from "../hooks/use-decks";
+import { DeckCard } from "./deck-card";
 
-export function FlashcardList({
-  flashcards,
-  onView,
-  onEdit,
-}: FlashcardListProps) {
-  if (flashcards.length === 0) {
+export function FlashcardList() {
+  const [search, setSearch] = useState("");
+  const { data: decks = [], isLoading, isError } = useDecks();
+
+  const filteredDecks = decks.filter((d) =>
+    d.title.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  if (isError) {
     return (
-      <div className="py-12 text-center">
-        <p className="text-muted-foreground">No flashcards found.</p>
+      <div className="flex h-[300px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center text-destructive">
+        <p>Failed to load flashcard decks. Please try again.</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {flashcards.map((flashcard) => (
-        <FlashcardItem
-          key={flashcard.id}
-          flashcard={flashcard}
-          onView={onView}
-          onEdit={onEdit}
-        />
-      ))}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="font-bold text-3xl tracking-tight">Flashcards</h1>
+        <Link href="/dashboard/flashcards/create">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" /> Add Flashcard
+          </Button>
+        </Link>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-1">
+          <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search flashcards..."
+            className="pl-8"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-32 animate-pulse rounded-xl bg-muted" />
+          ))}
+        </div>
+      ) : filteredDecks.length === 0 ? (
+        <div className="fade-in-50 flex min-h-[300px] animate-in flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+            <Search className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <h3 className="mt-4 font-semibold text-lg">No decks found</h3>
+          <p className="mt-2 mb-4 text-muted-foreground text-sm">
+            {search
+              ? "Try adjusting your search terms."
+              : "You haven't created any flashcard decks yet."}
+          </p>
+          {!search && (
+            <Link href="/dashboard/flashcards/create">
+              <Button variant="outline">Create your first deck</Button>
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredDecks.map((deck) => (
+            <DeckCard key={deck.id} deck={deck} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

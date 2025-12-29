@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Deck, DeckInsert, FlashcardGenerationParams } from "../types";
+import type {
+  Deck,
+  DeckInsert,
+  FlashcardGenerationParams,
+  FlashcardWithReview,
+} from "../types";
 
 export const FlashcardService = {
   /**
@@ -84,6 +89,86 @@ export const FlashcardService = {
       .from("decks")
       .update(updateData)
       .eq("id", deckId);
+
+    if (error) throw error;
+  },
+
+  /**
+   * Get all flashcards for a deck, with user's review status
+   */
+  async getFlashcards(deckId: string): Promise<FlashcardWithReview[]> {
+    const supabase = createClient();
+
+    // Determine user ID inside the service or assume RLS handles it?
+    // RLS handles filtering flashcard_reviews by user_id if setup correctly.
+    // However, we want to fetch cards EVEN IF there is no review? Yes.
+
+    const { data, error } = await supabase
+      .from("flashcards")
+      .select(`
+        *,
+        flashcard_reviews(*)
+      `)
+      .eq("deck_id", deckId)
+      .order("order_index", { ascending: true });
+
+    if (error) throw error;
+    return data as FlashcardWithReview[];
+  },
+
+  /**
+   * Record a review attempt
+   */
+  async recordReview(
+    flashcardId: string,
+    rating: "again" | "hard" | "good" | "easy",
+  ): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) throw new Error("User not authenticated");
+
+    const now = new Date();
+    const nextReview = new Date();
+
+    // Simple scheduling (placeholder)
+    switch (rating) {
+      case "again":
+        nextReview.setMinutes(now.getMinutes() + 1);
+        break;
+      case "hard":
+        nextReview.setMinutes(now.getMinutes() + 10);
+        break;
+      case "good":
+        nextReview.setDate(now.getDate() + 1);
+        break;
+      case "easy":
+        nextReview.setDate(now.getDate() + 4);
+        break;
+    }
+
+    // Map to DB status
+    const statusMap = {
+      again: "learning",
+      hard: "learning",
+      good: "review",
+      easy: "review",
+    };
+
+    // We assume 'flashcard_reviews' has a unique constraint on (flashcard_id, user_id)
+    const reviewData = {
+      flashcard_id: flashcardId,
+      user_id: user.id,
+      status: statusMap[rating],
+      last_reviewed: now.toISOString(),
+      next_review: nextReview.toISOString(),
+    };
+
+    const { error } = await supabase
+      .from("flashcard_reviews")
+      .upsert(reviewData as any, { onConflict: "flashcard_id,user_id" });
 
     if (error) throw error;
   },

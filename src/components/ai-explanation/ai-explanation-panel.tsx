@@ -71,61 +71,65 @@ export function AIExplanationPanel({
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="flex w-full flex-col p-0 sm:max-w-md">
-        <SheetHeader className="border-b px-4 py-3">
+      <SheetContent className="flex h-full w-full flex-col p-0 sm:max-w-md">
+        <SheetHeader className="shrink-0 border-b px-4 py-3">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-base">Manabi Explanation</SheetTitle>
           </div>
         </SheetHeader>
 
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {/* Messages */}
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "rounded-lg p-3",
-                  message.role === "assistant"
-                    ? "bg-muted"
-                    : "ml-8 bg-primary text-primary-foreground",
-                )}
-              >
-                <p className="whitespace-pre-wrap text-sm">{message.content}</p>
-              </div>
-            ))}
+        <div className="min-h-0 flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="space-y-4 p-4">
+              {/* Messages */}
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "rounded-lg p-3",
+                    message.role === "assistant"
+                      ? "bg-muted"
+                      : "ml-8 bg-primary text-primary-foreground",
+                  )}
+                >
+                  <p className="whitespace-pre-wrap text-sm">
+                    {message.content}
+                  </p>
+                </div>
+              ))}
 
-            {/* Loading State */}
-            {isLoading && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm">Thinking...</span>
-              </div>
-            )}
-
-            {/* Suggested Questions */}
-            {explanation?.suggestedQuestions &&
-              explanation.suggestedQuestions.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  {explanation.suggestedQuestions.map((question, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleSuggestedQuestion(question)}
-                      disabled={isLoading}
-                      className="flex w-full items-start gap-1 text-left text-xs hover:underline disabled:opacity-50"
-                    >
-                      <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" />
-                      <p>{question}</p>
-                    </button>
-                  ))}
+              {/* Loading State */}
+              {isLoading && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Thinking...</span>
                 </div>
               )}
-          </div>
-        </ScrollArea>
+
+              {/* Suggested Questions */}
+              {explanation?.suggestedQuestions &&
+                explanation.suggestedQuestions.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {explanation.suggestedQuestions.map((question, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleSuggestedQuestion(question)}
+                        disabled={isLoading}
+                        className="flex w-full items-start gap-1 text-left text-xs hover:underline disabled:opacity-50"
+                      >
+                        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" />
+                        <p>{question}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+            </div>
+          </ScrollArea>
+        </div>
 
         {/* Input Area */}
-        <div className="border-t p-4">
+        <div className="shrink-0 border-t p-4">
           <div className="flex items-center gap-2">
             <Input
               placeholder="Ask a follow-up question..."

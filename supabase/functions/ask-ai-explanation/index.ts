@@ -1,72 +1,75 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-/**
- * AI Explanation Edge Function - Gateway Version
- *
- * This function acts as a lightweight gateway that:
- * 1. Receives explanation requests from the frontend
- * 2. Forwards processing to the Python backend
- * 3. Returns the AI-generated explanation
- *
- * Set PYTHON_BACKEND_URL environment variable to your Railway deployment URL
- */
+// Import types and config
+import { API_CONFIG, ENV_VARS, ERROR_MESSAGES } from "./config.ts";
+// Import Services
+import { AIService } from "./services/ai.service.ts";
+import type { RequestPayload } from "./types.ts";
+import { Logger } from "./utils/logger.ts";
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
 
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Origin": API_CONFIG.cors.allowOrigin,
+  "Access-Control-Allow-Headers": API_CONFIG.cors.allowHeaders,
 };
 
 // ============================================================================
-// TYPES
-// ============================================================================
-
-interface QuestionOption {
-  id: string;
-  text: string;
-}
-
-interface ExplainContext {
-  contentType: "quiz" | "flashcard";
-  questionText: string;
-  options?: QuestionOption[];
-  correctAnswer: string;
-  userAnswer?: string;
-  isCorrect?: boolean;
-  front?: string;
-  back?: string;
-}
-
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
-
-interface RequestPayload {
-  context: ExplainContext;
-  history?: ChatMessage[];
-  question?: string;
-}
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-function mapContextForPython(context: ExplainContext) {
-  return {
-    content_type: context.contentType,
-    question_text: context.questionText,
-    options: context.options,
-    correct_answer: context.correctAnswer,
-    user_answer: context.userAnswer,
-    is_correct: context.isCorrect,
-    front: context.front,
-    back: context.back,
-  };
-}
-
-// ============================================================================
 // MAIN HANDLER
+// ============================================================================
+
+class ExplanationHandler {
+  private aiService: AIService;
+
+  constructor(openRouterApiKey: string) {
+    this.aiService = new AIService(openRouterApiKey);
+  }
+
+  async execute(payload: RequestPayload): Promise<{
+    explanation: string;
+    suggestedQuestions: string[];
+  }> {
+    const { context, history, question } = payload;
+
+    // Validate context
+    if (!context) {
+      throw new Error(ERROR_MESSAGES.missingContext);
+    }
+
+    Logger.info("Processing explanation request", {
+      contentType: context.contentType,
+      hasHistory: !!history?.length,
+      hasFollowUp: !!question,
+    });
+
+    let result: {
+      explanation: string;
+      suggested_questions: string[];
+    };
+
+    if (question && history) {
+      // Follow-up question
+      result = await this.aiService.generateFollowUp(
+        context,
+        history,
+        question,
+      );
+    } else {
+      // Initial explanation
+      result = await this.aiService.generateExplanation(context);
+    }
+
+    return {
+      explanation: result.explanation,
+      suggestedQuestions: result.suggested_questions,
+    };
+  }
+}
+
+// ============================================================================
+// EDGE FUNCTION ENTRY POINT
 // ============================================================================
 
 Deno.serve(async (req) => {
@@ -76,80 +79,40 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log("🚀 AI Explanation gateway started");
+    Logger.rocket("AI Explanation started");
 
-    // Parse request
+    // Parse and validate request
     const payload: RequestPayload = await req.json();
-    const { context, history, question } = payload;
 
-    // Validate
-    if (!context) {
-      throw new Error("Missing required field: context");
+    // Validate environment variables
+    const openRouterApiKey = Deno.env.get(ENV_VARS.openRouterApiKey);
+
+    if (!openRouterApiKey) {
+      throw new Error(ERROR_MESSAGES.missingOpenRouterKey);
     }
 
-    console.log("📝 Request:", {
-      contentType: context.contentType,
-      hasHistory: !!history?.length,
-      hasFollowUp: !!question,
+    // Execute explanation generation
+    const handler = new ExplanationHandler(openRouterApiKey);
+    const result = await handler.execute(payload);
+
+    Logger.celebrate("Explanation generated successfully!");
+    Logger.success("Result", result);
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
     });
-
-    // Get environment variables
-    const pythonBackendUrl = Deno.env.get("PYTHON_BACKEND_URL");
-    const backendApiKey = Deno.env.get("BACKEND_API_KEY") || "default-key";
-
-    if (!pythonBackendUrl) {
-      throw new Error("PYTHON_BACKEND_URL environment variable not set");
-    }
-
-    // Build request for Python backend
-    const backendRequest = {
-      context: mapContextForPython(context),
-      history: history || [],
-      question: question || null,
-    };
-
-    // Call Python backend
-    console.log("📤 Calling Python backend...");
-
-    const backendResponse = await fetch(`${pythonBackendUrl}/api/v1/explain`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": backendApiKey,
-      },
-      body: JSON.stringify(backendRequest),
-    });
-
-    if (!backendResponse.ok) {
-      const errorText = await backendResponse.text();
-      throw new Error(
-        `Python backend error: ${backendResponse.status} - ${errorText}`,
-      );
-    }
-
-    const result = await backendResponse.json();
-
-    console.log("✅ Backend returned explanation");
-
-    // Return response with camelCase for frontend
-    return new Response(
-      JSON.stringify({
-        explanation: result.explanation,
-        suggestedQuestions: result.suggested_questions || [],
-      }),
-      {
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      },
-    );
   } catch (error) {
-    console.error("❌ Gateway error:", error);
+    Logger.boom("Explanation generation failed");
+    Logger.error("Error details", error);
 
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
+    const errorStack = error instanceof Error ? error.stack : undefined;
 
     return new Response(
       JSON.stringify({
         error: errorMessage,
+        details: errorStack,
       }),
       {
         status: 500,

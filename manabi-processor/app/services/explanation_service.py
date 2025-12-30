@@ -156,7 +156,8 @@ class ExplanationService:
                 "explanation": result.get("explanation", cleaned),
                 "suggested_questions": result.get("suggested_questions", []),
             }
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            print(f"JSON Decode Error: {e.msg}, in text: {text}")
             # If parsing fails, return raw content as explanation
             return {
                 "explanation": cleaned,

@@ -97,4 +97,7 @@ async def explain_content(
             suggested_questions=result.get("suggested_questions", [])
         )
     except Exception as e:
+        print(f"Error in explain_content: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

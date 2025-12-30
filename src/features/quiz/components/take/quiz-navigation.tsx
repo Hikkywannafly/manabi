@@ -106,7 +106,7 @@ export function QuizNavigation({
                   )}
                 >
                   <WandSparkles className="mr-2" size={16} />
-                  Ask AI for explanation
+                  Ask Manabi for explanation
                 </Button>
               </div>
             </ScrollArea>

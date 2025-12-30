@@ -74,7 +74,7 @@ export const MissionService = {
 
         // If no record exists for this period, create one
         if (!userMission) {
-          const { data: newUserMission } = await supabase
+          const { data: newUserMission, error: createError } = await supabase
             .from("user_missions")
             .insert({
               user_id: userId,
@@ -86,7 +86,26 @@ export const MissionService = {
             .select()
             .single();
 
-          userMission = newUserMission || undefined;
+          if (createError) {
+            // Handle race condition: Duplicate key violation (23505)
+            if (createError.code === "23505") {
+              const { data: existingMission } = await supabase
+                .from("user_missions")
+                .select("*")
+                .eq("user_id", userId)
+                .eq("mission_id", mission.id)
+                .eq("period_start", periodStart)
+                .single();
+
+              userMission = existingMission || undefined;
+            } else {
+              console.error("Failed to create user mission:", createError);
+              // Fallback to not crashing, just skipping this mission for now or
+              // letting it be undefined and handled gracefully later
+            }
+          } else {
+            userMission = newUserMission || undefined;
+          }
         }
 
         // Calculate current progress based on criteria_type
@@ -94,9 +113,9 @@ export const MissionService = {
 
         switch (mission.criteria_type) {
           case "CREATE_FLASHCARD": {
-            // Count flashcards created in this period
+            // Count flashcard DECKS created in this period
             const { count } = await supabase
-              .from("flashcards")
+              .from("decks")
               .select("*", { count: "exact", head: true })
               .eq("owner_id", userId)
               .gte("created_at", periodStart);

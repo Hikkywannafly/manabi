@@ -27,6 +27,7 @@ interface QuizNavigationProps {
   isCorrect?: boolean;
   correctAnswer?: string;
   onRetry?: () => void;
+  onAskAI?: () => void;
 }
 
 export function QuizNavigation({
@@ -42,6 +43,7 @@ export function QuizNavigation({
   isCorrect = false,
   correctAnswer,
   onRetry,
+  onAskAI,
 }: QuizNavigationProps) {
   const hasNextQuestion = currentQuestion < totalQuestions - 1;
   const hasPreviousQuestion = currentQuestion > 0;
@@ -97,13 +99,14 @@ export function QuizNavigation({
                   </div>
                 </span>
                 <Button
+                  onClick={onAskAI}
                   className={cn(
                     "flex h-10 shrink-0 items-center rounded-2xl px-4 py-2 text-white",
                     buttonColor,
                   )}
                 >
                   <WandSparkles className="mr-2" size={16} />
-                  Ask AI for explanation
+                  Ask Manabi for explanation
                 </Button>
               </div>
             </ScrollArea>

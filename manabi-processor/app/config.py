@@ -12,9 +12,10 @@ class Settings(BaseSettings):
     # API Keys - Shared (fallback)
     openrouter_api_key: str = ""
 
-    # API Keys - Separate for Quiz and Flashcard (optional)
+    # API Keys - Separate for Quiz, Flashcard and Explanation
     openrouter_api_key_quiz: str = ""
     openrouter_api_key_flashcard: str = ""
+    openrouter_api_key_explanation: str = ""
 
     # Supabase
     supabase_url: str = ""
@@ -22,9 +23,10 @@ class Settings(BaseSettings):
     api_secret_key: str = "default-secret-key-change-in-production"
 
     # Model Configuration
-    default_model: str = "google/gemini-2.0-flash-001"
-    default_model_quiz: str = ""      # Optional: different model for quiz
-    default_model_flashcard: str = "" # Optional: different model for flashcard
+    default_model: str = "google/gemini-2.5-flash-lite"
+    default_model_quiz: str = ""
+    default_model_flashcard: str = ""
+    default_model_explanation: str = ""
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
 
     def get_quiz_api_key(self) -> str:
@@ -35,6 +37,10 @@ class Settings(BaseSettings):
         """Get API key for flashcard generation"""
         return self.openrouter_api_key_flashcard or self.openrouter_api_key
 
+    def get_explanation_api_key(self) -> str:
+        """Get API key for explanation"""
+        return self.openrouter_api_key_explanation or self.openrouter_api_key
+
     def get_quiz_model(self) -> str:
         """Get model for quiz generation"""
         return self.default_model_quiz or self.default_model
@@ -42,6 +48,10 @@ class Settings(BaseSettings):
     def get_flashcard_model(self) -> str:
         """Get model for flashcard generation"""
         return self.default_model_flashcard or self.default_model
+
+    def get_explanation_model(self) -> str:
+        """Get model for explanation"""
+        return self.default_model_explanation or self.default_model
 
     # Generation Settings
     max_tokens: int = 8192

@@ -112,8 +112,26 @@ export class AIService {
     const difficulty = params?.difficulty || AI_CONFIG.defaults.difficulty;
     const numberOfQuestions =
       params?.numberOfQuestions || AI_CONFIG.defaults.numberOfQuestions;
-    const questionType =
-      params?.questionType || AI_CONFIG.defaults.questionType;
+
+    // Handle questionTypes array - convert to formatted string for prompt
+    let questionType: string;
+    const questionTypes = params?.questionTypes;
+
+    if (!questionTypes || questionTypes.length === 0) {
+      // Use default if not provided
+      questionType = AI_CONFIG.defaults.questionType;
+    } else if (questionTypes.includes("mixed") || questionTypes.length > 1) {
+      // If "mixed" is selected or multiple types, format as "Mixed (type1, type2, ...)"
+      const types = questionTypes
+        .filter((t) => t !== "mixed")
+        .map((t) => t.replace(/_/g, " "))
+        .join(", ");
+      questionType = types ? `Mixed (${types})` : "Mixed";
+    } else {
+      // Single type selected - format it nicely
+      questionType = questionTypes[0].replace(/_/g, " ");
+    }
+
     const language = params?.language || AI_CONFIG.defaults.language;
     const customInstructions = params?.customInstructions;
 

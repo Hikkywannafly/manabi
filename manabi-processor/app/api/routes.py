@@ -4,7 +4,7 @@ API Route Handlers
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends
 
-from app.models.requests import QuizGenerationRequest, FlashcardGenerationRequest
+from app.models.requests import QuizGenerationRequest, FlashcardGenerationRequest, ExplainRequest
 from app.models.responses import GenerationResponse
 from app.services.quiz_generator import QuizGeneratorService
 from app.services.flashcard_generator import FlashcardGeneratorService
@@ -74,3 +74,30 @@ async def get_status(item_id: str):
     """Get generation status (for debugging)"""
     # In production, this would query Supabase
     return {"item_id": item_id, "message": "Check Supabase Realtime for updates"}
+
+
+@router.post("/explain")
+async def explain_content(
+    request: ExplainRequest,
+    _: str = Depends(verify_api_key),
+):
+    """
+    Generate AI explanation for quiz question or flashcard.
+
+    This is a synchronous endpoint (not background task)
+    since explanations are typically fast and need immediate response.
+    """
+    from app.services.explanation_service import ExplanationService
+    from app.models.responses import ExplainResponse
+
+    try:
+        result = await ExplanationService.generate(request)
+        return ExplainResponse(
+            explanation=result["explanation"],
+            suggested_questions=result.get("suggested_questions", [])
+        )
+    except Exception as e:
+        print(f"Error in explain_content: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))

@@ -18,3 +18,9 @@ class HealthResponse(BaseModel):
     """Health check response"""
     status: str
     version: str
+
+
+class ExplainResponse(BaseModel):
+    """Response for AI explanation"""
+    explanation: str
+    suggested_questions: list[str] = []

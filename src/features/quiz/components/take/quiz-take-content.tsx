@@ -2,8 +2,12 @@
 
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
+import {
+  type AIExplanationContext,
+  AIExplanationPanel,
+} from "@/components/ai-explanation";
 import { Button } from "@/components/ui/button";
 import { useAchievementNotifier } from "@/features/achievements/hooks/use-achievement-notifier";
 import { useMissionNotifier } from "@/features/missions/hooks/use-mission-notifier";
@@ -41,6 +45,9 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
     >
   >({});
 
+  // AI Explanation Panel state
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
+
   const {
     currentQuestionIndex,
     answers,
@@ -68,6 +75,42 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
     : null;
 
   const showFeedback = mode === "test" && !!currentQuestionResult;
+
+  // Build AI explanation context for current question
+  const aiExplanationContext = useMemo((): AIExplanationContext | null => {
+    if (!(currentQuestion && currentQuestionResult)) return null;
+
+    // Parse options
+    let options: Array<{ id: string; text: string }> = [];
+    try {
+      const rawOptions =
+        typeof currentQuestion.options === "string"
+          ? JSON.parse(currentQuestion.options)
+          : currentQuestion.options;
+
+      if (Array.isArray(rawOptions)) {
+        if (typeof rawOptions[0] === "string") {
+          options = rawOptions.map((text, idx) => ({
+            id: `option-${idx}`,
+            text,
+          }));
+        } else {
+          options = rawOptions;
+        }
+      }
+    } catch (e) {
+      console.error("Error parsing options for AI context:", e);
+    }
+
+    return {
+      contentType: "quiz",
+      questionText: currentQuestion.question_text || "",
+      options,
+      correctAnswer: currentQuestionResult.correctAnswer,
+      userAnswer: currentAnswer?.selectedOptionId || "",
+      isCorrect: currentQuestionResult.isCorrect,
+    };
+  }, [currentQuestion, currentQuestionResult, currentAnswer]);
 
   // Handle answer selection
   const onAnswerSelect = useCallback(
@@ -356,6 +399,7 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
           isCorrect={currentQuestionResult?.isCorrect}
           correctAnswer={currentQuestionResult?.correctAnswer}
           onRetry={handleRetry}
+          onAskAI={() => setIsAIPanelOpen(true)}
         />
       </div>
       {isSubmitting && (
@@ -366,6 +410,13 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
           </div>
         </div>
       )}
+
+      {/* AI Explanation Panel */}
+      <AIExplanationPanel
+        isOpen={isAIPanelOpen}
+        onClose={() => setIsAIPanelOpen(false)}
+        context={aiExplanationContext}
+      />
     </div>
   );
 }

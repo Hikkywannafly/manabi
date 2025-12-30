@@ -60,6 +60,13 @@ export class AIService {
 
     Your task is to create high-quality flashcards from the provided content.
 
+    LANGUAGE INSTRUCTION:
+    ${
+      params?.language && params.language !== "auto"
+        ? `Generate all flashcard content (questions and answers) in the language with ISO code: "${params.language}".`
+        : "Detect the main language of the content and generate flashcards in that same language."
+    }
+
     FLASHCARD GUIDELINES:
     - Front: Ask a clear, concise question or show a term/concept.
     - Back: Provide a comprehensive and well-structured answer.

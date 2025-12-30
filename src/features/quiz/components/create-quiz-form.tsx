@@ -40,6 +40,8 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
   const { checkAchievements } = useAchievementNotifier();
   const [files, setFiles] = useState<File[]>([]);
   const [textInput, setTextInput] = useState("");
+  const [linkInput, setLinkInput] = useState("");
+  const [youtubeInput, setYoutubeInput] = useState("");
   const [activeTab, setActiveTab] = useState("file");
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generationStatus, setGenerationStatus] = useState("");
@@ -49,8 +51,8 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
     resolver: zodResolver(quizCreationSchema),
     defaultValues: {
       visibility: "private",
-      language: "english",
-      questionType: "mixed",
+      language: "auto",
+      questionTypes: ["mixed"],
       numberOfQuestions: "5",
       mode: "quiz",
       difficulty: "medium",
@@ -81,11 +83,20 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
       // 1. Validation & Setup
       let filePath: string | undefined;
       let textContent: string | undefined;
+      let youtubeUrl: string | undefined;
+      let webpageUrl: string | undefined;
 
       if (activeTab === "text") {
         textContent = textInput.trim();
         setGenerationStatus("Processing text...");
+      } else if (activeTab === "link") {
+        webpageUrl = linkInput.trim();
+        setGenerationStatus("Processing link...");
+      } else if (activeTab === "youtube") {
+        youtubeUrl = youtubeInput.trim();
+        setGenerationStatus("Processing YouTube URL...");
       } else {
+        // file, image, media
         const file = files[0];
         setGenerationStatus("Uploading file...");
         const fileExt = file.name.split(".").pop();
@@ -107,25 +118,32 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
       if (!user) throw new Error("User not authenticated");
 
       let title = "Generated Quiz";
-      if (activeTab === "file" && files[0]) {
+      if (["file", "image", "media"].includes(activeTab) && files[0]) {
         const fileExt = files[0].name.split(".").pop();
         title = files[0].name.replace(`.${fileExt}`, "");
       } else if (activeTab === "text") {
         title = "Text Content Quiz";
+      } else if (activeTab === "link") {
+        title = "Webpage Quiz";
+      } else if (activeTab === "youtube") {
+        title = "YouTube Quiz";
       }
 
       // 2. Create Quiz via Service
       const quiz = await QuizService.createQuiz(
         user.id,
         title,
-        activeTab === "file" ? "file" : "text",
-        filePath || "direct_text",
+        activeTab,
+        filePath || textContent || webpageUrl || youtubeUrl || "unknown",
         values,
       );
 
-      return { quiz, filePath, textContent };
+      return { quiz, filePath, textContent, youtubeUrl, webpageUrl };
     },
-    onSuccess: async ({ quiz, filePath, textContent }, values) => {
+    onSuccess: async (
+      { quiz, filePath, textContent, youtubeUrl, webpageUrl },
+      values,
+    ) => {
       // Invalidate list so it updates immediately
       queryClient.invalidateQueries({ queryKey: ["quizzes"] });
 
@@ -169,17 +187,24 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
 
       // 4. Trigger AI Service
       try {
-        await AIService.generateContent(filePath, textContent, quiz.id, {
-          difficulty: (values.difficulty.charAt(0).toUpperCase() +
-            values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
-          numberOfQuestions: parseInt(values.numberOfQuestions, 10),
-          questionType: values.questionType,
-          language: values.language,
-          mode: values.mode,
-          parsingMode: values.parsingMode,
-          task: values.task,
-          customInstructions: values.customInstructions,
-        });
+        await AIService.generateContent(
+          filePath,
+          textContent,
+          youtubeUrl,
+          webpageUrl,
+          quiz.id,
+          {
+            difficulty: (values.difficulty.charAt(0).toUpperCase() +
+              values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
+            numberOfQuestions: parseInt(values.numberOfQuestions, 10),
+            questionTypes: values.questionTypes,
+            language: values.language,
+            mode: values.mode,
+            parsingMode: values.parsingMode,
+            task: values.task,
+            customInstructions: values.customInstructions,
+          },
+        );
       } catch (error) {
         console.error("AI Generation trigger failed", error);
         toast.error("Failed to start AI generation");
@@ -201,6 +226,14 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
     }
     if (activeTab === "text" && !textInput.trim()) {
       toast.error("Please enter some text.");
+      return;
+    }
+    if (activeTab === "link" && !linkInput.trim()) {
+      toast.error("Please enter a URL.");
+      return;
+    }
+    if (activeTab === "youtube" && !youtubeInput.trim()) {
+      toast.error("Please enter a YouTube URL.");
       return;
     }
 
@@ -247,7 +280,6 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
               </TabsTrigger>
               <TabsTrigger
                 value="link"
-                disabled
                 className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <LinkIcon className="mr-2 h-4 w-4" /> Link
@@ -269,21 +301,18 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
               </TabsTrigger>
               <TabsTrigger
                 value="media"
-                disabled
                 className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <ImageIcon className="mr-2 h-4 w-4" /> Media
               </TabsTrigger>
               <TabsTrigger
                 value="image"
-                disabled
                 className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <ImageIcon className="mr-2 h-4 w-4" /> Image
               </TabsTrigger>
               <TabsTrigger
                 value="youtube"
-                disabled
                 className="h-11 rounded-md border border-input bg-background data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <Youtube className="mr-2 h-4 w-4" /> YouTube
@@ -316,6 +345,86 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
                     value={textInput}
                     onChange={(e) => setTextInput(e.target.value)}
                   />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="link">
+              <Card className="min-h-[320px] border-2 border-border border-dashed bg-secondary/50 shadow-none">
+                <CardHeader>
+                  <CardTitle>Enter Webpage URL</CardTitle>
+                </CardHeader>
+                <CardContent className="border-none">
+                  <Textarea
+                    placeholder="e.g. https://en.wikipedia.org/wiki/Artificial_intelligence"
+                    className="min-h-[100px] resize-none border-none bg-transparent focus-visible:ring-0"
+                    value={linkInput}
+                    onChange={(e) => setLinkInput(e.target.value)}
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="youtube">
+              <Card className="min-h-[320px] border-2 border-border border-dashed bg-secondary/50 shadow-none">
+                <CardHeader>
+                  <CardTitle>Enter YouTube URL</CardTitle>
+                </CardHeader>
+                <CardContent className="border-none">
+                  <Textarea
+                    placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    className="min-h-[100px] resize-none border-none bg-transparent focus-visible:ring-0"
+                    value={youtubeInput}
+                    onChange={(e) => setYoutubeInput(e.target.value)}
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="image" className="space-y-4">
+              <Card className="min-h-[320px] border-2 border-border border-dashed bg-secondary/50 shadow-none">
+                <CardHeader>
+                  <CardTitle>Upload Image</CardTitle>
+                </CardHeader>
+                <CardContent className="flex h-full flex-col items-center justify-center p-6">
+                  {files.length === 0 ? (
+                    <FileUpload
+                      accept={{
+                        "image/png": [".png"],
+                        "image/jpeg": [".jpg", ".jpeg"],
+                        "image/webp": [".webp"],
+                        "image/heic": [".heic"],
+                      }}
+                      onFilesSelected={(newFiles) => setFiles(newFiles)}
+                    />
+                  ) : (
+                    <SelectedFileList files={files} onRemove={removeFile} />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="media" className="space-y-4">
+              <Card className="min-h-[320px] border-2 border-border border-dashed bg-secondary/50 shadow-none">
+                <CardHeader>
+                  <CardTitle>Upload Audio/Video</CardTitle>
+                </CardHeader>
+                <CardContent className="flex h-full flex-col items-center justify-center p-6">
+                  {files.length === 0 ? (
+                    <FileUpload
+                      accept={{
+                        "audio/mpeg": [".mp3"],
+                        "audio/wav": [".wav"],
+                        "audio/m4a": [".m4a"],
+                        "video/mp4": [".mp4"],
+                        "video/mpeg": [".mpeg"],
+                        "video/webm": [".webm"],
+                      }}
+                      onFilesSelected={(newFiles) => setFiles(newFiles)}
+                    />
+                  ) : (
+                    <SelectedFileList files={files} onRemove={removeFile} />
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

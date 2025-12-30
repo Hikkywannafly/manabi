@@ -1,3 +1,5 @@
+"use client";
+
 import type { UseFormReturn } from "react-hook-form";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -6,6 +8,8 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
+import { LanguageCombobox } from "@/components/ui/language-combobox";
+import { QuestionTypeMultiSelect } from "@/components/ui/question-type-select";
 import {
   Select,
   SelectContent,
@@ -50,59 +54,36 @@ export function QuizSettingsSidebar({ form }: QuizSettingsSidebarProps) {
             )}
           />
 
-          {/* Language */}
+          {/* Language - Searchable Combobox */}
           <FormField
             control={form.control}
             name="language"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Language of the quiz</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full bg-secondary">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="english">English</SelectItem>
-                    <SelectItem value="vietnamese">Vietnamese</SelectItem>
-                    <SelectItem value="japanese">Japanese</SelectItem>
-                    <SelectItem value="auto">Auto Detect</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <LanguageCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
               </FormItem>
             )}
           />
 
-          {/* Question Type */}
+          {/* Question Type - Multi-select */}
           <FormField
             control={form.control}
-            name="questionType"
+            name="questionTypes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Question Type</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full bg-secondary">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="mixed">Mixed</SelectItem>
-                    <SelectItem value="multiple_choice">
-                      Multiple Choice
-                    </SelectItem>
-                    <SelectItem value="true_false">True/False</SelectItem>
-                    <SelectItem value="fill_in_blank">Fill in Blank</SelectItem>
-                    <SelectItem value="short_answer">Short Answer</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormLabel>Question Types</FormLabel>
+                <FormControl>
+                  <QuestionTypeMultiSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
               </FormItem>
             )}
           />

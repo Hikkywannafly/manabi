@@ -6,6 +6,7 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
+import { LanguageCombobox } from "@/components/ui/language-combobox";
 import {
   Select,
   SelectContent,
@@ -60,24 +61,12 @@ export function FlashcardSettingsSidebar({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Language of the flashcards</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full bg-secondary">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="english">English</SelectItem>
-                    <SelectItem value="vietnamese">Vietnamese</SelectItem>
-                    <SelectItem value="spanish">Spanish</SelectItem>
-                    <SelectItem value="french">French</SelectItem>
-                    <SelectItem value="german">German</SelectItem>
-                    <SelectItem value="auto">Auto Detect</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <LanguageCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
               </FormItem>
             )}
           />

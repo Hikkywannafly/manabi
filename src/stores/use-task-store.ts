@@ -40,15 +40,23 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         id: tempId,
         user_id: "temp",
         title,
-        status: "todo",
+        status: "TODO",
         estimated_pomodoros: estimatedPomodoros,
         actual_pomodoros: 0,
+        position_order: 0,
+        priority: "medium",
         created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
 
       set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
 
-      const newTask = await taskService.createTask(title, estimatedPomodoros);
+      const newTask = await taskService.createTask(
+        title,
+        undefined,
+        "TODO",
+        estimatedPomodoros,
+      );
 
       // Replace optimistic task with real one
       set((state) => ({

@@ -1,20 +1,21 @@
+"use client";
+
 import { type UniqueIdentifier, useDndContext } from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { IconGripVertical } from "@tabler/icons-react";
 import { cva } from "class-variance-authority";
 import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import type { Task } from "../utils/store";
-import { ColumnActions } from "./column-action";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import type { Task } from "@/services/task-service";
 import { TaskCard } from "./task-card";
 
 export interface Column {
   id: UniqueIdentifier;
   title: string;
 }
+
+export type ColumnId = UniqueIdentifier;
 
 export type ColumnType = "Column";
 
@@ -34,14 +35,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     return tasks.map((task) => task.id);
   }, [tasks]);
 
-  const {
-    setNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { setNodeRef, transform, transition, isDragging } = useSortable({
     id: column.id,
     data: {
       type: "Column",
@@ -57,18 +51,15 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     transform: CSS.Translate.toString(transform),
   };
 
-  const variants = cva(
-    "flex h-[75vh] max-h-[75vh] w-[350px] max-w-full shrink-0 snap-center flex-col bg-secondary",
-    {
-      variants: {
-        dragging: {
-          default: "border-2 border-transparent",
-          over: "opacity-30 ring-2",
-          overlay: "ring-2 ring-primary",
-        },
+  const variants = cva("flex h-full w-full flex-col rounded-lg bg-secondary", {
+    variants: {
+      dragging: {
+        default: "border-2 border-transparent",
+        over: "opacity-30 ring-2",
+        overlay: "ring-2 ring-primary",
       },
     },
-  );
+  });
 
   return (
     <Card
@@ -78,26 +69,18 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
         dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
       })}
     >
-      <CardHeader className="space-between flex flex-row items-center border-b-2 p-4 text-left font-semibold">
-        <Button
-          variant={"ghost"}
-          {...attributes}
-          {...listeners}
-          className="-ml-2 relative h-auto cursor-grab p-1 text-primary/50"
-        >
-          <span className="sr-only">{`Move column: ${column.title}`}</span>
-          <IconGripVertical />
-        </Button>
-        <span className="mr-auto ml-2"> {column.title}</span>
-        <ColumnActions id={column.id} title={column.title} />
+      <CardHeader className="flex shrink-0 flex-row items-center border-b-2 p-4 text-left font-semibold">
+        <span className="text-lg">{column.title}</span>
       </CardHeader>
-      <CardContent className="flex grow flex-col gap-4 overflow-x-hidden p-2">
-        <ScrollArea className="h-full">
-          <SortableContext items={tasksIds}>
-            {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
-            ))}
-          </SortableContext>
+      <CardContent className="flex grow flex-col overflow-hidden p-0">
+        <ScrollArea className="h-full w-full px-3 py-2">
+          <div className="min-h-[100px] space-y-2 pr-3">
+            <SortableContext items={tasksIds}>
+              {tasks.map((task) => (
+                <TaskCard key={task.id} task={task} />
+              ))}
+            </SortableContext>
+          </div>
         </ScrollArea>
       </CardContent>
     </Card>
@@ -107,27 +90,22 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
 export function BoardContainer({ children }: { children: React.ReactNode }) {
   const dndContext = useDndContext();
 
-  const variations = cva("flex px-2 pb-4 md:px-0 lg:justify-start", {
+  const containerVariants = cva("grid h-full w-full grid-rows-1 gap-4 p-4", {
     variants: {
       dragging: {
-        default: "",
-        active: "snap-none",
+        default: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+        active: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
       },
     },
   });
 
   return (
-    <ScrollArea className="w-full whitespace-nowrap rounded-md">
-      <div
-        className={variations({
-          dragging: dndContext.active ? "active" : "default",
-        })}
-      >
-        <div className="flex flex-row items-start justify-center gap-4">
-          {children}
-        </div>
-      </div>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+    <div
+      className={containerVariants({
+        dragging: dndContext.active ? "active" : "default",
+      })}
+    >
+      {children}
+    </div>
   );
 }

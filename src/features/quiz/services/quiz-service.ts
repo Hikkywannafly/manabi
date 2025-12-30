@@ -53,7 +53,7 @@ export const QuizService = {
   async createQuiz(
     user_id: string,
     title: string,
-    sourceType: "file" | "text",
+    sourceType: string,
     sourceContent: string,
     values: QuizCreationValues,
   ) {

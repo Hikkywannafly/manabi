@@ -13,7 +13,7 @@ export const FlashcardService = {
   async createDeck(
     userId: string,
     title: string,
-    sourceType: "file" | "text",
+    sourceType: string,
     sourceContent: string,
     generationParams: FlashcardGenerationParams,
   ): Promise<Deck> {

@@ -69,7 +69,11 @@ export function FileUpload({
             {isDragActive ? "Drop the files here" : "Drop or select files"}
           </p>
           <p className="text-muted-foreground text-xs">
-            Currently supported: PDF, DOCX, TXT
+            Currently supported:{" "}
+            {Object.values(accept)
+              .flat()
+              .map((ext) => ext.replace(".", "").toUpperCase())
+              .join(", ")}
             <br />
             Up to {maxFiles} files, {Math.round(maxSize / 1024 / 1024)}MB total
           </p>

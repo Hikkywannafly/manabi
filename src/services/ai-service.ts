@@ -35,6 +35,8 @@ export const AIService = {
   async generateContent(
     filePath: string | undefined,
     textContent: string | undefined,
+    youtubeUrl: string | undefined,
+    webpageUrl: string | undefined,
     quizId: string,
     params: GenerationParams,
   ) {
@@ -45,6 +47,8 @@ export const AIService = {
           action: "generate_quiz",
           filePath,
           textContent,
+          youtubeUrl,
+          webpageUrl,
           quizId,
           generationParams: params,
         },
@@ -61,6 +65,8 @@ export const AIService = {
   async generateFlashcards(
     filePath: string | undefined,
     textContent: string | undefined,
+    youtubeUrl: string | undefined,
+    webpageUrl: string | undefined,
     deckId: string,
     params: FlashcardGenerationParams,
   ) {
@@ -70,6 +76,8 @@ export const AIService = {
         body: {
           filePath,
           textContent,
+          youtubeUrl,
+          webpageUrl,
           deckId,
           generationParams: params,
         },

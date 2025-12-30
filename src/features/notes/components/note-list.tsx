@@ -1,14 +1,13 @@
 "use client";
 
 import { Plus, Search, StickyNote } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRouter } from "@/i18n/routing";
 import { useNotes } from "../hooks/use-notes";
 import { NoteCard } from "./note-card";
-import { NoteEditor } from "./note-editor";
 
 export function NoteList() {
   const router = useRouter();
@@ -128,9 +127,6 @@ export function NoteList() {
           ))}
         </div>
       )}
-
-      {/* Editor Dialog */}
-      <NoteEditor />
     </div>
   );
 }

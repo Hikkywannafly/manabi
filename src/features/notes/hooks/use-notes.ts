@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { useAuth } from "@/contexts/auth-provider";
 import {
   type CreateNoteInput,
@@ -102,14 +103,19 @@ export function useNotes() {
     },
   });
 
+  const updateNote = useCallback(
+    async (id: string, updates: UpdateNoteInput) => {
+      await updateNoteMutation.mutateAsync({ id, updates });
+    },
+    [updateNoteMutation],
+  );
+
   return {
     notes,
     isLoading,
     error,
     createNote: createNoteMutation.mutateAsync,
-    updateNote: async (id: string, updates: UpdateNoteInput) => {
-      await updateNoteMutation.mutateAsync({ id, updates });
-    },
+    updateNote,
     deleteNote: deleteNoteMutation.mutateAsync,
     togglePin: (id: string, isPinned: boolean) =>
       togglePinMutation.mutateAsync({ id, isPinned }),

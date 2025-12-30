@@ -88,15 +88,18 @@ class QuestionOption(BaseModel):
 
 class ExplainContextRequest(BaseModel):
     """Context for explanation request"""
-    content_type: Literal["quiz", "flashcard"]
-    question_text: str
+    content_type: Literal["quiz", "flashcard"] = Field(..., alias="contentType")
+    question_text: str = Field(..., alias="questionText")
     options: Optional[list[QuestionOption]] = None
-    correct_answer: str
-    user_answer: Optional[str] = None
-    is_correct: Optional[bool] = None
+    correct_answer: str = Field(..., alias="correctAnswer")
+    user_answer: Optional[str] = Field(None, alias="userAnswer")
+    is_correct: Optional[bool] = Field(None, alias="isCorrect")
     # For flashcards
     front: Optional[str] = None
     back: Optional[str] = None
+
+    class Config:
+        populate_by_name = True
 
 
 class ExplainMessageRequest(BaseModel):

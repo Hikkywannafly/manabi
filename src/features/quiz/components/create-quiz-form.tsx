@@ -49,8 +49,8 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
     resolver: zodResolver(quizCreationSchema),
     defaultValues: {
       visibility: "private",
-      language: "english",
-      questionType: "mixed",
+      language: "auto",
+      questionTypes: ["mixed"],
       numberOfQuestions: "5",
       mode: "quiz",
       difficulty: "medium",
@@ -173,7 +173,7 @@ export function CreateQuizForm({ onGeneratingChange }: CreateQuizFormProps) {
           difficulty: (values.difficulty.charAt(0).toUpperCase() +
             values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
           numberOfQuestions: parseInt(values.numberOfQuestions, 10),
-          questionType: values.questionType,
+          questionTypes: values.questionTypes,
           language: values.language,
           mode: values.mode,
           parsingMode: values.parsingMode,

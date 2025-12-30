@@ -5,7 +5,7 @@ const supabase = createClient();
 export type GenerationParams = {
   difficulty: "Easy" | "Medium" | "Hard";
   numberOfQuestions: number;
-  questionType: string;
+  questionTypes: string[];
   language: string;
   mode: "quiz" | "exam";
   parsingMode: "fast" | "balanced" | "premium";

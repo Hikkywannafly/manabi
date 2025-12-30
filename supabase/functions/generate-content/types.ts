@@ -9,12 +9,13 @@
 export interface GenerationParams {
   difficulty?: "Easy" | "Medium" | "Hard";
   numberOfQuestions?: number;
-  questionType?:
-    | "Mixed"
-    | "Multiple Choice"
-    | "True/False"
-    | "Fill in the Blank"
-    | "Short Answer";
+  questionTypes?: (
+    | "mixed"
+    | "multiple_choice"
+    | "true_false"
+    | "fill_in_blank"
+    | "short_answer"
+  )[];
   language?: string; // e.g. "English", "Vietnamese", "Japanese" or "auto"
   mode?: "quiz" | "exam";
   parsingMode?: "fast" | "balanced" | "premium";

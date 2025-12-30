@@ -55,7 +55,7 @@ export function CreateFlashcardForm({
     resolver: zodResolver(flashcardCreationSchema),
     defaultValues: {
       visibility: "private",
-      language: "english",
+      language: "auto",
       numberOfCards: "5-10",
       difficulty: "medium",
       parsingMode: "fast",

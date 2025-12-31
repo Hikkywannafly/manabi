@@ -1,3 +1,5 @@
+"use client";
+
 import { Activity, Award, Book } from "lucide-react";
 import {
   Card,

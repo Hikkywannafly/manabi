@@ -17,6 +17,7 @@ interface FlashcardNavigationProps {
   onPrevious: () => void;
   onNext: () => void;
   onFinish?: () => void;
+  onAskAI?: () => void;
 }
 
 export function FlashcardNavigation({
@@ -25,6 +26,7 @@ export function FlashcardNavigation({
   onPrevious,
   onNext,
   onFinish,
+  onAskAI,
 }: FlashcardNavigationProps) {
   const hasNext = currentIndex < totalCards - 1;
   const hasPrevious = currentIndex > 0;
@@ -54,14 +56,17 @@ export function FlashcardNavigation({
             <Share className="mr-2" />
             Share
           </Button>
-          <Button
-            className={cn(
-              "flex h-10 shrink-0 items-center rounded-2xl px-4 py-2 text-white",
-            )}
-          >
-            <WandSparkles className="mr-2" size={16} />
-            Ask Manabi for explanation
-          </Button>
+          {onAskAI && (
+            <Button
+              className={cn(
+                "ml-2 flex h-10 shrink-0 items-center rounded-2xl px-4 py-2 text-white",
+              )}
+              onClick={onAskAI}
+            >
+              <WandSparkles className="mr-2" size={16} />
+              Ask Manabi for explanation
+            </Button>
+          )}
         </div>
         {/* Right Section: Navigation */}
         <div className="flex w-full items-center justify-end gap-2 md:w-2/5">

@@ -2,6 +2,7 @@
 
 import { ChevronRight, Loader2, Send } from "lucide-react";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -92,9 +93,9 @@ export function AIExplanationPanel({
                       : "ml-8 bg-primary text-primary-foreground",
                   )}
                 >
-                  <p className="whitespace-pre-wrap text-sm">
-                    {message.content}
-                  </p>
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
                 </div>
               ))}
 

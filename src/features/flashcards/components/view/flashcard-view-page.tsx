@@ -4,6 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { MoreVertical, Shuffle, SlidersHorizontal } from "lucide-react";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type AIExplanationContext,
+  AIExplanationPanel,
+} from "@/components/ai-explanation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -44,6 +48,9 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
   const [viewedCards, setViewedCards] = useState<Set<string>>(new Set());
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [sessionDuration, setSessionDuration] = useState(0);
+
+  // AI Explanation Panel state
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
 
   // Use ref to track if we've initialized to prevent re-initialization
   const isInitialized = useRef(false);
@@ -98,6 +105,20 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
       }
     }
   }, [currentIndex]);
+
+  // Build AI explanation context for current card
+  const aiExplanationContext = useMemo((): AIExplanationContext | null => {
+    const currentCard = cards?.[currentIndex];
+    if (!currentCard) return null;
+
+    return {
+      contentType: "flashcard",
+      questionText: currentCard.front,
+      front: currentCard.front,
+      back: currentCard.back,
+      correctAnswer: currentCard.back,
+    };
+  }, [cards, currentIndex]);
 
   const handleShuffle = () => {
     if (!originalCards) return;
@@ -321,8 +342,16 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
             setCurrentIndex((prev) => Math.min(cards.length - 1, prev + 1))
           }
           onFinish={handleFinish}
+          onAskAI={() => setIsAIPanelOpen(true)}
         />
       </div>
+
+      {/* AI Explanation Panel */}
+      <AIExplanationPanel
+        isOpen={isAIPanelOpen}
+        onClose={() => setIsAIPanelOpen(false)}
+        context={aiExplanationContext}
+      />
     </div>
   );
 }

@@ -78,22 +78,56 @@ export const achievementService = {
       .eq("owner_id", userId);
 
     // Stats: Created Decks
-    const { count: createdDecksCount } = await supabase
+    const { count: createdDecksCount, error: deckError } = await supabase
       .from("decks")
       .select("*", { count: "exact", head: true })
       .eq("owner_id", userId);
 
+    if (deckError) {
+      console.error("Failed to fetch deck count:", deckError);
+    }
+
     // Stats: Total Flashcards Created
-    const { data: userDecks } = await supabase
+    const { data: userDecks, error: userDecksError } = await supabase
       .from("decks")
       .select("id")
       .eq("owner_id", userId);
 
+    if (userDecksError) {
+      console.error("Failed to fetch user decks:", userDecksError);
+    }
+
     const deckIds = (userDecks || []).map((d) => d.id);
-    const { count: flashcardsCount } = await supabase
+    const { count: flashcardsCount, error: flashcardsError } = await supabase
       .from("flashcards")
       .select("*", { count: "exact", head: true })
       .in("deck_id", deckIds.length > 0 ? deckIds : [""]);
+
+    if (flashcardsError) {
+      console.error("Failed to fetch flashcard count:", flashcardsError);
+    }
+
+    // Stats: Flashcard Reviews
+    const { count: flashcardReviewCount } = await supabase
+      .from("flashcard_reviews")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId);
+
+    // Stats: Pomodoro Sessions
+    const { count: pomodoroCount } = await supabase
+      .from("pomodoro_sessions")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId);
+
+    // Stats: Total Study Minutes (sum of pomodoro durations)
+    const { data: pomodoroSessions } = await supabase
+      .from("pomodoro_sessions")
+      .select("duration_minutes")
+      .eq("user_id", userId);
+    const totalStudyMinutes = (pomodoroSessions || []).reduce(
+      (sum, session) => sum + (session.duration_minutes || 0),
+      0,
+    );
 
     // Stats: Study Minutes & Streaks (From profiles or aggregated)
     // For now assuming these columns exist on profiles from migration
@@ -141,6 +175,30 @@ export const achievementService = {
         case "FLASHCARD_CREATOR_100":
         case "FLASHCARD_CREATOR_500":
           currentSteps = flashcardsCount || 0;
+          break;
+
+        // Study - Flashcard Reviews
+        case "FLASHCARD_STUDENT":
+          currentSteps = flashcardReviewCount || 0;
+          break;
+
+        // Study - Pomodoro
+        case "POMODORO_MASTER":
+          currentSteps = pomodoroCount || 0;
+          break;
+
+        // Study - Total Minutes
+        case "STUDY_MARATHON":
+          currentSteps = totalStudyMinutes || 0;
+          break;
+
+        // Time-based achievements (EARLY_BIRD, NIGHT_OWL, PLAN_MASTER)
+        // These require more complex tracking - to be implemented later
+        case "EARLY_BIRD":
+        case "NIGHT_OWL":
+        case "PLAN_MASTER":
+          // TODO: Implement time-based and plan-based tracking
+          currentSteps = 0;
           break;
 
         // Default Logic

@@ -248,4 +248,91 @@ export const QuizService = {
       attempts: attempts || [],
     };
   },
+
+  async updateQuiz(
+    quizId: string,
+    data: { title?: string; questions?: QuizQuestion[] },
+  ) {
+    const supabase = createClient();
+
+    // Update quiz title if provided
+    if (data.title !== undefined) {
+      const { error: titleError } = await supabase
+        .from("quizzes")
+        .update({ title: data.title })
+        .eq("id", quizId);
+
+      if (titleError) throw titleError;
+    }
+
+    // Update questions if provided
+    if (data.questions) {
+      // 1. Get all CURRENT server-side IDs for this quiz (Snapshot before changes)
+      // We do this to identify which questions should be deleted later.
+      const { data: serverQuestions, error: fetchError } = await supabase
+        .from("quiz_questions")
+        .select("id")
+        .eq("quiz_id", quizId);
+
+      if (fetchError) throw fetchError;
+
+      // 2. Prepare questions for Upsert (Insert/Update)
+      const questionsToUpsert = data.questions.map((q) => ({
+        // If it's a temp ID, let database generate a new UUID by omitting 'id'
+        ...(q.id.startsWith("temp-") ? {} : { id: q.id }),
+        quiz_id: quizId,
+        question_text: q.question_text,
+        options: q.options,
+        correct_answer: q.correct_answer,
+        order_index: q.order_index,
+        question_type: q.question_type || "multiple_choice",
+      }));
+
+      // 3. Perform Upsert
+      // This will Insert new questions (no ID) and Update existing ones (with ID)
+      const { error: upsertError } = await supabase
+        .from("quiz_questions")
+        .upsert(questionsToUpsert, { onConflict: "id" });
+
+      if (upsertError) throw upsertError;
+
+      // 4. Handle Deletions
+      if (serverQuestions) {
+        // IDs that are intended to be kept (present in the UI)
+        const uiIds = new Set(
+          data.questions
+            .filter((q) => !q.id.startsWith("temp-"))
+            .map((q) => q.id),
+        );
+
+        // IDs that were in the DB but are NOT in the UI -> Delete them
+        // We only check against serverQuestions (snapshot), so we don't accidentally delete
+        // newly inserted questions that we don't have IDs for yet.
+        const idsToDelete = serverQuestions
+          .map((q) => q.id)
+          .filter((id) => !uiIds.has(id));
+
+        if (idsToDelete.length > 0) {
+          // Use .in() which is safer/cleaner than .not.in() with large lists
+          const { error: deleteError } = await supabase
+            .from("quiz_questions")
+            .delete()
+            .in("id", idsToDelete);
+
+          if (deleteError) throw deleteError;
+        }
+      }
+    }
+  },
+
+  async deleteQuiz(quizId: string) {
+    const supabase = createClient();
+
+    // Delete quiz (cascade will handle questions and attempts)
+    const { error } = await supabase.from("quizzes").delete().eq("id", quizId);
+
+    if (error) {
+      throw error;
+    }
+  },
 };

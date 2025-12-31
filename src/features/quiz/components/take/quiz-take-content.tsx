@@ -379,6 +379,7 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
         </div>
         <div className="flex-shrink-0">
           <QuizNavigation
+            quizId={quiz.id}
             currentQuestion={0}
             totalQuestions={1}
             answers={[]}
@@ -420,6 +421,7 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
       </div>
       <div className="flex-shrink-0">
         <QuizNavigation
+          quizId={quiz.id}
           currentQuestion={currentQuestionIndex}
           totalQuestions={questions.length}
           answers={answers}

@@ -3,6 +3,7 @@
 import {
   ArrowLeft,
   ArrowRight,
+  Check,
   Settings,
   Share,
   WandSparkles,
@@ -15,6 +16,7 @@ interface FlashcardNavigationProps {
   totalCards: number;
   onPrevious: () => void;
   onNext: () => void;
+  onFinish?: () => void;
 }
 
 export function FlashcardNavigation({
@@ -22,9 +24,11 @@ export function FlashcardNavigation({
   totalCards,
   onPrevious,
   onNext,
+  onFinish,
 }: FlashcardNavigationProps) {
   const hasNext = currentIndex < totalCards - 1;
   const hasPrevious = currentIndex > 0;
+  const isLastCard = currentIndex === totalCards - 1;
 
   return (
     <div
@@ -34,14 +38,6 @@ export function FlashcardNavigation({
     >
       <div className="flex w-full max-w-6xl flex-wrap justify-between gap-4 md:flex-nowrap md:gap-8">
         {/* Left Section: Settings / Actions */}
-        {/* <div className="flex grow items-center gap-2 md:w-3/5">
-          <Button variant="ghost" className="rounded-2xl">
-            <Settings className="size-4" />
-          </Button>
-          <Button variant="ghost" className="rounded-2xl">
-            <MessageSquare className="size-4" />
-          </Button>
-        </div> */}
         <div className="flex grow items-center md:w-3/5">
           <Button
             variant="outline"
@@ -80,15 +76,26 @@ export function FlashcardNavigation({
             Previous
           </Button>
 
-          <Button
-            size="sm"
-            onClick={onNext}
-            disabled={!hasNext}
-            className="flex shrink-0 items-center rounded-2xl px-3"
-          >
-            Next
-            <ArrowRight className="ml-2 size-4" />
-          </Button>
+          {isLastCard && onFinish ? (
+            <Button
+              size="sm"
+              onClick={onFinish}
+              className="flex shrink-0 items-center rounded-2xl px-3"
+            >
+              Finish
+              <Check className="ml-2 size-4" />
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={onNext}
+              disabled={!hasNext}
+              className="flex shrink-0 items-center rounded-2xl px-3"
+            >
+              Next
+              <ArrowRight className="ml-2 size-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

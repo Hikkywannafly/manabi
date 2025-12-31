@@ -1,8 +1,13 @@
 "use client";
 
-import { FileDown } from "lucide-react";
+import { FileDown, Shuffle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { QuizTakeMode } from "../../types";
 
 interface QuizHeaderProps {
@@ -10,6 +15,7 @@ interface QuizHeaderProps {
   currentQuestion: number;
   totalQuestions: number;
   mode?: QuizTakeMode;
+  onShuffle?: () => void;
 }
 
 export function QuizHeader({
@@ -17,6 +23,7 @@ export function QuizHeader({
   currentQuestion,
   totalQuestions,
   mode: _mode = "test",
+  onShuffle,
 }: QuizHeaderProps) {
   const router = useRouter();
 
@@ -56,6 +63,23 @@ export function QuizHeader({
           {currentQuestion + 1} / {totalQuestions}
         </div>
         <div className="flex gap-2">
+          {onShuffle && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="size-10 rounded-2xl"
+                  onClick={onShuffle}
+                >
+                  <Shuffle className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Randomize questions</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
           <Button
             className="inline-flex size-10 shrink-0 select-none items-center justify-center rounded-2xl border border-input font-medium text-sm ring-offset-background transition hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleExitQuiz}

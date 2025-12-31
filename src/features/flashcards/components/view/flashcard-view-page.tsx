@@ -57,9 +57,12 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
     }
   }, [originalCards]);
 
-  // Update session duration every second
+  // Check if all cards have been viewed
+  const isFinished = originalCards && viewedCards.size === originalCards.length;
+
+  // Update session duration every second (stop when finished)
   useEffect(() => {
-    if (!startTime) return;
+    if (!startTime || isFinished) return;
 
     const interval = setInterval(() => {
       const now = new Date();
@@ -68,7 +71,7 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [startTime]);
+  }, [startTime, isFinished]);
 
   // Get ordered cards - memoize to prevent recreation on every render
   const cards = useMemo(
@@ -96,9 +99,6 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
     }
   }, [currentIndex]);
 
-  // Check if all cards have been viewed
-  const isFinished = originalCards && viewedCards.size === originalCards.length;
-
   const handleShuffle = () => {
     if (!originalCards) return;
     const shuffled = [...cardOrder];
@@ -120,6 +120,14 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
     setStartTime(new Date());
     setSessionDuration(0);
   }, []);
+
+  const handleFinish = useCallback(() => {
+    // Manually trigger finish - mark all cards as viewed
+    if (originalCards) {
+      const allCardIds = new Set(originalCards.map((card) => card.id));
+      setViewedCards(allCardIds);
+    }
+  }, [originalCards]);
 
   const isLoading = isDeckLoading || isCardsLoading;
 
@@ -165,6 +173,7 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
         onRestart={handleRestart}
         sessionDuration={sessionDuration}
         deckId={deckId}
+        deckSlug={deck?.slug || "view"}
       />
     );
   }
@@ -311,6 +320,7 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
           onNext={() =>
             setCurrentIndex((prev) => Math.min(cards.length - 1, prev + 1))
           }
+          onFinish={handleFinish}
         />
       </div>
     </div>

@@ -18,6 +18,7 @@ interface FlashcardViewSummaryProps {
   onRestart: () => void;
   sessionDuration: number;
   deckId: string;
+  deckSlug: string;
 }
 
 export function FlashcardViewSummary({
@@ -26,6 +27,7 @@ export function FlashcardViewSummary({
   onRestart,
   sessionDuration,
   deckId,
+  deckSlug,
 }: FlashcardViewSummaryProps) {
   // Calculate Stats
   const stats = {
@@ -43,12 +45,12 @@ export function FlashcardViewSummary({
   };
 
   return (
-    <div className="py-4">
+    <div className="mx-auto max-w-4xl space-y-8 px-4 pb-32 sm:px-6 lg:px-8">
       {/* Header */}
-      <h2 className="mb-8 font-semibold text-2xl">Viewing Complete!</h2>
+      <h2 className="font-semibold text-2xl">Viewing Complete!</h2>
 
       {/* Stats Grid */}
-      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Cards Viewed */}
         <Card className="border-none bg-secondary/50 shadow-none">
           <CardHeader className="p-6 pb-2">
@@ -141,13 +143,13 @@ export function FlashcardViewSummary({
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-8 flex justify-center gap-4">
+      <div className="flex flex-wrap justify-center gap-4">
         <Link href="/dashboard/flashcards">
           <Button variant="outline" className="h-10 rounded-2xl px-6 py-2">
             Back to Decks
           </Button>
         </Link>
-        <Link href={`/dashboard/flashcards/${deckId}`}>
+        <Link href={`/dashboard/flashcards/${deckId}/${deckSlug}`}>
           <Button variant="outline" className="h-10 rounded-2xl px-6 py-2">
             View Deck
           </Button>

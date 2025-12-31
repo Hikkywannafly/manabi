@@ -168,6 +168,10 @@ export function CreateFlashcardForm({
       // Invalidate list
       queryClient.invalidateQueries({ queryKey: ["decks"] });
 
+      // IMPORTANT: Check achievements immediately after deck creation
+      // This ensures achievements unlock even if AI generation has issues
+      checkAchievements();
+
       // 3. Subscribe to Progress
       if (subscriptionRef.current) {
         subscriptionRef.current();

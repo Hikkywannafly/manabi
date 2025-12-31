@@ -3,18 +3,41 @@
 import {
   ArrowLeft,
   ArrowRight,
+  Edit,
   RefreshCw,
   RotateCcw,
   Settings,
   Share,
+  Trash,
   WandSparkles,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import type { QuizAnswer, QuizTakeMode } from "../../types";
 
 interface QuizNavigationProps {
+  quizId: string;
   currentQuestion: number;
   totalQuestions: number;
   answers: QuizAnswer[];
@@ -31,6 +54,7 @@ interface QuizNavigationProps {
 }
 
 export function QuizNavigation({
+  quizId,
   currentQuestion,
   totalQuestions,
   answers: _answers,
@@ -45,6 +69,9 @@ export function QuizNavigation({
   onRetry,
   onAskAI,
 }: QuizNavigationProps) {
+  const router = useRouter();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
   const hasNextQuestion = currentQuestion < totalQuestions - 1;
   const hasPreviousQuestion = currentQuestion > 0;
 
@@ -61,6 +88,30 @@ export function QuizNavigation({
       ? "bg-green-600 text-white hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-700"
       : "bg-red-600 text-white hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-700"
     : "bg-muted text-primary-foreground hover:bg-primary/90";
+
+  const handleEditQuiz = () => {
+    router.push(`/dashboard/quiz/${quizId}/edit`);
+  };
+
+  const handleShareQuiz = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    toast.success("Link copied to clipboard!");
+  };
+
+  const handleDeleteQuiz = async () => {
+    try {
+      const { QuizService } = await import("../../services/quiz-service");
+      await QuizService.deleteQuiz(quizId);
+      toast.success("Quiz deleted successfully");
+      router.push("/dashboard/quiz");
+    } catch (error) {
+      console.error("Error deleting quiz:", error);
+      toast.error("Failed to delete quiz");
+    } finally {
+      setShowDeleteDialog(false);
+    }
+  };
 
   return (
     <div
@@ -114,21 +165,36 @@ export function QuizNavigation({
         ) : (
           /* Settings/Share Section (EXAM mode or no feedback) */
           <div className="flex grow items-center md:w-3/5">
-            <Button
-              variant="outline"
-              className="flex-1 rounded-2xl md:flex-initial"
-              type="button"
-            >
-              <Settings className="mr-2 size-4" />
-              Settings
-            </Button>
-            <Button
-              variant="outline"
-              className="ml-2 flex-1 shrink-0 rounded-2xl md:flex-initial"
-            >
-              <Share className="mr-2" />
-              Share
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex-1 rounded-2xl md:flex-initial"
+                  type="button"
+                >
+                  <Settings className="mr-2 size-4" />
+                  Settings
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuItem onClick={handleEditQuiz}>
+                  <Edit className="mr-2 size-4" />
+                  Edit Quiz
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleShareQuiz}>
+                  <Share className="mr-2 size-4" />
+                  Share Quiz
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash className="mr-2 size-4" />
+                  Delete Quiz
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
 
@@ -216,6 +282,28 @@ export function QuizNavigation({
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Quiz?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              quiz and all associated questions and attempts.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteQuiz}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

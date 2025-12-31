@@ -1,0 +1,78 @@
+/* Tiptap Editor Styles */
+
+.tiptap {
+  cursor: text;
+  touch-action: manipulation;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tiptap:focus {
+  outline: none;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: hsl(var(--muted-foreground));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Remove default margins from tiptap paragraphs to work with prose */
+.tiptap > * {
+  margin: 0;
+}
+
+/* Fix list styling in tiptap */
+.tiptap ul,
+.tiptap ol {
+  padding: 0 1rem;
+  margin: 0.75rem 0;
+}
+
+.tiptap ul li,
+.tiptap ol li {
+  margin: 0.25rem 0;
+}
+
+/* Code blocks */
+.tiptap pre {
+  background: hsl(var(--secondary));
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  color: hsl(var(--foreground));
+  font-family: "JetBrainsMono", monospace;
+  margin: 0.75rem 0;
+}
+
+.tiptap code {
+  background: hsl(var(--secondary));
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.9em;
+}
+
+/* Blockquotes */
+.tiptap blockquote {
+  padding-left: 1rem;
+  border-left: 2px solid hsl(var(--border));
+  margin: 0.75rem 0;
+}
+
+/* Links */
+.tiptap a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tiptap a:hover {
+  opacity: 0.8;
+}
+
+/* Toolbar button active states */
+button[data-state="on"] {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}

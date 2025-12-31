@@ -27,8 +27,8 @@ export function TaskList() {
     fetchTasks();
   }, [fetchTasks]);
 
-  const todoTasks = tasks.filter((t) => t.status !== "done");
-  const doneTasks = tasks.filter((t) => t.status === "done");
+  const todoTasks = tasks.filter((t) => t.status !== "DONE");
+  const doneTasks = tasks.filter((t) => t.status === "DONE");
 
   if (isLoading && tasks.length === 0) {
     // Use a skeleton or just return null to avoid layout shift/flicker
@@ -62,7 +62,7 @@ export function TaskList() {
           {/* Checkbox */}
           <button
             type="button"
-            onClick={() => updateTaskStatus(task.id, "done")}
+            onClick={() => updateTaskStatus(task.id, "DONE")}
             className="flex size-5 items-center justify-center rounded-md border border-white/30 text-transparent transition-colors hover:border-white hover:text-white/50"
           >
             {/* Empty square */}
@@ -124,7 +124,7 @@ export function TaskList() {
               <div className="w-4" /> {/* Spacer for grip */}
               <button
                 type="button"
-                onClick={() => updateTaskStatus(task.id, "todo")}
+                onClick={() => updateTaskStatus(task.id, "TODO")}
                 className="flex size-5 items-center justify-center rounded-md border border-white/30 bg-white/10 text-white"
               >
                 <Check className="size-3" />

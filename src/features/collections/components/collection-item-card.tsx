@@ -8,13 +8,9 @@ import type { CollectionDeck, CollectionQuiz } from "../types";
 
 interface CollectionItemCardProps {
   item: (CollectionQuiz | CollectionDeck) & { type: "quiz" | "deck" };
-  collectionId: string;
 }
 
-export function CollectionItemCard({
-  item,
-  collectionId,
-}: CollectionItemCardProps) {
+export function CollectionItemCard({ item }: CollectionItemCardProps) {
   const removeItem = useRemoveItemFromCollection();
 
   const handleRemove = () => {

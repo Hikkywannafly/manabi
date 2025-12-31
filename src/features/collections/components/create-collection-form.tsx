@@ -34,7 +34,7 @@ export function CreateCollectionForm() {
   // Fetch available items
   const { data: availableItems, isLoading } = useQuery({
     queryKey: ["available-items", user?.id],
-    queryFn: () => CollectionService.getAvailableItems(user!.id),
+    queryFn: () => CollectionService.getAvailableItems(user?.id || ""),
     enabled: !!user,
   });
 

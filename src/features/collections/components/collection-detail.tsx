@@ -190,7 +190,6 @@ export function CollectionDetail({ collectionId }: CollectionDetailProps) {
                     <CollectionItemCard
                       key={`${item.type}-${item.id}`}
                       item={item}
-                      collectionId={collectionId}
                     />
                   ))}
                 </div>
@@ -221,11 +220,7 @@ export function CollectionDetail({ collectionId }: CollectionDetailProps) {
               ) : (
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredDecks.map((item) => (
-                    <CollectionItemCard
-                      key={`deck-${item.id}`}
-                      item={item}
-                      collectionId={collectionId}
-                    />
+                    <CollectionItemCard key={`deck-${item.id}`} item={item} />
                   ))}
                 </div>
               )}
@@ -255,11 +250,7 @@ export function CollectionDetail({ collectionId }: CollectionDetailProps) {
               ) : (
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredQuizzes.map((item) => (
-                    <CollectionItemCard
-                      key={`quiz-${item.id}`}
-                      item={item}
-                      collectionId={collectionId}
-                    />
+                    <CollectionItemCard key={`quiz-${item.id}`} item={item} />
                   ))}
                 </div>
               )}

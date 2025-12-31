@@ -2,7 +2,6 @@
 
 import { formatDistanceToNow } from "date-fns";
 import { Calendar, MoreVertical, Pin, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -22,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRouter } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { useNotes } from "../hooks/use-notes";
 import type { Note } from "../services/note-service";

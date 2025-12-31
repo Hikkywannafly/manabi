@@ -1,5 +1,5 @@
 import { use } from "react";
-import { FlashcardStudyMode } from "@/features/flashcards/components/study/flashcard-study-mode";
+import { FlashcardViewPage } from "@/features/flashcards/components/view/flashcard-view-page";
 
 export default function StudyFlashcardPage({
   params,
@@ -7,5 +7,5 @@ export default function StudyFlashcardPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  return <FlashcardStudyMode deckId={id} />;
+  return <FlashcardViewPage deckId={id} />;
 }

@@ -2,7 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   type AIExplanationContext,
@@ -29,7 +29,27 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
   const router = useRouter();
   const { checkAchievements } = useAchievementNotifier();
   const { checkMissions } = useMissionNotifier();
-  const questions = quiz.questions || [];
+
+  // Question order management for shuffle
+  const [questionOrder, setQuestionOrder] = useState<number[]>([]);
+  const originalQuestions = quiz.questions || [];
+  const isInitialized = useRef(false);
+
+  // Initialize question order on mount (only once)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We only want to initialize once when questions load
+  useEffect(() => {
+    if (originalQuestions.length > 0 && !isInitialized.current) {
+      setQuestionOrder(originalQuestions.map((_, i) => i));
+      isInitialized.current = true;
+    }
+  }, [originalQuestions.length]);
+
+  // Get ordered questions based on questionOrder
+  const questions = useMemo(
+    () =>
+      questionOrder.map((index) => originalQuestions[index]).filter(Boolean),
+    [questionOrder, originalQuestions],
+  );
 
   // Store server result
   const [serverResult, setServerResult] = useState<QuizResult | null>(null);
@@ -63,6 +83,18 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
 
   const { mutateAsync: submitAttempt, isPending: isSubmitting } =
     useSubmitQuizAttempt();
+
+  // Shuffle handler
+  const handleShuffle = useCallback(() => {
+    if (originalQuestions.length === 0) return;
+    const shuffled = [...questionOrder];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    setQuestionOrder(shuffled);
+    // Note: Answers are preserved by question ID, so shuffle doesn't affect them
+  }, [questionOrder, originalQuestions.length]);
 
   const currentQuestion = questions[currentQuestionIndex];
   const currentAnswer = answers.find(
@@ -371,6 +403,7 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
             currentQuestion={currentQuestionIndex}
             totalQuestions={questions.length}
             mode={mode}
+            onShuffle={handleShuffle}
           />
           {currentQuestion && (
             <QuizQuestionComponent

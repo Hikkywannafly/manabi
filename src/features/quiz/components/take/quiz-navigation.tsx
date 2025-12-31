@@ -60,7 +60,7 @@ export function QuizNavigation({
     ? isCorrect
       ? "bg-green-600 text-white hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-700"
       : "bg-red-600 text-white hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-700"
-    : "bg-primary text-primary-foreground hover:bg-primary/90";
+    : "bg-muted text-primary-foreground hover:bg-primary/90";
 
   return (
     <div
@@ -115,7 +115,7 @@ export function QuizNavigation({
           /* Settings/Share Section (EXAM mode or no feedback) */
           <div className="flex grow items-center md:w-3/5">
             <Button
-              variant="default"
+              variant="outline"
               className="flex-1 rounded-2xl md:flex-initial"
               type="button"
             >
@@ -123,7 +123,7 @@ export function QuizNavigation({
               Settings
             </Button>
             <Button
-              variant="default"
+              variant="outline"
               className="ml-2 flex-1 shrink-0 rounded-2xl md:flex-initial"
             >
               <Share className="mr-2" />

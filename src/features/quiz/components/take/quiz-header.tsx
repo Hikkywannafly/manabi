@@ -1,7 +1,7 @@
 "use client";
 
-import { FileDown, Shuffle } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { FileDown, GraduationCap, Shuffle, TestTube } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -22,17 +22,22 @@ export function QuizHeader({
   title,
   currentQuestion,
   totalQuestions,
-  mode: _mode = "test",
+  mode = "test",
   onShuffle,
 }: QuizHeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
   };
 
-  const handleExitQuiz = () => {
-    router.back();
+  const handleModeToggle = () => {
+    const newMode: QuizTakeMode = mode === "exam" ? "test" : "exam";
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("mode", newMode);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
   return (
@@ -80,28 +85,29 @@ export function QuizHeader({
               </TooltipContent>
             </Tooltip>
           )}
-          <Button
-            className="inline-flex size-10 shrink-0 select-none items-center justify-center rounded-2xl border border-input font-medium text-sm ring-offset-background transition hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleExitQuiz}
-            variant="outline"
-            size="icon"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="size-4"
-            >
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="inline-flex size-10 shrink-0 select-none items-center justify-center rounded-2xl border border-input font-medium text-sm ring-offset-background transition hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={handleModeToggle}
+                variant="outline"
+                size="icon"
+              >
+                {mode === "exam" ? (
+                  <GraduationCap className="size-4" />
+                ) : (
+                  <TestTube className="size-4" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                {mode === "exam"
+                  ? "Switch to Test Mode"
+                  : "Switch to Exam Mode"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
           <Button
             className="inline-flex size-10 shrink-0 select-none items-center justify-center rounded-2xl border border-input font-medium text-sm ring-offset-background transition hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleCopyLink}

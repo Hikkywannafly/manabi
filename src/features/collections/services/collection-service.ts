@@ -45,7 +45,7 @@ export const CollectionService = {
     // Fetch quizzes in this collection
     const { data: quizzes, error: quizzesError } = await supabase
       .from("quizzes")
-      .select("id, title, created_at, visibility, status")
+      .select("id, title, slug, created_at, visibility, status")
       .eq("collection_id", collectionId)
       .order("created_at", { ascending: false });
 
@@ -56,7 +56,7 @@ export const CollectionService = {
     // Fetch decks in this collection
     const { data: decks, error: decksError } = await supabase
       .from("decks")
-      .select("id, title, created_at, visibility, status")
+      .select("id, title, slug, created_at, visibility, status")
       .eq("collection_id", collectionId)
       .order("created_at", { ascending: false });
 
@@ -153,19 +153,21 @@ export const CollectionService = {
   /**
    * Delete a collection (items will have collection_id set to null)
    */
-  async deleteCollection(collectionId: string): Promise<void> {
+  async deleteCollection(collectionId: string, userId: string): Promise<void> {
     const supabase = createClient();
 
-    // First, remove collection_id from all quizzes and decks
+    // First, remove collection_id from all quizzes and decks owned by user
     await supabase
       .from("quizzes")
       .update({ collection_id: null })
-      .eq("collection_id", collectionId);
+      .eq("collection_id", collectionId)
+      .eq("owner_id", userId);
 
     await supabase
       .from("decks")
       .update({ collection_id: null })
-      .eq("collection_id", collectionId);
+      .eq("collection_id", collectionId)
+      .eq("owner_id", userId);
 
     // Then delete the collection
     const { error } = await supabase
@@ -183,33 +185,21 @@ export const CollectionService = {
    */
   async addItemsToCollection(
     collectionId: string,
+    userId: string,
     quizIds: string[],
     deckIds: string[],
   ): Promise<void> {
     const supabase = createClient();
 
-    // Update quizzes
-    if (quizIds.length > 0) {
-      const { error: quizError } = await supabase
-        .from("quizzes")
-        .update({ collection_id: collectionId })
-        .in("id", quizIds);
+    // Use RPC for atomic and secure update
+    const { error } = await supabase.rpc("add_items_to_collection", {
+      p_collection_id: collectionId,
+      p_quiz_ids: quizIds,
+      p_deck_ids: deckIds,
+    });
 
-      if (quizError) {
-        throw quizError;
-      }
-    }
-
-    // Update decks
-    if (deckIds.length > 0) {
-      const { error: deckError } = await supabase
-        .from("decks")
-        .update({ collection_id: collectionId })
-        .in("id", deckIds);
-
-      if (deckError) {
-        throw deckError;
-      }
+    if (error) {
+      throw error;
     }
   },
 
@@ -219,6 +209,7 @@ export const CollectionService = {
   async removeItemFromCollection(
     itemId: string,
     itemType: "quiz" | "deck",
+    userId: string,
   ): Promise<void> {
     const supabase = createClient();
 
@@ -227,7 +218,8 @@ export const CollectionService = {
     const { error } = await supabase
       .from(table)
       .update({ collection_id: null })
-      .eq("id", itemId);
+      .eq("id", itemId)
+      .eq("owner_id", userId);
 
     if (error) {
       throw error;
@@ -249,7 +241,7 @@ export const CollectionService = {
     // Fetch quizzes that are either not in a collection or in the current collection
     const quizzesQuery = supabase
       .from("quizzes")
-      .select("id, title, created_at, visibility, status")
+      .select("id, title, slug, created_at, visibility, status")
       .eq("owner_id", userId);
 
     if (currentCollectionId) {
@@ -272,7 +264,7 @@ export const CollectionService = {
     // Fetch decks that are either not in a collection or in the current collection
     const decksQuery = supabase
       .from("decks")
-      .select("id, title, created_at, visibility, status")
+      .select("id, title, slug, created_at, visibility, status")
       .eq("owner_id", userId);
 
     if (currentCollectionId) {

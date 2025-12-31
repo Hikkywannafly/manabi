@@ -28,7 +28,9 @@ export function CollectionItemCard({
   const editUrl = isQuiz
     ? `/dashboard/quiz/${item.id}/edit`
     : `/dashboard/flashcards/${item.id}/edit`;
-  const startUrl = isQuiz ? `/quiz/${item.id}` : `/flashcards/${item.id}/study`;
+  const startUrl = isQuiz
+    ? `/quiz/${item.id}/${item.slug}/take?mode=test`
+    : `/flashcards/${item.id}/${item.slug}`;
 
   const formattedDate = item.created_at
     ? new Date(item.created_at).toLocaleDateString("vi-VN")

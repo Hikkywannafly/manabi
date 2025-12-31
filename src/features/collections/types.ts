@@ -10,6 +10,7 @@ export interface CollectionDetail extends Collection {
 export interface CollectionQuiz {
   id: string;
   title: string;
+  slug: string;
   created_at: string | null;
   visibility: Database["public"]["Enums"]["quiz_visibility"] | null;
   status: Database["public"]["Enums"]["quiz_status"] | null;
@@ -18,6 +19,7 @@ export interface CollectionQuiz {
 export interface CollectionDeck {
   id: string;
   title: string;
+  slug: string;
   created_at: string | null;
   visibility: Database["public"]["Enums"]["deck_visibility"] | null;
   status: Database["public"]["Enums"]["deck_status"] | null;

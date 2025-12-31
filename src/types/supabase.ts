@@ -111,6 +111,8 @@ export type Database = {
           id: string;
           mastery_percentage: number | null;
           owner_id: string;
+          progress: number | null;
+          progress_message: string | null;
           settings: Json | null;
           slug: string | null;
           source_content: string | null;
@@ -129,6 +131,8 @@ export type Database = {
           id?: string;
           mastery_percentage?: number | null;
           owner_id: string;
+          progress?: number | null;
+          progress_message?: string | null;
           settings?: Json | null;
           slug?: string | null;
           source_content?: string | null;
@@ -147,6 +151,8 @@ export type Database = {
           id?: string;
           mastery_percentage?: number | null;
           owner_id?: string;
+          progress?: number | null;
+          progress_message?: string | null;
           settings?: Json | null;
           slug?: string | null;
           source_content?: string | null;
@@ -667,6 +673,8 @@ export type Database = {
           generation_params: Json | null;
           id: string;
           owner_id: string;
+          progress: number | null;
+          progress_message: string | null;
           slug: string | null;
           source_content: string | null;
           source_type: string | null;
@@ -683,6 +691,8 @@ export type Database = {
           generation_params?: Json | null;
           id?: string;
           owner_id: string;
+          progress?: number | null;
+          progress_message?: string | null;
           slug?: string | null;
           source_content?: string | null;
           source_type?: string | null;
@@ -699,6 +709,8 @@ export type Database = {
           generation_params?: Json | null;
           id?: string;
           owner_id?: string;
+          progress?: number | null;
+          progress_message?: string | null;
           slug?: string | null;
           source_content?: string | null;
           source_type?: string | null;
@@ -873,31 +885,43 @@ export type Database = {
         Row: {
           actual_pomodoros: number | null;
           created_at: string | null;
+          description: string | null;
+          due_date: string | null;
           estimated_pomodoros: number | null;
           id: string;
           position_order: number | null;
+          priority: Database["public"]["Enums"]["task_priority"] | null;
           status: string | null;
           title: string;
+          updated_at: string | null;
           user_id: string;
         };
         Insert: {
           actual_pomodoros?: number | null;
           created_at?: string | null;
+          description?: string | null;
+          due_date?: string | null;
           estimated_pomodoros?: number | null;
           id?: string;
           position_order?: number | null;
+          priority?: Database["public"]["Enums"]["task_priority"] | null;
           status?: string | null;
           title: string;
+          updated_at?: string | null;
           user_id: string;
         };
         Update: {
           actual_pomodoros?: number | null;
           created_at?: string | null;
+          description?: string | null;
+          due_date?: string | null;
           estimated_pomodoros?: number | null;
           id?: string;
           position_order?: number | null;
+          priority?: Database["public"]["Enums"]["task_priority"] | null;
           status?: string | null;
           title?: string;
+          updated_at?: string | null;
           user_id?: string;
         };
         Relationships: [];
@@ -1099,6 +1123,14 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      add_items_to_collection: {
+        Args: {
+          p_collection_id: string;
+          p_deck_ids: string[];
+          p_quiz_ids: string[];
+        };
+        Returns: undefined;
+      };
       complete_user_mission: {
         Args: { p_mission_id: string; p_user_id: string; p_xp_reward: number };
         Returns: undefined;

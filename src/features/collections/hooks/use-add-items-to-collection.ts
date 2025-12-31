@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/auth-provider";
 import { handleErrorNotification } from "@/lib/notifications";
 import { CollectionService } from "../services/collection-service";
 
 export function useAddItemsToCollection() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -16,8 +18,10 @@ export function useAddItemsToCollection() {
       quizIds: string[];
       deckIds: string[];
     }) => {
+      if (!user) throw new Error("User not authenticated");
       return CollectionService.addItemsToCollection(
         collectionId,
+        user.id,
         quizIds,
         deckIds,
       );

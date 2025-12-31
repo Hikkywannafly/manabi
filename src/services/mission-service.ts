@@ -72,37 +72,38 @@ export const MissionService = {
             um.mission_id === mission.id && um.period_start === periodStart,
         );
 
-        // If no record exists for this period, create one
+        // If no record exists for this period, create one using upsert to handle race conditions
         if (!userMission) {
           const { data: newUserMission, error: createError } = await supabase
             .from("user_missions")
-            .insert({
-              user_id: userId,
-              mission_id: mission.id,
-              period_start: periodStart,
-              progress_value: 0,
-              status: "IN_PROGRESS",
-            })
+            .upsert(
+              {
+                user_id: userId,
+                mission_id: mission.id,
+                period_start: periodStart,
+                progress_value: 0,
+                status: "IN_PROGRESS",
+              },
+              {
+                onConflict: "user_id,mission_id,period_start",
+                ignoreDuplicates: false, // Update if exists
+              },
+            )
             .select()
             .single();
 
           if (createError) {
-            // Handle race condition: Duplicate key violation (23505)
-            if (createError.code === "23505") {
-              const { data: existingMission } = await supabase
-                .from("user_missions")
-                .select("*")
-                .eq("user_id", userId)
-                .eq("mission_id", mission.id)
-                .eq("period_start", periodStart)
-                .single();
+            console.error("Failed to upsert user mission:", createError);
+            // Fallback: try to fetch the existing record
+            const { data: existingMission } = await supabase
+              .from("user_missions")
+              .select("*")
+              .eq("user_id", userId)
+              .eq("mission_id", mission.id)
+              .eq("period_start", periodStart)
+              .single();
 
-              userMission = existingMission || undefined;
-            } else {
-              console.error("Failed to create user mission:", createError);
-              // Fallback to not crashing, just skipping this mission for now or
-              // letting it be undefined and handled gracefully later
-            }
+            userMission = existingMission || undefined;
           } else {
             userMission = newUserMission || undefined;
           }

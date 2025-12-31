@@ -3,10 +3,9 @@
 import {
   ArrowLeft,
   ArrowRight,
-  MessageSquare,
-  RotateCcw,
   Settings,
-  SlidersHorizontal,
+  Share,
+  WandSparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,9 +15,6 @@ interface FlashcardNavigationProps {
   totalCards: number;
   onPrevious: () => void;
   onNext: () => void;
-  onShuffle?: () => void;
-  onFlipOrder?: () => void;
-  showBack?: boolean;
 }
 
 export function FlashcardNavigation({
@@ -26,9 +22,6 @@ export function FlashcardNavigation({
   totalCards,
   onPrevious,
   onNext,
-  onShuffle,
-  onFlipOrder,
-  showBack: _showBack = false,
 }: FlashcardNavigationProps) {
   const hasNext = currentIndex < totalCards - 1;
   const hasPrevious = currentIndex > 0;
@@ -41,39 +34,41 @@ export function FlashcardNavigation({
     >
       <div className="flex w-full max-w-6xl flex-wrap justify-between gap-4 md:flex-nowrap md:gap-8">
         {/* Left Section: Settings / Actions */}
-        <div className="flex grow items-center gap-2 md:w-3/5">
-          <Button
-            variant="outline"
-            className="rounded-2xl"
-            onClick={onFlipOrder}
-            title="Flip Order"
-          >
-            <SlidersHorizontal className="mr-2 size-4" />
-            <span className="hidden sm:inline">Flip Order</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="rounded-2xl"
-            onClick={onShuffle}
-            title="Shuffle"
-          >
-            <RotateCcw className="mr-2 size-4" />
-            <span className="hidden sm:inline">Shuffle</span>
-          </Button>
+        {/* <div className="flex grow items-center gap-2 md:w-3/5">
           <Button variant="ghost" className="rounded-2xl">
             <Settings className="size-4" />
           </Button>
           <Button variant="ghost" className="rounded-2xl">
             <MessageSquare className="size-4" />
           </Button>
+        </div> */}
+        <div className="flex grow items-center md:w-3/5">
+          <Button
+            variant="outline"
+            className="flex-1 rounded-2xl md:flex-initial"
+            type="button"
+          >
+            <Settings className="mr-2 size-4" />
+            Settings
+          </Button>
+          <Button
+            variant="outline"
+            className="ml-2 flex-1 shrink-0 rounded-2xl md:flex-initial"
+          >
+            <Share className="mr-2" />
+            Share
+          </Button>
+          <Button
+            className={cn(
+              "flex h-10 shrink-0 items-center rounded-2xl px-4 py-2 text-white",
+            )}
+          >
+            <WandSparkles className="mr-2" size={16} />
+            Ask Manabi for explanation
+          </Button>
         </div>
-
         {/* Right Section: Navigation */}
         <div className="flex w-full items-center justify-end gap-2 md:w-2/5">
-          <span className="mr-4 font-medium text-muted-foreground text-sm">
-            {currentIndex + 1} / {totalCards}
-          </span>
-
           <Button
             size="sm"
             onClick={onPrevious}
@@ -82,7 +77,7 @@ export function FlashcardNavigation({
             variant="secondary"
           >
             <ArrowLeft className="mr-2 size-4" />
-            Prev
+            Previous
           </Button>
 
           <Button

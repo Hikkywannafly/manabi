@@ -44,15 +44,7 @@ export default function QuizTakeWithSlugPage() {
 
   if (isError || !quiz) {
     return (
-      <DashboardPage
-        title="Error"
-        headerAction={
-          <Button variant="outline" size="sm" onClick={handleBack}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-        }
-      >
+      <DashboardPage title="Error">
         <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
           <h3 className="mb-2 font-semibold text-destructive text-lg">
             Quiz not found

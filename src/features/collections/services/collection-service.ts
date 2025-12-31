@@ -185,7 +185,6 @@ export const CollectionService = {
    */
   async addItemsToCollection(
     collectionId: string,
-    userId: string,
     quizIds: string[],
     deckIds: string[],
   ): Promise<void> {

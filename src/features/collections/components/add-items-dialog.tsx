@@ -35,7 +35,8 @@ export function AddItemsDialog({
 
   const { data: availableItems, isLoading } = useQuery({
     queryKey: ["available-items", user?.id, collectionId],
-    queryFn: () => CollectionService.getAvailableItems(user!.id, collectionId),
+    queryFn: () =>
+      CollectionService.getAvailableItems(user?.id || "", collectionId),
     enabled: !!user && open,
   });
 

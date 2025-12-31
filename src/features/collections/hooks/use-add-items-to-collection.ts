@@ -21,7 +21,6 @@ export function useAddItemsToCollection() {
       if (!user) throw new Error("User not authenticated");
       return CollectionService.addItemsToCollection(
         collectionId,
-        user.id,
         quizIds,
         deckIds,
       );

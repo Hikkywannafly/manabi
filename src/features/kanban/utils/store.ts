@@ -35,6 +35,7 @@ export type State = {
 export type Actions = {
   dragTask: (id: string | null) => void;
   updateCol: (id: UniqueIdentifier, newName: string) => void;
+  removeCol: (id: UniqueIdentifier) => void;
 };
 
 export const useTaskStore = create<State & Actions>()(
@@ -47,6 +48,10 @@ export const useTaskStore = create<State & Actions>()(
           columns: state.columns.map((col) =>
             col.id === id ? { ...col, title: newName } : col,
           ),
+        })),
+      removeCol: (id: UniqueIdentifier) =>
+        set((state) => ({
+          columns: state.columns.filter((col) => col.id !== id),
         })),
       dragTask: (id: string | null) => set({ draggedTask: id }),
     }),

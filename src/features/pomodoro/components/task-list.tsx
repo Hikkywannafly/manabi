@@ -10,25 +10,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useTaskStore } from "@/stores/use-task-store";
+import { useTasks } from "../hooks";
 
 export function TaskList() {
   const {
     tasks,
+    todoTasks,
+    doneTasks,
     activeTaskId,
     isLoading,
     fetchTasks,
     updateTaskStatus,
     deleteTask,
     setActiveTask,
-  } = useTaskStore();
+  } = useTasks();
 
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
-
-  const todoTasks = tasks.filter((t) => t.status !== "DONE");
-  const doneTasks = tasks.filter((t) => t.status === "DONE");
 
   if (isLoading && tasks.length === 0) {
     // Use a skeleton or just return null to avoid layout shift/flicker

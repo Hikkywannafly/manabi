@@ -18,6 +18,22 @@ import { useTaskStore } from "../utils/store";
 import { BoardColumn, BoardContainer } from "./board-column";
 import { TaskCard } from "./task-card";
 
+const getDisplayTasks = (tasks: Task[], columnId: string) => {
+  const columnTasks = tasks.filter((task) => task.status === columnId);
+
+  if (columnId === "TODO") {
+    return [...columnTasks].sort((a, b) => {
+      const priorityWeight = { high: 3, medium: 2, low: 1 };
+      const weightDiff =
+        priorityWeight[b.priority] - priorityWeight[a.priority];
+      if (weightDiff !== 0) return weightDiff;
+      return a.position_order - b.position_order;
+    });
+  }
+
+  return columnTasks;
+};
+
 export type { ColumnId } from "./board-column";
 
 export function KanbanBoard() {
@@ -80,13 +96,15 @@ export function KanbanBoard() {
       >
         <BoardContainer>
           <SortableContext items={columnsId}>
-            {columns?.map((col) => (
-              <BoardColumn
-                key={col.id}
-                column={col}
-                tasks={localTasks.filter((task) => task.status === col.id)}
-              />
-            ))}
+            {columns?.map((col) => {
+              const displayTasks = getDisplayTasks(
+                localTasks,
+                col.id as string,
+              );
+              return (
+                <BoardColumn key={col.id} column={col} tasks={displayTasks} />
+              );
+            })}
           </SortableContext>
         </BoardContainer>
 
@@ -97,8 +115,9 @@ export function KanbanBoard() {
                 <BoardColumn
                   isOverlay
                   column={dragState.activeColumn}
-                  tasks={localTasks.filter(
-                    (task) => task.status === dragState.activeColumn?.id,
+                  tasks={getDisplayTasks(
+                    localTasks,
+                    dragState.activeColumn.id as string,
                   )}
                 />
               )}

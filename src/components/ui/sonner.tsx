@@ -21,12 +21,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
           // Explicit colors for types
           success:
-            "!bg-emerald-50 !text-emerald-900 !border-emerald-200 dark:!bg-emerald-950/50 dark:!text-emerald-50 dark:!border-emerald-800",
+            "!bg-emerald-100 !text-emerald-950 !border-emerald-300 dark:!bg-emerald-900/90 dark:!text-emerald-50 dark:!border-emerald-700",
           error:
-            "!bg-red-50 !text-red-900 !border-red-200 dark:!bg-red-950/50 dark:!text-red-50 dark:!border-red-800",
+            "!bg-red-600  !border-red-300 dark:!bg-red-900/90 dark:!text-red-50 dark:!border-red-700",
           warning:
-            "!bg-amber-50 !text-amber-900 !border-amber-200 dark:!bg-amber-950/50 dark:!text-amber-50 dark:!border-amber-800",
-          info: "!bg-blue-50 !text-blue-900 !border-blue-200 dark:!bg-blue-950/50 dark:!text-blue-50 dark:!border-blue-800",
+            "!bg-amber-100 !text-amber-950 !border-amber-300 dark:!bg-amber-900/90 dark:!text-amber-50 dark:!border-amber-700",
+          info: "!bg-blue-100 !text-blue-950 !border-blue-300 dark:!bg-blue-900/90 dark:!text-blue-50 dark:!border-blue-700",
         },
       }}
       {...props}

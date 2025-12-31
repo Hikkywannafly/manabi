@@ -44,7 +44,7 @@ export function ColumnActions({
           e.preventDefault();
           setIsEditDisable(!editDisable);
           updateCol(id, name);
-          toast(`${title} updated to ${name}`);
+          toast.success(`${title} updated to ${name}`);
         }}
       >
         <Input
@@ -105,7 +105,7 @@ export function ColumnActions({
 
                 setShowDeleteDialog(false);
                 removeCol(id);
-                toast("This column has been deleted.");
+                toast.success("This column has been deleted.");
               }}
             >
               Delete

@@ -135,7 +135,66 @@ export function handleErrorNotification(
     }
   }
 
-  notifyError("Error", errorMessage);
+  // Transform technical error messages into user-friendly ones
+  const friendlyMessage = transformErrorMessage(errorMessage, defaultMessage);
+
+  notifyError("Error", friendlyMessage);
+}
+
+/**
+ * Transform technical error messages into user-friendly messages
+ * @param errorMessage - The raw error message
+ * @param defaultMessage - Fallback message
+ * @returns User-friendly error message
+ */
+function transformErrorMessage(
+  errorMessage: string,
+  defaultMessage: string,
+): string {
+  // RLS (Row Level Security) errors
+  if (errorMessage.includes("row-level security policy")) {
+    return "You don't have permission to perform this action. Please check your account settings.";
+  }
+
+  // Foreign key constraint errors
+  if (errorMessage.includes("foreign key constraint")) {
+    return "This action cannot be completed because it would break data relationships.";
+  }
+
+  // Unique constraint errors
+  if (
+    errorMessage.includes("unique constraint") ||
+    errorMessage.includes("duplicate key")
+  ) {
+    return "This item already exists. Please use a different name or value.";
+  }
+
+  // Network errors
+  if (
+    errorMessage.includes("Failed to fetch") ||
+    errorMessage.includes("Network request failed") ||
+    errorMessage.includes("NetworkError")
+  ) {
+    return "Network error. Please check your internet connection and try again.";
+  }
+
+  // Authentication errors
+  if (
+    errorMessage.includes("not authenticated") ||
+    errorMessage.includes("invalid token") ||
+    errorMessage.includes("JWT")
+  ) {
+    return "Your session has expired. Please sign in again.";
+  }
+
+  // Timeout errors
+  if (errorMessage.includes("timeout") || errorMessage.includes("timed out")) {
+    return "The request took too long. Please try again.";
+  }
+
+  // If no pattern matches, return the default message
+  // This prevents showing raw technical errors to users
+  return defaultMessage;
 }
 
 /**

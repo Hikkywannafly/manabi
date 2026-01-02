@@ -1,5 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { PartialProfile } from "@/types/db/profile";
 
 type ClerkUser = {
   imageUrl?: string;
@@ -10,12 +11,16 @@ type ClerkUser = {
 interface UserAvatarProfileProps {
   className?: string;
   showInfo?: boolean;
-  user: ClerkUser | User | null;
+  user: ClerkUser | User | PartialProfile | null;
 }
 
-// Type guard to check if user is Supabase User
-function isSupabaseUser(user: ClerkUser | User | null): user is User {
+// Type guards
+function isSupabaseUser(user: any): user is User {
   return user !== null && "email" in user && "id" in user;
+}
+
+function isDbProfile(user: any): user is PartialProfile {
+  return user !== null && "nickname" in user && !("email" in user);
 }
 
 export function UserAvatarProfile({
@@ -23,18 +28,24 @@ export function UserAvatarProfile({
   showInfo = false,
   user,
 }: UserAvatarProfileProps) {
-  // Handle both Supabase User and Clerk-like user structure
-  const imageUrl = isSupabaseUser(user)
-    ? user.user_metadata?.avatar_url
-    : user?.imageUrl;
+  // Handle Database Profile, Supabase User, and Clerk-like user structure
+  const imageUrl = isDbProfile(user)
+    ? user.avatar_url
+    : isSupabaseUser(user)
+      ? user.user_metadata?.avatar_url
+      : user?.imageUrl;
 
-  const fullName = isSupabaseUser(user)
-    ? user.user_metadata?.full_name || user.email?.split("@")[0]
-    : user?.fullName;
+  const fullName = isDbProfile(user)
+    ? user.full_name || user.nickname
+    : isSupabaseUser(user)
+      ? user.user_metadata?.full_name || user.email?.split("@")[0]
+      : user?.fullName;
 
-  const email = isSupabaseUser(user)
-    ? user.email
-    : user?.emailAddresses?.[0]?.emailAddress;
+  const email = isDbProfile(user)
+    ? null // Profiles don't have email in PartialProfile
+    : isSupabaseUser(user)
+      ? user.email
+      : user?.emailAddresses?.[0]?.emailAddress;
 
   return (
     <div className="flex items-center gap-2">

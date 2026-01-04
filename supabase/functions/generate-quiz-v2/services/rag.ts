@@ -15,30 +15,55 @@ export class RagService {
     private githubToken: string,
   ) {}
 
-  private async getEmbedding(text: string): Promise<number[]> {
-    const response = await fetch(AI_CONFIG.embeddingsUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${this.githubToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: AI_CONFIG.embeddingModel,
-        input: text,
-      }),
-    });
+  private async getEmbedding(
+    text: string,
+    retries = 3,
+  ): Promise<number[]> {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const response = await fetch(AI_CONFIG.embeddingsUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${this.githubToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: AI_CONFIG.embeddingModel,
+            input: text,
+          }),
+        });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        `GitHub Models Embeddings API error: ${response.status} - ${
-          JSON.stringify(errorData)
-        }`,
-      );
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+
+          // If rate limited (429), retry with exponential backoff
+          if (response.status === 429 && attempt < retries) {
+            const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+            Logger.info(
+              `Rate limited, retrying in ${
+                delay / 1000
+              }s (attempt ${attempt}/${retries})...`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            continue;
+          }
+
+          throw new Error(
+            `GitHub Models Embeddings API error: ${response.status} - ${
+              JSON.stringify(errorData)
+            }`,
+          );
+        }
+
+        const data = await response.json();
+        return data.data?.[0]?.embedding || [];
+      } catch (error) {
+        if (attempt === retries) throw error;
+        Logger.error(`Embedding attempt ${attempt} failed`, error);
+      }
     }
 
-    const data = await response.json();
-    return data.data?.[0]?.embedding || [];
+    throw new Error("Failed to get embedding after retries");
   }
 
   async processAndStore(
@@ -72,12 +97,21 @@ export class RagService {
       Logger.brain(`Embedding batch ${batchNum}/${totalBatches}...`);
 
       try {
-        // Generate embeddings for batch using GitHub Models API
-        const embeddingsResults = await Promise.all(
-          batch.map((chunk: DocumentChunk) =>
-            this.getEmbedding(chunk.pageContent)
-          ),
-        );
+        // Generate embeddings sequentially to avoid rate limits
+        const embeddingsResults: number[][] = [];
+        for (let j = 0; j < batch.length; j++) {
+          const chunk = batch[j];
+          Logger.info(
+            `Embedding chunk ${j + 1}/${batch.length} in batch ${batchNum}...`,
+          );
+          const embedding = await this.getEmbedding(chunk.pageContent);
+          embeddingsResults.push(embedding);
+
+          // Add small delay between requests to avoid rate limiting
+          if (j < batch.length - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
+          }
+        }
 
         // Prepare rows for insertion
         const rows: VectorDocument[] = batch.map((

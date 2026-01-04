@@ -7,7 +7,11 @@ export class ProgressTracker {
     private quizId: string,
   ) {}
 
-  async update(percent: number, message: string): Promise<void> {
+  async update(
+    percent: number,
+    message: string,
+    data?: unknown,
+  ): Promise<void> {
     try {
       // Update quiz status in database
       await this.supabase
@@ -23,7 +27,7 @@ export class ProgressTracker {
       await channel.send({
         type: "broadcast",
         event: "progress",
-        payload: { progress: percent, message },
+        payload: { progress: percent, message, data },
       });
 
       Logger.info(`Progress: ${percent}% - ${message}`);

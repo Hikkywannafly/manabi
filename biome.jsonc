@@ -22,7 +22,7 @@
       "!**/public/sw.js",
       "!**/src/app/globals.css",
       "!src/lib/theme.ts",
-      "!supabase/functions/**"
+      "!supabase/functions"
     ]
   },
   // Formatter settings

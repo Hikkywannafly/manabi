@@ -290,9 +290,11 @@ Deno.serve(async (req) => {
     // =========================================================================
     // 8. COMPLETE
     // =========================================================================
+    const finalSlug = `${slug}-${quizId.slice(0, 4)}`;
     await progress.update(
       PROGRESS_STEPS.COMPLETE.percent,
       PROGRESS_STEPS.COMPLETE.message,
+      { slug: finalSlug }, // Send slug to frontend
     );
 
     Logger.celebrate("🎉 Quiz generation completed!");

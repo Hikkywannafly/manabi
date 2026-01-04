@@ -207,21 +207,36 @@ Deno.serve(async (req) => {
     // =========================================================================
     // 5. RETRIEVE CONTEXT
     // =========================================================================
-    await progress.update(
-      PROGRESS_STEPS.RETRIEVE.percent,
-      PROGRESS_STEPS.RETRIEVE.message,
-    );
+    let finalContext: string;
 
-    const retrievalQuery = params.task === "extract"
-      ? "Find questions, answers, quiz items, and assessments"
-      : `Key concepts for a ${params.difficulty} ${params.mode}: ${
-        extractedText.substring(0, 300)
-      }`;
+    if (chunksStored === 0) {
+      // No embeddings stored (rate limited), use full text directly
+      Logger.info(
+        "Skipping RAG retrieval (no embeddings). Using full extracted text.",
+      );
+      finalContext = extractedText.substring(0, 10000);
+      await progress.update(
+        PROGRESS_STEPS.RETRIEVE.percent,
+        "Skipped (using full text)",
+      );
+    } else {
+      // Normal RAG retrieval
+      await progress.update(
+        PROGRESS_STEPS.RETRIEVE.percent,
+        PROGRESS_STEPS.RETRIEVE.message,
+      );
 
-    const context = await ragService.retrieveContext(retrievalQuery, 15);
+      const retrievalQuery = params.task === "extract"
+        ? "Find questions, answers, quiz items, and assessments"
+        : `Key concepts for a ${params.difficulty} ${params.mode}: ${
+          extractedText.substring(0, 300)
+        }`;
 
-    // Use extracted text as fallback if retrieval returns nothing
-    const finalContext = context || extractedText.substring(0, 10000);
+      const context = await ragService.retrieveContext(retrievalQuery, 15);
+
+      // Use extracted text as fallback if retrieval returns nothing
+      finalContext = context || extractedText.substring(0, 10000);
+    }
 
     // =========================================================================
     // 6. GENERATE QUIZ

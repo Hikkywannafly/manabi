@@ -99,51 +99,96 @@ export class RagService {
       try {
         // Generate embeddings sequentially to avoid rate limits
         const embeddingsResults: number[][] = [];
+        const successfulChunks: DocumentChunk[] = [];
+        let rateLimitHit = false;
+
         for (let j = 0; j < batch.length; j++) {
           const chunk = batch[j];
           Logger.info(
             `Embedding chunk ${j + 1}/${batch.length} in batch ${batchNum}...`,
           );
-          const embedding = await this.getEmbedding(chunk.pageContent);
-          embeddingsResults.push(embedding);
 
-          // Add small delay between requests to avoid rate limiting
-          if (j < batch.length - 1) {
-            await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
+          try {
+            const embedding = await this.getEmbedding(chunk.pageContent);
+            embeddingsResults.push(embedding);
+            successfulChunks.push(chunk);
+
+            // Add small delay between requests to avoid rate limiting
+            if (j < batch.length - 1) {
+              await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
+            }
+          } catch (chunkError) {
+            const errorMessage = chunkError instanceof Error
+              ? chunkError.message
+              : String(chunkError);
+
+            // If rate limited, save what we have so far and stop
+            if (errorMessage.includes("429")) {
+              Logger.error(
+                `Rate limit hit at chunk ${
+                  j + 1
+                }/${batch.length} in batch ${batchNum}`,
+                chunkError,
+              );
+              rateLimitHit = true;
+              break; // Exit chunk loop, save partial batch
+            }
+
+            // For other errors, rethrow
+            throw chunkError;
           }
         }
 
-        // Prepare rows for insertion
-        const rows: VectorDocument[] = batch.map((
-          chunk: DocumentChunk,
-          idx: number,
-        ) => ({
-          content: chunk.pageContent,
-          metadata: chunk.metadata,
-          embedding: embeddingsResults[idx],
-        }));
+        // Save successfully embedded chunks (even if partial)
+        if (successfulChunks.length > 0) {
+          const rows: VectorDocument[] = successfulChunks.map((
+            chunk: DocumentChunk,
+            idx: number,
+          ) => ({
+            content: chunk.pageContent,
+            metadata: chunk.metadata,
+            embedding: embeddingsResults[idx],
+          }));
 
-        // Insert into Supabase
-        const { error } = await this.supabase
-          .from(DATABASE_CONFIG.tables.documents)
-          .insert(rows);
+          // Insert into Supabase
+          const { error } = await this.supabase
+            .from(DATABASE_CONFIG.tables.documents)
+            .insert(rows);
 
-        if (error) {
-          Logger.error(`Batch ${batchNum} insert error`, error);
-          throw new Error(ERROR_MESSAGES.databaseInsertFailed(error.message));
+          if (error) {
+            Logger.error(`Batch ${batchNum} insert error`, error);
+            throw new Error(ERROR_MESSAGES.databaseInsertFailed(error.message));
+          }
+
+          storedCount += successfulChunks.length;
+          Logger.success(
+            `Stored ${successfulChunks.length}/${batch.length} chunks from batch ${batchNum} (total: ${storedCount}/${chunks.length})`,
+          );
         }
 
-        storedCount += batch.length;
-        Logger.success(
-          `Stored batch ${batchNum}/${totalBatches} (${storedCount}/${chunks.length} chunks)`,
-        );
+        // If rate limited, stop processing more batches
+        if (rateLimitHit) {
+          Logger.info(
+            `Successfully stored ${storedCount} chunks before rate limit. Continuing without remaining embeddings...`,
+          );
+          break; // Exit batch loop
+        }
       } catch (error) {
+        // For other errors, still throw
         Logger.error(`Batch ${batchNum} failed`, error);
         throw error;
       }
     }
 
-    Logger.celebrate(`All ${storedCount} chunks stored in vector DB!`);
+    if (storedCount === 0) {
+      Logger.info(
+        "No chunks were embedded (rate limited immediately). Will use full text for generation.",
+      );
+    } else {
+      Logger.celebrate(
+        `Stored ${storedCount}/${chunks.length} chunks in vector DB!`,
+      );
+    }
     return storedCount;
   }
 
@@ -152,7 +197,25 @@ export class RagService {
     Logger.search(`Query: "${query.substring(0, 100)}..."`);
 
     // Generate query embedding using GitHub Models API
-    const embedding = await this.getEmbedding(query);
+    let embedding: number[];
+    try {
+      embedding = await this.getEmbedding(query);
+    } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
+
+      // If rate limited, skip retrieval and return empty (will use full text)
+      if (errorMessage.includes("429")) {
+        Logger.error(
+          "Rate limited during retrieval. Skipping vector search.",
+          error,
+        );
+        return ""; // Caller will use full extracted text as fallback
+      }
+
+      throw error;
+    }
 
     Logger.info("Query embedding generated, searching vectors...");
 

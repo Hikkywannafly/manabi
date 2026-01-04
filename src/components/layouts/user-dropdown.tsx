@@ -29,7 +29,7 @@ interface UserDropdownProps {
 }
 
 export function UserDropdown({ variant = "sidebar" }: UserDropdownProps) {
-  const { user } = useUser();
+  const { user, profile } = useUser();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -45,6 +45,18 @@ export function UserDropdown({ variant = "sidebar" }: UserDropdownProps) {
 
   if (!user) return null;
 
+  // Merge profile data with auth user for avatar display
+  const displayUser = profile
+    ? {
+        ...user,
+        user_metadata: {
+          ...user.user_metadata,
+          full_name: profile.full_name || profile.nickname,
+          avatar_url: profile.avatar_url,
+        },
+      }
+    : user;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -53,7 +65,7 @@ export function UserDropdown({ variant = "sidebar" }: UserDropdownProps) {
             <UserAvatarProfile
               className="h-8 w-8 rounded-full"
               showInfo={false}
-              user={user}
+              user={displayUser}
             />
           </Button>
         ) : (
@@ -64,7 +76,7 @@ export function UserDropdown({ variant = "sidebar" }: UserDropdownProps) {
             <UserAvatarProfile
               className="h-8 w-8 rounded-full"
               showInfo
-              user={user}
+              user={displayUser}
             />
             <IconChevronsDown className="ml-auto size-4" />
           </SidebarMenuButton>
@@ -81,7 +93,7 @@ export function UserDropdown({ variant = "sidebar" }: UserDropdownProps) {
             <UserAvatarProfile
               className="h-8 w-8 rounded-full"
               showInfo
-              user={user}
+              user={displayUser}
             />
           </div>
         </DropdownMenuLabel>

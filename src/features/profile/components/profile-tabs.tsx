@@ -1,3 +1,5 @@
+"use client";
+
 import { Activity, Award, Book } from "lucide-react";
 import {
   Card,
@@ -7,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProfileAwards } from "./profile-awards";
 
 export function ProfileTabs() {
   return (
@@ -102,20 +105,8 @@ export function ProfileTabs() {
         </Card>
       </TabsContent>
 
-      <TabsContent value="achievements">
-        <Card>
-          <CardHeader>
-            <CardTitle>Achievements</CardTitle>
-            <CardDescription>
-              View your earned badges and certificates.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground text-sm">
-              Achievements will appear here.
-            </p>
-          </CardContent>
-        </Card>
+      <TabsContent value="achievements" className="mt-6">
+        <ProfileAwards />
       </TabsContent>
 
       <TabsContent value="settings">

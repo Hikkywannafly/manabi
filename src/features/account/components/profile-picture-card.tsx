@@ -1,21 +1,23 @@
 "use client";
 
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useProfile } from "@/features/profile/hooks";
+import { useUploadAvatar } from "../hooks";
 
 export function ProfilePictureCard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>("/placeholder-user.jpg");
+  const { data: profile } = useProfile();
+  const { mutate: uploadAvatar, isPending } = useUploadAvatar();
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      uploadAvatar(file);
     }
   };
 
@@ -26,12 +28,23 @@ export function ProfilePictureCard() {
       </CardHeader>
       <CardContent className="flex items-center gap-6">
         <div className="relative h-24 w-24 overflow-hidden rounded-full border bg-muted">
-          <Image
-            src={previewUrl}
-            alt="Profile picture"
-            fill
-            className="object-cover"
-          />
+          {profile?.avatar_url ? (
+            <Image
+              src={profile.avatar_url}
+              alt="Profile picture"
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-primary/10 font-bold text-primary text-xl">
+              {profile?.nickname?.substring(0, 2).toUpperCase() || "U"}
+            </div>
+          )}
+          {isPending && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+              <Loader2 className="h-6 w-6 animate-spin text-white" />
+            </div>
+          )}
         </div>
         <input
           type="file"
@@ -39,14 +52,20 @@ export function ProfilePictureCard() {
           className="hidden"
           accept="image/*"
           onChange={handleImageChange}
+          disabled={isPending}
         />
         <Button
           variant="outline"
           className="gap-2"
           onClick={() => fileInputRef.current?.click()}
+          disabled={isPending}
         >
-          <Camera className="h-4 w-4" />
-          Choose Image
+          {isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Camera className="h-4 w-4" />
+          )}
+          Change Photo
         </Button>
       </CardContent>
     </Card>

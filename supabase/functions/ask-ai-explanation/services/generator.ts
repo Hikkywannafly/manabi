@@ -10,12 +10,16 @@ import type {
   ExplainContext,
 } from "../types.ts";
 import { Logger } from "../utils/logger.ts";
+import type { RagService } from "./rag.ts";
 
 export class GeneratorService {
-  constructor(private githubToken: string) {}
+  constructor(
+    private githubToken: string,
+    private ragService?: RagService,
+  ) {}
 
   /**
-   * Generate initial explanation for quiz or flashcard
+   * Generate initial explanation for quiz or flashcard (non-streaming)
    */
   async generateExplanation(
     context: ExplainContext,
@@ -24,14 +28,62 @@ export class GeneratorService {
       contentType: context.contentType,
     });
 
-    const prompt = this.buildPrompt(context);
-    const messages = [{ role: "user" as const, content: prompt }];
+    // Retrieve RAG context if available
+    let ragContext = "";
+    if (this.ragService && AI_CONFIG.rag.enabled) {
+      ragContext = await this.ragService.retrieveContextByMetadata(
+        context.quizId,
+        context.deckId,
+        context.questionText,
+      );
+    }
+
+    // Detect language from context
+    const detectedLanguage = this.detectLanguage(context);
+
+    const prompt = this.buildPrompt(context, ragContext, detectedLanguage);
+    const messages = [
+      { role: "system" as const, content: PROMPT_TEMPLATES.system() },
+      { role: "user" as const, content: prompt },
+    ];
 
     return this.callAI(messages);
   }
 
   /**
-   * Generate response to follow-up question
+   * Generate initial explanation with streaming (real-time)
+   */
+  async *generateExplanationStream(
+    context: ExplainContext,
+  ): AsyncGenerator<string, string[], void> {
+    Logger.info("Generating explanation (streaming)", {
+      contentType: context.contentType,
+    });
+
+    // Retrieve RAG context if available
+    let ragContext = "";
+    if (this.ragService && AI_CONFIG.rag.enabled) {
+      ragContext = await this.ragService.retrieveContextByMetadata(
+        context.quizId,
+        context.deckId,
+        context.questionText,
+      );
+    }
+
+    // Detect language from context
+    const detectedLanguage = this.detectLanguage(context);
+
+    const prompt = this.buildPrompt(context, ragContext, detectedLanguage);
+    const messages = [
+      { role: "system" as const, content: PROMPT_TEMPLATES.system() },
+      { role: "user" as const, content: prompt },
+    ];
+
+    return yield* this.callAIStream(messages);
+  }
+
+  /**
+   * Generate response to follow-up question (non-streaming)
    */
   async generateFollowUp(
     context: ExplainContext,
@@ -42,6 +94,7 @@ export class GeneratorService {
 
     const initialPrompt = this.buildPrompt(context);
     const messages: ChatMessage[] = [
+      { role: "system", content: PROMPT_TEMPLATES.system() },
       { role: "user", content: initialPrompt },
       ...history,
       { role: "user", content: PROMPT_TEMPLATES.followUp(question) },
@@ -51,25 +104,96 @@ export class GeneratorService {
   }
 
   /**
+   * Generate response to follow-up question with streaming
+   */
+  async *generateFollowUpStream(
+    context: ExplainContext,
+    history: ChatMessage[],
+    question: string,
+  ): AsyncGenerator<string, string[], void> {
+    Logger.info("Generating follow-up response (streaming)", { question });
+
+    const initialPrompt = this.buildPrompt(context);
+    const messages: ChatMessage[] = [
+      { role: "system", content: PROMPT_TEMPLATES.system() },
+      { role: "user", content: initialPrompt },
+      ...history,
+      { role: "user", content: PROMPT_TEMPLATES.followUp(question) },
+    ];
+
+    return yield* this.callAIStream(messages);
+  }
+
+  /**
    * Build prompt based on context type
    */
-  private buildPrompt(context: ExplainContext): string {
+  private buildPrompt(
+    context: ExplainContext,
+    ragContext = "",
+    language = "English",
+  ): string {
+    // Prepend RAG context if available
+    const contextPrefix = ragContext
+      ? `## Additional Context from Source Material\n\n${ragContext}\n\n---\n\n`
+      : "";
+
+    // Add language instruction
+    const languageInstruction = language !== "English"
+      ? `\n\n**IMPORTANT**: You MUST respond in ${language}. All explanations and suggested questions must be in ${language}.`
+      : "";
+
     if (context.contentType === "quiz") {
-      return PROMPT_TEMPLATES.quiz({
+      return contextPrefix + PROMPT_TEMPLATES.quiz({
         questionText: context.questionText,
         options: context.options,
         correctAnswer: context.correctAnswer,
         userAnswer: context.userAnswer,
         isCorrect: context.isCorrect,
-      });
+      }) + languageInstruction;
     } else {
-      return PROMPT_TEMPLATES.flashcard({
+      return contextPrefix + PROMPT_TEMPLATES.flashcard({
         front: context.front,
         back: context.back,
         questionText: context.questionText,
         correctAnswer: context.correctAnswer,
-      });
+      }) + languageInstruction;
     }
+  }
+
+  /**
+   * Detect language from context
+   */
+  private detectLanguage(context: ExplainContext): string {
+    const text = context.questionText + " " + context.correctAnswer;
+
+    // Simple language detection based on character sets
+    // Vietnamese: Contains Vietnamese-specific characters
+    if (
+      /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i
+        .test(text)
+    ) {
+      return "Vietnamese";
+    }
+
+    // Japanese: Contains Hiragana, Katakana, or Kanji
+    if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(text)) {
+      return "Japanese";
+    }
+
+    // Korean: Contains Hangul
+    if (/[\uAC00-\uD7AF]/.test(text)) {
+      return "Korean";
+    }
+
+    // Chinese: Contains Chinese characters (but not Japanese Kanji context)
+    if (
+      /[\u4E00-\u9FFF]/.test(text) && !/[\u3040-\u309F\u30A0-\u30FF]/.test(text)
+    ) {
+      return "Chinese";
+    }
+
+    // Default to English
+    return "English";
   }
 
   /**
@@ -115,6 +239,87 @@ export class GeneratorService {
       Logger.success(`AI response received: ${text.length} characters`);
 
       return this.parseResponse(text);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      throw new Error(ERROR_MESSAGES.aiGenerationFailed(message));
+    }
+  }
+
+  /**
+   * Call GitHub Models API with streaming
+   */
+  private async *callAIStream(
+    messages: ChatMessage[],
+  ): AsyncGenerator<string, string[], void> {
+    try {
+      const response = await fetch(AI_CONFIG.chatUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.githubToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: AI_CONFIG.generationModel,
+          messages: messages,
+          temperature: AI_CONFIG.generation.temperature,
+          max_tokens: AI_CONFIG.generation.max_tokens,
+          top_p: AI_CONFIG.generation.top_p,
+          stream: true, // Enable streaming
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          `GitHub Models API error: ${response.status} - ${
+            JSON.stringify(errorData)
+          }`,
+        );
+      }
+
+      if (!response.body) {
+        throw new Error("No response body");
+      }
+
+      // Parse SSE stream
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6);
+            if (data === "[DONE]") continue;
+
+            try {
+              const parsed = JSON.parse(data);
+              const delta = parsed.choices?.[0]?.delta?.content;
+
+              if (delta) {
+                fullText += delta;
+                yield delta; // Yield each chunk progressively
+              }
+            } catch (_e) {
+              // Skip invalid JSON
+            }
+          }
+        }
+      }
+
+      Logger.success(`Streaming completed: ${fullText.length} characters`);
+
+      // Parse final response to extract suggested questions
+      const result = this.parseResponse(fullText);
+      return result.suggested_questions;
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       throw new Error(ERROR_MESSAGES.aiGenerationFailed(message));

@@ -14,7 +14,6 @@ class Settings(BaseSettings):
 
     # API Keys - Separate for Quiz, Flashcard and Explanation
     openrouter_api_key_quiz: str = ""
-    openrouter_api_key_flashcard: str = ""
     openrouter_api_key_explanation: str = ""
 
     # Supabase
@@ -25,17 +24,16 @@ class Settings(BaseSettings):
     # Model Configuration
     default_model: str = "google/gemini-2.5-flash-lite"
     default_model_quiz: str = ""
-    default_model_flashcard: str = ""
     default_model_explanation: str = ""
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
+
+    # Google AI (Direct)
+    google_api_key: str = ""
 
     def get_quiz_api_key(self) -> str:
         """Get API key for quiz generation"""
         return self.openrouter_api_key_quiz or self.openrouter_api_key
 
-    def get_flashcard_api_key(self) -> str:
-        """Get API key for flashcard generation"""
-        return self.openrouter_api_key_flashcard or self.openrouter_api_key
 
     def get_explanation_api_key(self) -> str:
         """Get API key for explanation"""
@@ -45,9 +43,6 @@ class Settings(BaseSettings):
         """Get model for quiz generation"""
         return self.default_model_quiz or self.default_model
 
-    def get_flashcard_model(self) -> str:
-        """Get model for flashcard generation"""
-        return self.default_model_flashcard or self.default_model
 
     def get_explanation_model(self) -> str:
         """Get model for explanation"""

@@ -2,12 +2,10 @@
 fastapi==0.109.2
 uvicorn[standard]==0.27.1
 python-multipart==0.0.9
-httpx>=0.24,<0.26  # Required by supabase
 
-# LangChain Core
+# Document Loaders (LangChain Community)
 langchain==0.1.9
 langchain-community==0.0.24
-langchain-openai==0.0.8
 langchain-text-splitters==0.0.1
 
 # Document Processing
@@ -18,14 +16,10 @@ youtube-transcript-api==0.6.2
 beautifulsoup4==4.12.3
 lxml==5.1.0
 
-# Supabase
-supabase==2.4.0
-
 # Utils
 python-dotenv==1.0.1
-pydantic==2.6.1
-pydantic-settings==2.2.1
-
-# Image Processing (optional, for OCR)
-# pillow==10.2.0
-# pytesseract==0.3.10
+langchain-google-genai
+supabase
+tiktoken
+pydantic-settings
+docx2txt

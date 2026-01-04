@@ -147,19 +147,26 @@ export function AIExplanationPanel({
               {/* Suggested Questions */}
               {explanation?.suggestedQuestions &&
                 explanation.suggestedQuestions.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    {explanation.suggestedQuestions.map((question, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => handleSuggestedQuestion(question)}
-                        disabled={isLoading}
-                        className="flex w-full items-start gap-1 text-left text-xs hover:underline disabled:opacity-50"
-                      >
-                        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" />
-                        <p>{question}</p>
-                      </button>
-                    ))}
+                  <div className="space-y-2 rounded-lg border border-border/50 bg-muted/30 p-4">
+                    <h4 className="font-semibold text-foreground/80 text-sm">
+                      Suggested Questions
+                    </h4>
+                    <div className="space-y-2">
+                      {explanation.suggestedQuestions.map((question, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleSuggestedQuestion(question)}
+                          disabled={isLoading}
+                          className="group flex w-full items-start gap-2 rounded-md p-2 text-left text-sm transition-colors hover:bg-muted disabled:opacity-50"
+                        >
+                          <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                          <span className="text-foreground/70 group-hover:text-foreground">
+                            {question}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
             </div>

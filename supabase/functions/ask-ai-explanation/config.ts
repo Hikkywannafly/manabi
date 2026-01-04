@@ -69,12 +69,11 @@ export const PROMPT_TEMPLATES = {
   // System message for consistent AI behavior
   system: () =>
     `You are Manabi AI, an expert educational tutor specializing in personalized learning. Your role is to:
-- Provide clear, accurate, and encouraging explanations
+- Provide clear, accurate, and concise explanations
+- Focus on the core concept without being overly verbose
 - Adapt your teaching style to the student's level
-- Use examples and analogies to clarify concepts
-- Encourage critical thinking and deeper understanding
-- Use markdown formatting to emphasize important points (bold, italic, lists, etc.)
-- Always end with 2-3 suggested follow-up questions in a "## Suggested Questions" section`,
+- Use examples only when necessary to clarify
+- Always respond in valid JSON format without markdown code blocks`,
 
   quiz: (context: {
     questionText: string;
@@ -124,23 +123,31 @@ ${
 4. **Encourage:** Be supportive and constructive`
     }
 
-4. **Suggest Follow-ups:** Provide 2-3 thoughtful questions to deepen understanding
+## Your Task
+${
+      wasCorrect
+        ? `1. **Briefly explain** why "${context.correctAnswer}" is correct
+2. **Add context** if helpful for deeper understanding`
+        : `1. **Explain why** "${context.correctAnswer}" is the right choice
+2. **Address the error** ${
+          hasUserAnswer
+            ? `in choosing "${context.userAnswer}"`
+            : "and common mistakes"
+        }`
+    }
+3. **Suggest 2-3 follow-up questions** to deepen understanding
 
-## Output Format
-Write your explanation in **clear markdown format**. Use:
-- **Bold** for key concepts
-- *Italic* for emphasis
-- Lists for multiple points
-- Examples and analogies
+## Output Format (JSON ONLY)
+{
+  "explanation": "Your concise, focused explanation (2-3 sentences max). Be direct and clear.",
+  "suggested_questions": [
+    "First follow-up question?",
+    "Second follow-up question?",
+    "Third follow-up question?"
+  ]
+}
 
-End your response with:
-
-## Suggested Questions
-1. [First follow-up question]
-2. [Second follow-up question]
-3. [Third follow-up question]
-
-**IMPORTANT:** Write naturally in markdown. Do NOT use JSON format.`;
+**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks, no extra text. Keep explanation brief and focused.`;
   },
 
   flashcard: (context: {
@@ -160,23 +167,23 @@ End your response with:
 2. **Provide Examples:** Give 1-2 concrete examples or use cases
 3. **Memory Aid:** Suggest a mnemonic, analogy, or visualization technique
 4. **Context:** Explain why this concept is important or how it connects to broader topics
-5. **Suggest Follow-ups:** Provide 2-3 questions to test understanding
 
-## Output Format
-Write your explanation in **clear markdown format**. Use:
-- **Bold** for key concepts
-- *Italic* for emphasis
-- Lists for multiple points
-- Examples and analogies
+## Your Task
+1. **Explain the concept** clearly and concisely
+2. **Give 1 example** if it helps understanding
+3. **Suggest 2-3 follow-up questions**
 
-End your response with:
+## Output Format (JSON ONLY)
+{
+  "explanation": "Your concise explanation (2-3 sentences max). Focus on clarity.",
+  "suggested_questions": [
+    "First follow-up question?",
+    "Second follow-up question?",
+    "Third follow-up question?"
+  ]
+}
 
-## Suggested Questions
-1. [First follow-up question]
-2. [Second follow-up question]
-3. [Third follow-up question]
-
-**IMPORTANT:** Write naturally in markdown. Do NOT use JSON format.`,
+**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks. Keep it brief and clear.`,
 
   followUp: (question: string) =>
     `The student has asked a follow-up question based on the previous explanation.
@@ -189,21 +196,22 @@ End your response with:
 2. **Connect to Previous:** Reference the earlier explanation if relevant
 3. **Expand Understanding:** Provide additional insights or examples
 4. **Encourage Curiosity:** Acknowledge their good question
-5. **Suggest Next Steps:** Provide 1-2 related questions to continue learning
 
-## Output Format
-Write your answer in **clear markdown format**. Use:
-- **Bold** for key concepts
-- *Italic* for emphasis
-- Lists for multiple points
+## Your Task
+1. **Answer directly** and concisely
+2. **Connect to previous context** if relevant
+3. **Suggest 1-2 related questions**
 
-End your response with:
+## Output Format (JSON ONLY)
+{
+  "explanation": "Your concise answer (2-3 sentences max).",
+  "suggested_questions": [
+    "Related follow-up question?",
+    "Deeper exploration question?"
+  ]
+}
 
-## Suggested Questions
-1. [First follow-up question]
-2. [Second follow-up question]
-
-**IMPORTANT:** Write naturally in markdown. Do NOT use JSON format.`,
+**CRITICAL:** Return ONLY the JSON object. Be brief and direct.`,
 } as const;
 
 // ============================================================================

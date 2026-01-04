@@ -327,58 +327,40 @@ export class GeneratorService {
   }
 
   /**
-   * Parse AI response - extract suggested questions from markdown
+   * Parse AI response JSON
    */
   private parseResponse(text: string): AIExplanationResult {
     Logger.info("Parsing AI response...");
 
-    // Try to extract suggested questions from markdown
-    const suggestedQuestionsMatch = text.match(
-      /##\s*Suggested Questions\s*\n((?:\d+\.\s*.+\n?)+)/i,
-    );
+    // Clean markdown code blocks
+    const cleanedText = text
+      .replace(/```json\s*/g, "")
+      .replace(/```\s*/g, "")
+      .trim();
 
-    let explanation = text;
-    let suggested_questions: string[] = [];
+    try {
+      const parsed = JSON.parse(cleanedText);
 
-    if (suggestedQuestionsMatch) {
-      // Extract the questions section
-      const questionsText = suggestedQuestionsMatch[1];
-
-      // Parse numbered list
-      suggested_questions = questionsText
-        .split("\n")
-        .map((line) => line.replace(/^\d+\.\s*/, "").trim())
-        .filter((q) => q.length > 0);
-
-      // Remove the suggested questions section from explanation
-      explanation = text.replace(suggestedQuestionsMatch[0], "").trim();
-
-      Logger.success(
-        `Extracted ${suggested_questions.length} suggested questions from markdown`,
-      );
-    } else {
-      // Fallback: try JSON parsing (for backward compatibility)
-      const cleanedText = text
-        .replace(/```json\s*/g, "")
-        .replace(/```\s*/g, "")
-        .trim();
-
-      try {
-        const parsed = JSON.parse(cleanedText);
-        if (parsed && typeof parsed === "object") {
-          explanation = parsed.explanation || text;
-          suggested_questions = parsed.suggested_questions || [];
-          Logger.success("Parsed as JSON (fallback)");
-        }
-      } catch {
-        // Not JSON, use as-is
-        Logger.info("Using raw text as explanation");
+      // Validate structure
+      if (!parsed || typeof parsed !== "object") {
+        throw new Error("Response is not an object");
       }
-    }
 
-    return {
-      explanation,
-      suggested_questions,
-    };
+      Logger.success("Successfully parsed AI response");
+
+      return {
+        explanation: parsed.explanation || text,
+        suggested_questions: parsed.suggested_questions || [],
+      };
+    } catch (error) {
+      Logger.error("JSON parsing failed", { text: cleanedText, error });
+
+      // Fallback: return raw text as explanation
+      Logger.warning("Using fallback: raw text as explanation");
+      return {
+        explanation: text,
+        suggested_questions: [],
+      };
+    }
   }
 }

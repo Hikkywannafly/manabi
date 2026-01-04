@@ -70,7 +70,7 @@ export class AIService {
    */
   private async callAI(messages: ChatMessage[]): Promise<AIExplanationResult> {
     try {
-      const response = await fetch(AI_CONFIG.apiUrl, {
+      const response = await fetch(AI_CONFIG.chatUrl, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
@@ -79,7 +79,7 @@ export class AIService {
           "X-Title": "Manabi AI Explanation",
         },
         body: JSON.stringify({
-          model: AI_CONFIG.model,
+          model: AI_CONFIG.generationModel,
           messages: messages,
           temperature: AI_CONFIG.generation.temperature,
           max_tokens: AI_CONFIG.generation.max_tokens,
@@ -90,9 +90,11 @@ export class AIService {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          `OpenRouter API error: ${response.status} - ${JSON.stringify(
-            errorData,
-          )}`,
+          `OpenRouter API error: ${response.status} - ${
+            JSON.stringify(
+              errorData,
+            )
+          }`,
         );
       }
 

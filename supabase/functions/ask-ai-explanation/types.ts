@@ -20,10 +20,14 @@ export interface ExplainContext {
   isCorrect?: boolean;
   front?: string;
   back?: string;
+  // RAG metadata for retrieving context from vectors
+  quizId?: string;
+  deckId?: string;
+  questionId?: string;
 }
 
 export interface ChatMessage {
-  role: "user" | "assistant";
+  role: "system" | "user" | "assistant";
   content: string;
 }
 
@@ -50,4 +54,15 @@ export interface ErrorResponse {
 export interface AIExplanationResult {
   explanation: string;
   suggested_questions: string[];
+}
+
+// ============================================================================
+// STREAMING TYPES
+// ============================================================================
+
+export interface StreamChunk {
+  type: "content" | "suggestions" | "done" | "error";
+  content?: string;
+  suggestions?: string[];
+  error?: string;
 }

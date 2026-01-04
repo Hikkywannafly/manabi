@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight, Loader2, Send } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,19 @@ export function AIExplanationPanel({
     askFollowUp,
     reset,
   } = useAIExplanation(context);
+
+  // Auto-scroll to bottom when messages update
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]",
+      );
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  });
 
   // Fetch explanation when panel opens with new context
   useEffect(() => {
@@ -80,7 +93,7 @@ export function AIExplanationPanel({
         </SheetHeader>
 
         <div className="min-h-0 flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
+          <ScrollArea ref={scrollAreaRef} className="h-full">
             <div className="space-y-4 p-4">
               {/* Messages */}
               {messages.map((message, index) => (

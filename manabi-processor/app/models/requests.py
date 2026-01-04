@@ -17,18 +17,12 @@ class QuizGenerationParams(BaseModel):
     custom_instructions: Optional[str] = None
 
 
-class FlashcardGenerationParams(BaseModel):
-    """Parameters for flashcard generation"""
-    difficulty: Literal["Easy", "Medium", "Hard"] = "Medium"
-    number_of_cards: int = Field(default=20, ge=1, le=100)
-    language: str = "english"
-    parsing_mode: Literal["fast", "balanced", "premium"] = "balanced"
-    custom_instructions: Optional[str] = None
 
 
 class QuizGenerationRequest(BaseModel):
     """Request model for quiz generation"""
     quiz_id: str
+    user_id: str
 
     # Content sources (one required)
     file_url: Optional[str] = None
@@ -53,31 +47,6 @@ class QuizGenerationRequest(BaseModel):
         return "unknown"
 
 
-class FlashcardGenerationRequest(BaseModel):
-    """Request model for flashcard generation"""
-    deck_id: str
-
-    # Content sources (one required)
-    file_url: Optional[str] = None
-    file_type: Optional[str] = None
-    text_content: Optional[str] = None
-    youtube_url: Optional[str] = None
-    webpage_url: Optional[str] = None
-
-    # Generation parameters
-    params: FlashcardGenerationParams = Field(default_factory=FlashcardGenerationParams)
-
-    def get_source_type(self) -> str:
-        """Determine the content source type"""
-        if self.file_url:
-            return "file"
-        elif self.youtube_url:
-            return "youtube"
-        elif self.webpage_url:
-            return "webpage"
-        elif self.text_content:
-            return "text"
-        return "unknown"
 
 
 class QuestionOption(BaseModel):
@@ -88,15 +57,12 @@ class QuestionOption(BaseModel):
 
 class ExplainContextRequest(BaseModel):
     """Context for explanation request"""
-    content_type: Literal["quiz", "flashcard"] = Field(..., alias="contentType")
+    content_type: Literal["quiz"] = Field(..., alias="contentType")
     question_text: str = Field(..., alias="questionText")
     options: Optional[list[QuestionOption]] = None
     correct_answer: str = Field(..., alias="correctAnswer")
     user_answer: Optional[str] = Field(None, alias="userAnswer")
     is_correct: Optional[bool] = Field(None, alias="isCorrect")
-    # For flashcards
-    front: Optional[str] = None
-    back: Optional[str] = None
 
     class Config:
         populate_by_name = True

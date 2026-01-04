@@ -228,8 +228,11 @@ export function QuizSettingsSidebar({ form }: QuizSettingsSidebarProps) {
                 </Select>
                 <div className="mt-2 flex items-center gap-4 rounded-md border border-yellow-500 bg-yellow-100 p-4 text-yellow-900 dark:border-amber-500 dark:bg-amber-950 dark:text-amber-100">
                   <p className="text-sm">
-                    Fast mode skips images and tables. Use Balanced mode if
-                    material has them, but processing will take longer.
+                    <strong>Fast:</strong> Text-only, skips images/tables.{" "}
+                    <br />
+                    <strong>Balanced:</strong> Recommended for most docs. <br />
+                    <strong>Premium:</strong> Enhanced accuracy for complex
+                    layouts (Upgrade required).
                   </p>
                 </div>
               </FormItem>

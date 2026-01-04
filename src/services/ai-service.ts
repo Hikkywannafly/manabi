@@ -41,10 +41,9 @@ export const AIService = {
     params: GenerationParams,
   ) {
     const { data, error } = await supabase.functions.invoke(
-      "generate-content",
+      "generate-quiz-v2",
       {
         body: {
-          action: "generate_quiz",
           filePath,
           textContent,
           youtubeUrl,

@@ -21,7 +21,8 @@
       "!**/build",
       "!**/public/sw.js",
       "!**/src/app/globals.css",
-      "!src/lib/theme.ts"
+      "!src/lib/theme.ts",
+      "!supabase/functions/**"
     ]
   },
   // Formatter settings

@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2",
+    "langchain": "npm:langchain@0.1.36",
+    "langchain/text_splitter": "npm:langchain@0.1.36/text_splitter",
+    "cheerio": "npm:cheerio@1.0.0-rc.12",
+    "mammoth": "https://esm.sh/mammoth@1.8.0",
+    "youtube-transcript": "npm:youtube-transcript@1.0.6"
+  }
+}

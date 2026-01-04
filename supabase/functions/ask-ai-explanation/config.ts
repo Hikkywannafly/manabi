@@ -73,7 +73,8 @@ export const PROMPT_TEMPLATES = {
 - Adapt your teaching style to the student's level
 - Use examples and analogies to clarify concepts
 - Encourage critical thinking and deeper understanding
-- Always respond in valid JSON format without markdown code blocks`,
+- Use markdown formatting to emphasize important points (bold, italic, lists, etc.)
+- Always end with 2-3 suggested follow-up questions in a "## Suggested Questions" section`,
 
   quiz: (context: {
     questionText: string;
@@ -125,17 +126,21 @@ ${
 
 4. **Suggest Follow-ups:** Provide 2-3 thoughtful questions to deepen understanding
 
-## Output Format (JSON ONLY)
-{
-  "explanation": "Your detailed, structured explanation here. Use clear paragraphs and examples.",
-  "suggested_questions": [
-    "A deeper question about the concept?",
-    "A related application question?",
-    "An extension or edge case?"
-  ]
-}
+## Output Format
+Write your explanation in **clear markdown format**. Use:
+- **Bold** for key concepts
+- *Italic* for emphasis
+- Lists for multiple points
+- Examples and analogies
 
-**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks, no extra text.`;
+End your response with:
+
+## Suggested Questions
+1. [First follow-up question]
+2. [Second follow-up question]
+3. [Third follow-up question]
+
+**IMPORTANT:** Write naturally in markdown. Do NOT use JSON format.`;
   },
 
   flashcard: (context: {
@@ -157,17 +162,21 @@ ${
 4. **Context:** Explain why this concept is important or how it connects to broader topics
 5. **Suggest Follow-ups:** Provide 2-3 questions to test understanding
 
-## Output Format (JSON ONLY)
-{
-  "explanation": "Your comprehensive explanation with examples and memory techniques.",
-  "suggested_questions": [
-    "A question to test basic understanding?",
-    "A question about practical application?",
-    "A question connecting to related concepts?"
-  ]
-}
+## Output Format
+Write your explanation in **clear markdown format**. Use:
+- **Bold** for key concepts
+- *Italic* for emphasis
+- Lists for multiple points
+- Examples and analogies
 
-**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks, no extra text.`,
+End your response with:
+
+## Suggested Questions
+1. [First follow-up question]
+2. [Second follow-up question]
+3. [Third follow-up question]
+
+**IMPORTANT:** Write naturally in markdown. Do NOT use JSON format.`,
 
   followUp: (question: string) =>
     `The student has asked a follow-up question based on the previous explanation.
@@ -182,16 +191,19 @@ ${
 4. **Encourage Curiosity:** Acknowledge their good question
 5. **Suggest Next Steps:** Provide 1-2 related questions to continue learning
 
-## Output Format (JSON ONLY)
-{
-  "explanation": "Your clear, contextual answer to their follow-up question.",
-  "suggested_questions": [
-    "A related follow-up question?",
-    "A deeper exploration question?"
-  ]
-}
+## Output Format
+Write your answer in **clear markdown format**. Use:
+- **Bold** for key concepts
+- *Italic* for emphasis
+- Lists for multiple points
 
-**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks, no extra text.`,
+End your response with:
+
+## Suggested Questions
+1. [First follow-up question]
+2. [Second follow-up question]
+
+**IMPORTANT:** Write naturally in markdown. Do NOT use JSON format.`,
 } as const;
 
 // ============================================================================

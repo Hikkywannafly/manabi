@@ -14,9 +14,15 @@ export function useAIExplanation(context: AIExplanationContext | null) {
   const [isStreaming, setIsStreaming] = useState(false);
 
   const fetchExplanation = useCallback(async () => {
-    if (!context) return;
+    if (!context) {
+      return;
+    }
 
     setIsStreaming(true);
+
+    // Show loading immediately
+    setMessages([{ role: "assistant", content: "" }]);
+
     let fullContent = "";
     let suggestions: string[] = [];
 
@@ -34,6 +40,8 @@ export function useAIExplanation(context: AIExplanationContext | null) {
       const result = await stream.return([]);
       suggestions = (result.value || []) as string[];
 
+      // Update with parsed content
+      setMessages([{ role: "assistant", content: fullContent }]);
       setExplanation({
         explanation: fullContent,
         suggestedQuestions: suggestions,
@@ -47,6 +55,12 @@ export function useAIExplanation(context: AIExplanationContext | null) {
         setMessages([{ role: "assistant", content: data.explanation }]);
       } catch (fallbackError) {
         console.error("Fallback error:", fallbackError);
+        setMessages([
+          {
+            role: "assistant",
+            content: "Sorry, I encountered an error. Please try again.",
+          },
+        ]);
       }
     } finally {
       setIsStreaming(false);
@@ -61,8 +75,12 @@ export function useAIExplanation(context: AIExplanationContext | null) {
       let fullContent = "";
       let suggestions: string[] = [];
 
-      // Add user message immediately
-      setMessages((prev) => [...prev, { role: "user", content: question }]);
+      // Add user message and assistant placeholder immediately
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", content: question },
+        { role: "assistant", content: "" },
+      ]);
 
       try {
         const stream = AIExplanationService.askFollowUpStream(
@@ -85,6 +103,11 @@ export function useAIExplanation(context: AIExplanationContext | null) {
         const result = await stream.return([]);
         suggestions = (result.value || []) as string[];
 
+        // Update with parsed content
+        setMessages((prev) => [
+          ...prev.slice(0, -1),
+          { role: "assistant", content: fullContent },
+        ]);
         setExplanation({
           explanation: fullContent,
           suggestedQuestions: suggestions,
@@ -99,12 +122,19 @@ export function useAIExplanation(context: AIExplanationContext | null) {
             question,
           );
           setMessages((prev) => [
-            ...prev,
+            ...prev.slice(0, -1),
             { role: "assistant", content: data.explanation },
           ]);
           setExplanation(data);
         } catch (fallbackError) {
           console.error("Fallback error:", fallbackError);
+          setMessages((prev) => [
+            ...prev.slice(0, -1),
+            {
+              role: "assistant",
+              content: "Sorry, I encountered an error. Please try again.",
+            },
+          ]);
         }
       } finally {
         setIsStreaming(false);

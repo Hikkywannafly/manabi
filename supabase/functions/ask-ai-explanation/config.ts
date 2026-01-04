@@ -1,6 +1,6 @@
 /**
  * Configuration for AI Explanation Edge Function
- * Centralized config for easy maintenance and updates
+ * Aligned with generate-quiz-v2 architecture
  */
 
 // ============================================================================
@@ -8,30 +8,27 @@
 // ============================================================================
 
 export const API_CONFIG = {
-  // CORS settings
   cors: {
     allowOrigin: "*",
     allowHeaders: "authorization, x-client-info, apikey, content-type",
   },
-
-  // Request timeout (ms)
   timeout: 60000, // 1 minute
 } as const;
 
 // ============================================================================
-// OPENROUTER AI CONFIGURATION
+// GITHUB MODELS AI CONFIGURATION
 // ============================================================================
 
 export const AI_CONFIG = {
-  // OpenRouter API endpoint
-  apiUrl: "https://openrouter.ai/api/v1/chat/completions",
+  // GitHub Models API endpoints
+  chatUrl: "https://models.github.ai/inference/chat/completions",
 
-  // Model selection (using free tier)
-  model: "google/gemini-2.5-flash-lite",
+  // Model selection - using gpt-4o-mini for speed and efficiency
+  generationModel: "gpt-4o-mini",
 
   // Generation settings
   generation: {
-    temperature: 0.7, // 0.0 - 1.0 (higher = more creative)
+    temperature: 0.7,
     max_tokens: 2048,
     top_p: 0.95,
   },
@@ -42,10 +39,7 @@ export const AI_CONFIG = {
 // ============================================================================
 
 export const LOGGING_CONFIG = {
-  // Enable detailed logging
   verbose: true,
-
-  // Emojis for log messages
   emojis: {
     info: "ℹ️",
     success: "✅",
@@ -54,6 +48,7 @@ export const LOGGING_CONFIG = {
     rocket: "🚀",
     celebrate: "🎉",
     boom: "💥",
+    brain: "🧠",
   },
 } as const;
 
@@ -75,10 +70,10 @@ export const PROMPT_TEMPLATES = {
 
 **Options:**
 ${
-  context.options
-    ? context.options.map((o) => `- ${o.text}`).join("\n")
-    : "No options provided"
-}
+      context.options
+        ? context.options.map((o) => `- ${o.text}`).join("\n")
+        : "No options provided"
+    }
 
 **Correct Answer:** ${context.correctAnswer}
 **Student's Answer:** ${context.userAnswer || "Not provided"}
@@ -146,7 +141,7 @@ IMPORTANT: Return ONLY the JSON object, no markdown code blocks.`,
 
 export const ERROR_MESSAGES = {
   missingContext: "Missing required field: context",
-  missingOpenRouterKey: "Missing OPENROUTER_API_KEY environment variable",
+  missingGithubToken: "Missing GITHUB_TOKEN environment variable",
   aiGenerationFailed: (message: string) => `AI generation failed: ${message}`,
   parseResponseFailed: (message: string) =>
     `Failed to parse AI response: ${message}`,
@@ -158,5 +153,5 @@ export const ERROR_MESSAGES = {
 // ============================================================================
 
 export const ENV_VARS = {
-  openRouterApiKey: "OPENROUTER_API_KEY",
+  githubToken: "GITHUB_TOKEN",
 } as const;

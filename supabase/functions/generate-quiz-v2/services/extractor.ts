@@ -27,7 +27,7 @@ export class ExtractorService {
     this.visionExtractor = new VisionExtractor(
       githubToken,
       AI_CONFIG.chatUrl,
-      AI_CONFIG.generationModel,
+      AI_CONFIG.visionModel,
     );
     this.ocrExtractor = new OCRExtractor();
     this.fileExtractor = new FileExtractor(

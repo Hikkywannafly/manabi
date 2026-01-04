@@ -117,8 +117,19 @@ export class FileExtractor {
   ): Promise<string> {
     const mimeType = `image/${fileType === "jpg" ? "jpeg" : fileType}`;
 
-    // Auto mode: Try OCR first (free), fallback to Vision if fails
+    // Auto mode: Originally tried OCR first, but momentarily disabled per user request
+    // Now defaults to Vision API directly
     if (extractionMode === "auto") {
+      Logger.info(
+        "Auto mode: Defaulting to Vision API directly (OCR disabled temporarily)",
+      );
+      return await this.visionExtractor.extractFromBuffer(
+        arrayBuffer,
+        mimeType,
+        parsingMode,
+      );
+
+      /* OCR DISABLED TEMPORARILY
       Logger.info(
         "Auto mode: Trying OCR first, will fallback to Vision API if needed",
       );
@@ -137,6 +148,7 @@ export class FileExtractor {
           parsingMode,
         );
       }
+      */
     }
 
     // Explicit OCR mode

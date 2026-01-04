@@ -3,7 +3,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // Import types and config
 import { API_CONFIG, ENV_VARS, ERROR_MESSAGES } from "./config.ts";
 // Import Services
-import { AIService } from "./services/ai.service.ts";
+import { GeneratorService } from "./services/generator.ts";
 import type { RequestPayload } from "./types.ts";
 import { Logger } from "./utils/logger.ts";
 
@@ -21,10 +21,10 @@ const CORS_HEADERS = {
 // ============================================================================
 
 class ExplanationHandler {
-  private aiService: AIService;
+  private generatorService: GeneratorService;
 
-  constructor(openRouterApiKey: string) {
-    this.aiService = new AIService(openRouterApiKey);
+  constructor(githubToken: string) {
+    this.generatorService = new GeneratorService(githubToken);
   }
 
   async execute(payload: RequestPayload): Promise<{
@@ -51,14 +51,14 @@ class ExplanationHandler {
 
     if (question && history) {
       // Follow-up question
-      result = await this.aiService.generateFollowUp(
+      result = await this.generatorService.generateFollowUp(
         context,
         history,
         question,
       );
     } else {
       // Initial explanation
-      result = await this.aiService.generateExplanation(context);
+      result = await this.generatorService.generateExplanation(context);
     }
 
     return {
@@ -85,14 +85,14 @@ Deno.serve(async (req) => {
     const payload: RequestPayload = await req.json();
 
     // Validate environment variables
-    const openRouterApiKey = Deno.env.get(ENV_VARS.openRouterApiKey);
+    const githubToken = Deno.env.get(ENV_VARS.githubToken);
 
-    if (!openRouterApiKey) {
-      throw new Error(ERROR_MESSAGES.missingOpenRouterKey);
+    if (!githubToken) {
+      throw new Error(ERROR_MESSAGES.missingGithubToken);
     }
 
     // Execute explanation generation
-    const handler = new ExplanationHandler(openRouterApiKey);
+    const handler = new ExplanationHandler(githubToken);
     const result = await handler.execute(payload);
 
     Logger.celebrate("Explanation generated successfully!");
@@ -105,8 +105,9 @@ Deno.serve(async (req) => {
     Logger.boom("Explanation generation failed");
     Logger.error("Error details", error);
 
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error
+      ? error.message
+      : "Unknown error";
     const errorStack = error instanceof Error ? error.stack : undefined;
 
     return new Response(

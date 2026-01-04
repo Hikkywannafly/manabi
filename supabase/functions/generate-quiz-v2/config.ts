@@ -26,7 +26,13 @@ export const AI_CONFIG = {
   embeddingsUrl: "https://models.github.ai/inference/embeddings",
 
   // Model selection
-  generationModel: "openai/gpt-4o",
+  // Recommended: "gpt-4o" for complex logic, "gpt-4o-mini" for speed/efficiency
+  generationModel: "gpt-4o-mini",
+
+  // Vision model specifically for image extraction
+  // Recommended: "gpt-4o" for best OCR/understanding, "gpt-4o-mini" for speed
+  visionModel: "gpt-4o-mini",
+
   embeddingModel: "text-embedding-3-small",
 
   // Generation settings

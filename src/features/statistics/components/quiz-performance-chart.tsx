@@ -119,7 +119,7 @@ export function QuizPerformanceChart() {
       {/* Enhanced Statistics Footer */}
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {/* Average Score Card */}
-        <div className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-blue-500/10 to-cyan-500/10 p-4 transition-all hover:shadow-md">
+        <div className="group relative flex h-full flex-col overflow-hidden rounded-lg border bg-gradient-to-br from-blue-500/10 to-cyan-500/10 p-4 transition-all hover:shadow-md">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <p className="font-medium text-muted-foreground text-xs">
@@ -139,7 +139,7 @@ export function QuizPerformanceChart() {
 
         {/* Trend Card */}
         <div
-          className={`group relative overflow-hidden rounded-lg border p-4 transition-all hover:shadow-md ${
+          className={`group relative flex h-full flex-col overflow-hidden rounded-lg border p-4 transition-all hover:shadow-md ${
             stats.trend > 0
               ? "bg-gradient-to-br from-emerald-500/10 to-green-500/10"
               : stats.trend < 0
@@ -182,7 +182,7 @@ export function QuizPerformanceChart() {
         </div>
 
         {/* Total Quizzes Card */}
-        <div className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-violet-500/10 to-purple-500/10 p-4 transition-all hover:shadow-md">
+        <div className="group relative flex h-full flex-col overflow-hidden rounded-lg border bg-gradient-to-br from-violet-500/10 to-purple-500/10 p-4 transition-all hover:shadow-md">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <p className="font-medium text-muted-foreground text-xs">

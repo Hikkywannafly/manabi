@@ -1,5 +1,8 @@
 "use client";
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -8,66 +11,200 @@ import {
 } from "@/components/ui/tooltip";
 import { useActivityCalendar } from "../hooks/use-statistics";
 
-function getColor(level: number) {
-  if (level === 0) return "bg-secondary-foreground/10";
-  if (level === 1) return "bg-blue-200 dark:bg-blue-900";
-  if (level === 2) return "bg-blue-400 dark:bg-blue-700";
-  if (level === 3) return "bg-blue-600 dark:bg-blue-500";
-  return "bg-blue-700 dark:bg-blue-400";
+function getActivityColor(count: number): string {
+  if (count === 0) return "bg-secondary/50 hover:bg-secondary";
+  if (count < 30)
+    return "bg-blue-200 dark:bg-blue-900/40 hover:bg-blue-300 dark:hover:bg-blue-900/60";
+  if (count < 60)
+    return "bg-blue-400 dark:bg-blue-700/60 hover:bg-blue-500 dark:hover:bg-blue-700/80";
+  if (count < 90)
+    return "bg-blue-600 dark:bg-blue-500/70 hover:bg-blue-700 dark:hover:bg-blue-500/90";
+  return "bg-blue-700 dark:bg-blue-400 hover:bg-blue-800 dark:hover:bg-blue-300";
 }
 
 export function ActivityCalendar() {
   const { data: activityData = [], isLoading } = useActivityCalendar();
+  const [currentDate, setCurrentDate] = useState(new Date());
 
-  // Fill in missing days with zero activity (last 365 days)
-  const fullYearData = Array.from({ length: 365 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (364 - i));
-    const dateStr = date.toISOString().split("T")[0];
+  // Get current month and year
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
 
-    const existing = activityData.find((d) => d.date === dateStr);
-    return existing || { date: dateStr, count: 0, level: 0 };
-  });
+  // Get first day of month and number of days
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startingDayOfWeek = firstDay.getDay();
+
+  // Create calendar grid
+  const calendarDays: (number | null)[] = [];
+
+  // Add empty cells for days before month starts
+  for (let i = 0; i < startingDayOfWeek; i++) {
+    calendarDays.push(null);
+  }
+
+  // Add days of month
+  for (let day = 1; day <= daysInMonth; day++) {
+    calendarDays.push(day);
+  }
+
+  // Get activity data for current month
+  const getActivityForDay = (day: number) => {
+    const dateStr = new Date(year, month, day).toISOString().split("T")[0];
+    return activityData.find((d) => d.date === dateStr);
+  };
+
+  const goToPreviousMonth = () => {
+    setCurrentDate(new Date(year, month - 1, 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentDate(new Date(year, month + 1, 1));
+  };
+
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
 
   if (isLoading) {
     return (
-      <div className="flex flex-wrap gap-1">
-        {Array.from({ length: 365 }).map((_, i) => (
-          <div
-            key={i}
-            className="size-2.5 animate-pulse rounded-sm bg-secondary-foreground/10"
-          />
-        ))}
+      <div className="space-y-3">
+        <div className="h-6 w-32 animate-pulse rounded bg-secondary" />
+        <div className="grid grid-cols-7 gap-1.5">
+          {Array.from({ length: 35 }).map((_, i) => (
+            <div
+              key={i}
+              className="aspect-square animate-pulse rounded bg-secondary"
+            />
+          ))}
+        </div>
       </div>
     );
   }
 
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const monthName = firstDay.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-1">
-        {fullYearData.map((day, i) => (
-          <TooltipProvider key={i}>
-            <Tooltip>
-              <TooltipTrigger>
-                <div className={`size-2.5 rounded-sm ${getColor(day.level)}`} />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {day.count} minutes on{" "}
-                  {new Date(day.date).toLocaleDateString()}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ))}
+    <div className="flex flex-col space-y-3">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h4 className="font-medium text-muted-foreground text-sm">
+          {monthName}
+        </h4>
+        <div className="flex items-center gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={goToToday}
+            className="h-7 px-2 text-xs"
+          >
+            Today
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={goToPreviousMonth}
+            className="size-7"
+          >
+            <ChevronLeft className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={goToNextMonth}
+            className="size-7"
+          >
+            <ChevronRight className="size-3.5" />
+          </Button>
+        </div>
       </div>
-      <div className="flex items-center justify-end gap-2 text-muted-foreground text-xs">
+
+      <div className="w-full">
+        {/* Week day headers */}
+        <div className="mb-1 grid grid-cols-7 gap-1">
+          {weekDays.map((day) => (
+            <div
+              key={day}
+              className="text-center font-medium text-[10px] text-muted-foreground"
+            >
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {calendarDays.map((day, index) => {
+            if (day === null) {
+              return <div key={`empty-${index}`} className="aspect-square" />;
+            }
+
+            const activity = getActivityForDay(day);
+            const activityCount = activity?.count || 0;
+            const isToday =
+              day === new Date().getDate() &&
+              month === new Date().getMonth() &&
+              year === new Date().getFullYear();
+
+            return (
+              <TooltipProvider key={day}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div
+                      className={`flex aspect-square w-full items-center justify-center rounded border transition-all ${
+                        isToday
+                          ? "border-primary ring-2 ring-primary/20"
+                          : "border-border"
+                      } ${getActivityColor(activityCount)}`}
+                    >
+                      <span
+                        className={`font-medium text-xs ${
+                          activityCount >= 60 ? "text-white" : "text-foreground"
+                        }`}
+                      >
+                        {day}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-popover text-popover-foreground">
+                    <div className="space-y-1">
+                      <p className="font-semibold text-foreground">
+                        {new Date(year, month, day).toLocaleDateString(
+                          "en-US",
+                          {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          },
+                        )}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {activity
+                          ? `${activity.count} minutes of study`
+                          : "No activity"}
+                      </p>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex max-w-[350px] items-center justify-end gap-2 border-t pt-2 text-[10px] text-muted-foreground">
         <span>Less</span>
         <div className="flex gap-1">
-          <div className="size-2.5 rounded-sm bg-secondary-foreground/10"></div>
-          <div className="size-2.5 rounded-sm bg-blue-200 dark:bg-blue-900"></div>
-          <div className="size-2.5 rounded-sm bg-blue-400 dark:bg-blue-700"></div>
-          <div className="size-2.5 rounded-sm bg-blue-600 dark:bg-blue-500"></div>
+          <div className="size-2.5 rounded-sm bg-secondary/50"></div>
+          <div className="size-2.5 rounded-sm bg-blue-200 dark:bg-blue-900/40"></div>
+          <div className="size-2.5 rounded-sm bg-blue-400 dark:bg-blue-700/60"></div>
+          <div className="size-2.5 rounded-sm bg-blue-600 dark:bg-blue-500/70"></div>
           <div className="size-2.5 rounded-sm bg-blue-700 dark:bg-blue-400"></div>
         </div>
         <span>More</span>

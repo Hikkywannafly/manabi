@@ -131,9 +131,9 @@ export function FlashcardProgressChart() {
       </ChartContainer>
 
       {/* Enhanced Statistics Footer */}
-      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="mt-12 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {/* Retention Rate Card */}
-        <div className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-emerald-500/10 to-green-500/10 p-4 transition-all hover:shadow-md">
+        <div className="group relative flex h-full flex-col overflow-hidden rounded-lg border bg-gradient-to-br from-emerald-500/10 to-green-500/10 p-4 transition-all hover:shadow-md">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <p className="font-medium text-muted-foreground text-xs">
@@ -152,7 +152,7 @@ export function FlashcardProgressChart() {
         </div>
 
         {/* Mastered Cards Card */}
-        <div className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-violet-500/10 to-purple-500/10 p-4 transition-all hover:shadow-md">
+        <div className="group relative flex h-full flex-col overflow-hidden rounded-lg border bg-gradient-to-br from-violet-500/10 to-purple-500/10 p-4 transition-all hover:shadow-md">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <p className="font-medium text-muted-foreground text-xs">
@@ -172,7 +172,7 @@ export function FlashcardProgressChart() {
         </div>
 
         {/* Total Cards Card */}
-        <div className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-4 transition-all hover:shadow-md">
+        <div className="group relative flex h-full flex-col overflow-hidden rounded-lg border bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-4 transition-all hover:shadow-md">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <p className="font-medium text-muted-foreground text-xs">

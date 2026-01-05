@@ -80,7 +80,7 @@ export const studyToolsNavItems: NavItem[] = [
   },
   {
     title: "Tutors",
-    url: "/dashboard/tutor",
+    url: "",
     icon: "graduationCap",
     isActive: false,
     items: [],
@@ -98,7 +98,7 @@ export const studyToolsNavItems: NavItem[] = [
 export const planningNavItems: NavItem[] = [
   {
     title: "Planner",
-    url: "/dashboard/planner",
+    url: "",
     icon: "calendar",
     isActive: false,
     items: [],
@@ -116,7 +116,7 @@ export const planningNavItems: NavItem[] = [
 export const socialNavItems: NavItem[] = [
   {
     title: "Study Groups",
-    url: "/dashboard/study-groups",
+    url: "",
     icon: "users",
     isActive: false,
     items: [],
@@ -141,7 +141,7 @@ export const socialNavItems: NavItem[] = [
 export const accountNavItems: NavItem[] = [
   {
     title: "Billing",
-    url: "/dashboard/billing",
+    url: "",
     icon: "billing",
     isActive: false,
     items: [],
@@ -155,7 +155,7 @@ export const accountNavItems: NavItem[] = [
   },
   {
     title: "Feedback",
-    url: "/dashboard/feedback",
+    url: "",
     icon: "messageCircle",
     isActive: false,
     items: [],

@@ -8,25 +8,42 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-const chartData = [
-  { day: "Mon", hours: 4 },
-  { day: "Tue", hours: 3 },
-  { day: "Wed", hours: 2 },
-  { day: "Thu", hours: 5 },
-  { day: "Fri", hours: 1.5 },
-  { day: "Sat", hours: 6 },
-  { day: "Sun", hours: 4 },
-];
+import { useWeeklyStudyHours } from "../hooks/use-statistics";
 
 const chartConfig = {
-  hours: {
-    label: "Hours",
-    color: "hsl(var(--primary))",
+  quiz: {
+    label: "Quiz",
+    color: "hsl(330, 81%, 60%)", // Vibrant pink
+  },
+  flashcard: {
+    label: "Flashcard",
+    color: "hsl(271, 91%, 65%)", // Vibrant purple
+  },
+  pomodoro: {
+    label: "Pomodoro",
+    color: "hsl(24, 95%, 53%)", // Vibrant orange
   },
 } satisfies ChartConfig;
 
 export function WeeklyStudyHoursChart() {
+  const { data: weeklyData = [], isLoading } = useWeeklyStudyHours();
+
+  // Convert minutes to hours
+  const chartData = weeklyData.map((d) => ({
+    day: d.day,
+    quiz: Math.round((d.quiz / 60) * 10) / 10,
+    flashcard: Math.round((d.flashcard / 60) * 10) / 10,
+    pomodoro: Math.round((d.pomodoro / 60) * 10) / 10,
+  }));
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[200px] items-center justify-center">
+        <p className="text-muted-foreground text-sm">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
       <BarChart accessibilityLayer data={chartData}>
@@ -38,7 +55,24 @@ export function WeeklyStudyHoursChart() {
           tickFormatter={(value) => value.slice(0, 3)}
         />
         <ChartTooltip content={<ChartTooltipContent />} />
-        <Bar dataKey="hours" fill="var(--color-hours)" radius={4} />
+        <Bar
+          dataKey="pomodoro"
+          stackId="a"
+          fill="var(--color-pomodoro)"
+          radius={[0, 0, 4, 4]}
+        />
+        <Bar
+          dataKey="quiz"
+          stackId="a"
+          fill="var(--color-quiz)"
+          radius={[0, 0, 0, 0]}
+        />
+        <Bar
+          dataKey="flashcard"
+          stackId="a"
+          fill="var(--color-flashcard)"
+          radius={[4, 4, 0, 0]}
+        />
       </BarChart>
     </ChartContainer>
   );

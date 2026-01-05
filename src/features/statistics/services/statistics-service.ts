@@ -502,4 +502,200 @@ export const StatisticsService = {
       };
     });
   },
+
+  // XP Growth Over Time
+  async getXPGrowth(
+    userId: string,
+    days: number = 30,
+  ): Promise<
+    Array<{
+      date: string;
+      mission: number;
+      achievement: number;
+      quiz: number;
+      total: number;
+    }>
+  > {
+    const supabase = createClient();
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const { data: transactions } = await supabase
+      .from("xp_transactions")
+      .select("amount, source_type, created_at")
+      .eq("user_id", userId)
+      .gte("created_at", startDate.toISOString())
+      .order("created_at", { ascending: true });
+
+    // Group by date and source type
+    const dailyXP: Record<string, Record<string, number>> = {};
+
+    transactions?.forEach((tx) => {
+      const date = new Date(tx.created_at as string)
+        .toISOString()
+        .split("T")[0];
+      if (!dailyXP[date]) {
+        dailyXP[date] = {
+          MISSION: 0,
+          ACHIEVEMENT: 0,
+          QUIZ: 0,
+          STREAK: 0,
+          POMODORO: 0,
+        };
+      }
+      dailyXP[date][tx.source_type] =
+        (dailyXP[date][tx.source_type] || 0) + tx.amount;
+    });
+
+    return Object.entries(dailyXP)
+      .map(([date, sources]) => ({
+        date,
+        mission: sources.MISSION || 0,
+        achievement: sources.ACHIEVEMENT || 0,
+        quiz: sources.QUIZ || 0,
+        total: Object.values(sources).reduce((sum, val) => sum + val, 0),
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  },
+
+  // Quiz Accuracy Trend
+  async getQuizAccuracyTrend(
+    userId: string,
+    days: number = 30,
+  ): Promise<Array<{ date: string; avgScore: number; quizCount: number }>> {
+    const supabase = createClient();
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const { data: attempts } = await supabase
+      .from("quiz_attempts")
+      .select("completed_at, score")
+      .eq("user_id", userId)
+      .gte("completed_at", startDate.toISOString())
+      .order("completed_at", { ascending: true });
+
+    // Group by date
+    const dailyScores: Record<string, { totalScore: number; count: number }> =
+      {};
+
+    attempts?.forEach((attempt) => {
+      if (attempt.completed_at) {
+        const date = new Date(attempt.completed_at).toISOString().split("T")[0];
+        if (!dailyScores[date]) {
+          dailyScores[date] = { totalScore: 0, count: 0 };
+        }
+        dailyScores[date].totalScore += attempt.score;
+        dailyScores[date].count += 1;
+      }
+    });
+
+    return Object.entries(dailyScores)
+      .map(([date, data]) => ({
+        date,
+        avgScore: Math.round(data.totalScore / data.count),
+        quizCount: data.count,
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  },
+
+  // XP Source Breakdown
+  async getXPSourceBreakdown(
+    userId: string,
+    days: number = 30,
+  ): Promise<
+    Array<{ source: string; amount: number; percentage: number; count: number }>
+  > {
+    const supabase = createClient();
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const { data: transactions } = await supabase
+      .from("xp_transactions")
+      .select("amount, source_type")
+      .eq("user_id", userId)
+      .gte("created_at", startDate.toISOString());
+
+    const sourceData: Record<string, { amount: number; count: number }> = {};
+    let totalXP = 0;
+
+    transactions?.forEach((tx) => {
+      if (!sourceData[tx.source_type]) {
+        sourceData[tx.source_type] = { amount: 0, count: 0 };
+      }
+      sourceData[tx.source_type].amount += tx.amount;
+      sourceData[tx.source_type].count += 1;
+      totalXP += tx.amount;
+    });
+
+    return Object.entries(sourceData)
+      .map(([source, data]) => ({
+        source,
+        amount: data.amount,
+        percentage: totalXP > 0 ? Math.round((data.amount / totalXP) * 100) : 0,
+        count: data.count,
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  },
+
+  // Learning Velocity (Content Creation Rate)
+  async getLearningVelocity(
+    userId: string,
+    weeks: number = 12,
+  ): Promise<
+    Array<{ week: string; quizzes: number; decks: number; total: number }>
+  > {
+    const supabase = createClient();
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - weeks * 7);
+
+    const { data: quizzes } = await supabase
+      .from("quizzes")
+      .select("created_at")
+      .eq("owner_id", userId)
+      .gte("created_at", startDate.toISOString());
+
+    const { data: decks } = await supabase
+      .from("decks")
+      .select("created_at")
+      .eq("owner_id", userId)
+      .gte("created_at", startDate.toISOString());
+
+    const weeklyData: Record<string, { quizzes: number; decks: number }> = {};
+
+    // Helper to get week start date
+    const getWeekStart = (date: Date) => {
+      const d = new Date(date);
+      d.setDate(d.getDate() - d.getDay());
+      return d.toISOString().split("T")[0];
+    };
+
+    quizzes?.forEach((quiz) => {
+      if (quiz.created_at) {
+        const week = getWeekStart(new Date(quiz.created_at));
+        if (!weeklyData[week]) weeklyData[week] = { quizzes: 0, decks: 0 };
+        weeklyData[week].quizzes += 1;
+      }
+    });
+
+    decks?.forEach((deck) => {
+      if (deck.created_at) {
+        const week = getWeekStart(new Date(deck.created_at));
+        if (!weeklyData[week]) weeklyData[week] = { quizzes: 0, decks: 0 };
+        weeklyData[week].decks += 1;
+      }
+    });
+
+    return Object.entries(weeklyData)
+      .map(([week, data]) => ({
+        week,
+        quizzes: data.quizzes,
+        decks: data.decks,
+        total: data.quizzes + data.decks,
+      }))
+      .sort((a, b) => a.week.localeCompare(b.week));
+  },
 };

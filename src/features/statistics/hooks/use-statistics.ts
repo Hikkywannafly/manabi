@@ -91,3 +91,43 @@ export function useHourlyEfficiency() {
     enabled: !!user,
   });
 }
+
+export function useXPGrowth(days: number = 30) {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ["xp-growth", user?.id, days],
+    queryFn: () => StatisticsService.getXPGrowth(user?.id ?? "", days),
+    enabled: !!user,
+  });
+}
+
+export function useQuizAccuracyTrend(days: number = 30) {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ["quiz-accuracy-trend", user?.id, days],
+    queryFn: () => StatisticsService.getQuizAccuracyTrend(user?.id ?? "", days),
+    enabled: !!user,
+  });
+}
+
+export function useXPSourceBreakdown(days: number = 30) {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ["xp-source-breakdown", user?.id, days],
+    queryFn: () => StatisticsService.getXPSourceBreakdown(user?.id ?? "", days),
+    enabled: !!user,
+  });
+}
+
+export function useLearningVelocity(weeks: number = 12) {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ["learning-velocity", user?.id, weeks],
+    queryFn: () => StatisticsService.getLearningVelocity(user?.id ?? "", weeks),
+    enabled: !!user,
+  });
+}

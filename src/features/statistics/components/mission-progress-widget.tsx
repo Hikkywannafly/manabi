@@ -15,9 +15,11 @@ export function MissionProgressWidget() {
           <p className="mt-1 text-blue-500 text-xs">Complete a mission!</p>
         </div>
         <div className="text-center">
-          <div className="font-bold text-2xl text-primary">0</div>
+          <div className="bg-gradient-to-br from-orange-500 to-pink-500 bg-clip-text font-bold text-2xl text-transparent">
+            0
+          </div>
           <p className="text-muted-foreground text-sm">XP from Missions</p>
-          <p className="mt-1 text-green-500 text-xs">+1,768 XP available</p>
+          <p className="mt-1 text-orange-500 text-xs">+1,768 XP available</p>
         </div>
         <div className="text-center">
           <div className="font-bold text-2xl text-muted-foreground">0%</div>
@@ -30,14 +32,14 @@ export function MissionProgressWidget() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h4 className="font-medium">Active Missions</h4>
-          <div className="inline-flex items-center rounded-full border bg-secondary px-2.5 py-0.5 font-semibold text-secondary-foreground text-xs">
+          <div className="inline-flex items-center rounded-full border bg-gradient-to-r from-purple-500/10 to-pink-500/10 px-2.5 py-0.5 font-semibold text-purple-600 text-xs dark:text-purple-400">
             8 active
           </div>
         </div>
 
         <div className="space-y-4">
           {/* Mission Item 1 */}
-          <div className="space-y-2">
+          <div className="space-y-2 rounded-lg border bg-gradient-to-br from-secondary to-secondary/50 p-3 transition-all hover:shadow-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 font-semibold text-primary-foreground text-xs">
@@ -45,7 +47,7 @@ export function MissionProgressWidget() {
                 </span>
                 <span className="font-medium text-sm">Weekly Study Master</span>
               </div>
-              <div className="flex items-center gap-1 text-muted-foreground text-sm">
+              <div className="flex items-center gap-1 text-orange-500 text-sm">
                 <Trophy className="size-3" />
                 354 XP
               </div>
@@ -58,7 +60,7 @@ export function MissionProgressWidget() {
           </div>
 
           {/* Mission Item 2 */}
-          <div className="space-y-2">
+          <div className="space-y-2 rounded-lg border bg-gradient-to-br from-secondary to-secondary/50 p-3 transition-all hover:shadow-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 font-semibold text-primary-foreground text-xs">
@@ -66,7 +68,7 @@ export function MissionProgressWidget() {
                 </span>
                 <span className="font-medium text-sm">Daily Quiz Master</span>
               </div>
-              <div className="flex items-center gap-1 text-muted-foreground text-sm">
+              <div className="flex items-center gap-1 text-orange-500 text-sm">
                 <Trophy className="size-3" />
                 88 XP
               </div>
@@ -79,7 +81,10 @@ export function MissionProgressWidget() {
           </div>
         </div>
 
-        <Button variant="ghost" className="mt-2 h-9 w-full rounded-2xl">
+        <Button
+          variant="ghost"
+          className="mt-2 h-9 w-full rounded-2xl transition-colors hover:bg-purple-500/10"
+        >
           <span className="flex items-center justify-center text-xs">
             Show 5 more <ChevronDown className="ml-1 size-3" />
           </span>

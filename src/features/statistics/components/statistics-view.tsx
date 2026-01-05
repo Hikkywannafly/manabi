@@ -27,6 +27,8 @@ import { MissionProgressWidget } from "./mission-progress-widget";
 import { QuizPerformanceChart } from "./quiz-performance-chart";
 import { SummaryCard } from "./summary-card";
 import { WeeklyStudyHoursChart } from "./weekly-study-hours-chart";
+import { XPGrowthChart } from "./xp-growth-chart";
+import { XPSourceBreakdown } from "./xp-source-breakdown";
 
 export function StatisticsView() {
   const { user } = useAuth();
@@ -196,82 +198,104 @@ export function StatisticsView() {
 
       {/* Study Efficiency */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 bg-secondary">
+        <div className="flex items-center gap-2">
           <Zap className="size-5 text-muted-foreground" />
           <h3 className="font-semibold text-lg">Study Efficiency</h3>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="relative rounded-lg bg-tertiary p-4 text-center transition-all hover:shadow-md">
-            <Clock className="absolute top-2 right-2 size-4 text-muted-foreground opacity-30" />
-            <div className="font-bold text-2xl text-blue-500">
-              {bestStudyTime?.hour || "4:00 PM"}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {/* Best Study Hour */}
+          <div className="overflow-hidden rounded-lg border bg-secondary text-card-foreground shadow-sm">
+            <div className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
+              <h3 className="font-medium text-sm tracking-tight">
+                Best Study Hour
+              </h3>
+              <Clock className="size-4 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground text-sm">Best Study Hour</p>
-            <div className="mt-2 space-y-1">
-              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                <div
-                  className="size-full flex-1 bg-blue-500 transition-all"
-                  style={{ transform: "translateX(0%)" }}
-                />
+            <div className="p-6 pt-0">
+              <div className="font-bold text-2xl">
+                {bestStudyTime?.hour || "4:00 PM"}
               </div>
-              <p className="font-medium text-blue-500 text-xs">
-                Peak performance
-              </p>
+              <div className="mt-2 space-y-1">
+                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="size-full flex-1 bg-blue-500 transition-all"
+                    style={{ transform: "translateX(0%)" }}
+                  />
+                </div>
+                <p className="font-medium text-blue-500 text-xs">
+                  Peak performance
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="relative rounded-lg bg-tertiary p-4 text-center transition-all hover:shadow-md">
-            <Target className="absolute top-2 right-2 size-4 text-muted-foreground opacity-30" />
-            <div className="font-bold text-2xl text-blue-500">
-              {Math.round(focusMetrics?.averageSessionMinutes || 0)}m
+          {/* Avg Session */}
+          <div className="overflow-hidden rounded-lg border bg-secondary text-card-foreground shadow-sm">
+            <div className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
+              <h3 className="font-medium text-sm tracking-tight">
+                Avg Session
+              </h3>
+              <Target className="size-4 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground text-sm">Avg Session</p>
-            <div className="mt-2 space-y-1">
-              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                <div
-                  className="size-full flex-1 bg-yellow-500 transition-all"
-                  style={{
-                    transform: `translateX(-${100 - Math.min(((focusMetrics?.averageSessionMinutes || 0) / 25) * 100, 100)}%)`,
-                  }}
-                />
+            <div className="p-6 pt-0">
+              <div className="font-bold text-2xl">
+                {Math.round(focusMetrics?.averageSessionMinutes || 0)}m
               </div>
-              <p className="mt-1 text-muted-foreground text-xs">
-                {(focusMetrics?.averageSessionMinutes || 0) >= 25
-                  ? "Great!"
-                  : "Try for 25+ min"}
-              </p>
+              <div className="mt-2 space-y-1">
+                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full bg-yellow-500 transition-all"
+                    style={{
+                      width: `${Math.min(((focusMetrics?.averageSessionMinutes || 0) / 25) * 100, 100)}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-muted-foreground text-xs">
+                  {(focusMetrics?.averageSessionMinutes || 0) >= 25
+                    ? "Great!"
+                    : "Try for 25+ min"}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="relative rounded-lg bg-tertiary p-4 text-center transition-all hover:shadow-md">
-            <CalendarIcon className="absolute top-2 right-2 size-4 text-muted-foreground opacity-30" />
-            <div className="font-bold text-2xl text-blue-500">
-              {focusMetrics?.consistency || 0}%
+          {/* Consistency */}
+          <div className="overflow-hidden rounded-lg border bg-secondary text-card-foreground shadow-sm">
+            <div className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
+              <h3 className="font-medium text-sm tracking-tight">
+                Consistency
+              </h3>
+              <CalendarIcon className="size-4 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground text-sm">Consistency</p>
-            <div className="mt-2 space-y-1">
-              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                <div
-                  className="size-full flex-1 bg-yellow-500 transition-all"
-                  style={{
-                    transform: `translateX(-${100 - (focusMetrics?.consistency || 0)}%)`,
-                  }}
-                />
+            <div className="p-6 pt-0">
+              <div className="font-bold text-2xl">
+                {focusMetrics?.consistency || 0}%
               </div>
-              <p className="mt-1 text-muted-foreground text-xs">
-                {(focusMetrics?.consistency || 0) >= 50
-                  ? "Keep it up!"
-                  : "Room to improve"}
-              </p>
+              <div className="mt-2 space-y-1">
+                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full bg-yellow-500 transition-all"
+                    style={{
+                      width: `${focusMetrics?.consistency || 0}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-muted-foreground text-xs">
+                  {(focusMetrics?.consistency || 0) >= 50
+                    ? "Keep it up!"
+                    : "Room to improve"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="flex items-center justify-between rounded-lg bg-tertiary p-4 transition-all hover:shadow-md">
+          {/* Most Productive Day */}
+          <div className="flex items-center justify-between rounded-lg border bg-secondary p-4 shadow-sm transition-all hover:shadow-md">
             <div className="flex items-center gap-3">
-              <div className="rounded-full bg-gray-100 p-2 dark:bg-gray-800">
+              <div className="rounded-full bg-muted p-2">
                 <Zap className="size-5" />
               </div>
               <div>
@@ -296,9 +320,10 @@ export function StatisticsView() {
             </svg>
           </div>
 
-          <div className="rounded-lg bg-tertiary p-4 transition-all hover:shadow-md">
+          {/* Focus Quality */}
+          <div className="rounded-lg border bg-secondary p-4 shadow-sm transition-all hover:shadow-md">
             <div className="flex items-start gap-3">
-              <div className="rounded-full bg-gray-100 p-2 dark:bg-gray-800">
+              <div className="rounded-full bg-muted p-2">
                 <Target className="size-5" />
               </div>
               <div className="flex-1 space-y-1">
@@ -319,6 +344,25 @@ export function StatisticsView() {
 
       {/* Hourly Study Efficiency Chart */}
       <div className="rounded-lg border bg-secondary p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="font-semibold text-lg">Hourly Study Efficiency</h3>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="lucide lucide-info size-4 text-muted-foreground"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 16v-4"></path>
+            <path d="M12 8h.01"></path>
+          </svg>
+        </div>
         <HourlyEfficiencyChart />
       </div>
 
@@ -355,6 +399,43 @@ export function StatisticsView() {
           </div>
           <div className="flex-1">
             <FlashcardProgressChart />
+          </div>
+        </div>
+      </div>
+
+      {/* XP Growth & Source Breakdown */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* XP Growth Over Time */}
+        <div className="rounded-lg border bg-secondary p-6">
+          <div className="mb-6 flex items-center gap-2">
+            <Trophy className="size-5 text-muted-foreground" />
+            <div>
+              <h3 className="font-semibold text-lg leading-none tracking-tight">
+                XP Growth Over Time
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Your XP earnings from different sources
+              </p>
+            </div>
+          </div>
+          <XPGrowthChart />
+        </div>
+
+        {/* XP Source Breakdown */}
+        <div className="flex flex-col rounded-lg border bg-secondary p-6">
+          <div className="mb-6 flex items-center justify-center gap-2">
+            <Target className="size-5 text-muted-foreground" />
+            <div>
+              <h3 className="font-semibold text-lg leading-none tracking-tight">
+                XP Source Breakdown
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Where your XP comes from
+              </p>
+            </div>
+          </div>
+          <div className="flex-1">
+            <XPSourceBreakdown />
           </div>
         </div>
       </div>

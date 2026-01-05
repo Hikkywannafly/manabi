@@ -12,6 +12,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-provider";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -179,20 +180,46 @@ export function StatisticsView() {
           <ActivityCalendar />
         </div>
         <div className="space-y-4 lg:col-span-1">
-          <div className="rounded-lg border bg-secondary p-6">
-            <div className="mb-6 flex items-center gap-2">
-              <CalendarIcon className="size-5 text-muted-foreground" />
-              <div>
-                <h3 className="font-semibold text-lg leading-none tracking-tight">
-                  Weekly Study Hours
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  Study time by category
-                </p>
+          <Tabs defaultValue="week" className="w-full">
+            <TabsList className="mb-4 grid w-full grid-cols-2">
+              <TabsTrigger value="week">Week</TabsTrigger>
+              <TabsTrigger value="month">Month</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="week" className="mt-0">
+              <div className="rounded-lg border bg-secondary p-6">
+                <div className="mb-6 flex items-center gap-2">
+                  <CalendarIcon className="size-5 text-muted-foreground" />
+                  <div>
+                    <h3 className="font-semibold text-lg leading-none tracking-tight">
+                      Weekly Study Hours
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      Study time by category
+                    </p>
+                  </div>
+                </div>
+                <WeeklyStudyHoursChart />
               </div>
-            </div>
-            <WeeklyStudyHoursChart />
-          </div>
+            </TabsContent>
+
+            <TabsContent value="month" className="mt-0">
+              <div className="rounded-lg border bg-secondary p-6">
+                <div className="mb-6 flex items-center gap-2">
+                  <CalendarIcon className="size-5 text-muted-foreground" />
+                  <div>
+                    <h3 className="font-semibold text-lg leading-none tracking-tight">
+                      Monthly Study Hours
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      Study time by category
+                    </p>
+                  </div>
+                </div>
+                <WeeklyStudyHoursChart />
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 

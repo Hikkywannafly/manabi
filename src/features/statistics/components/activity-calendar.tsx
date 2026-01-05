@@ -6,34 +6,54 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useActivityCalendar } from "../hooks/use-statistics";
 
-// Mock data: 365 days of activity
-const activityData = Array.from({ length: 365 }, (_, i) => ({
-  date: new Date(new Date().setDate(new Date().getDate() - i)).toISOString(),
-  count: Math.floor(Math.random() * 5),
-})).reverse();
-
-function getColor(count: number) {
-  if (count === 0) return "bg-secondary-foreground/10";
-  if (count === 1) return "bg-blue-200 dark:bg-blue-900";
-  if (count === 2) return "bg-blue-400 dark:bg-blue-700";
-  if (count === 3) return "bg-blue-600 dark:bg-blue-500";
+function getColor(level: number) {
+  if (level === 0) return "bg-secondary-foreground/10";
+  if (level === 1) return "bg-blue-200 dark:bg-blue-900";
+  if (level === 2) return "bg-blue-400 dark:bg-blue-700";
+  if (level === 3) return "bg-blue-600 dark:bg-blue-500";
   return "bg-blue-700 dark:bg-blue-400";
 }
 
 export function ActivityCalendar() {
+  const { data: activityData = [], isLoading } = useActivityCalendar();
+
+  // Fill in missing days with zero activity (last 365 days)
+  const fullYearData = Array.from({ length: 365 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (364 - i));
+    const dateStr = date.toISOString().split("T")[0];
+
+    const existing = activityData.find((d) => d.date === dateStr);
+    return existing || { date: dateStr, count: 0, level: 0 };
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-wrap gap-1">
+        {Array.from({ length: 365 }).map((_, i) => (
+          <div
+            key={i}
+            className="size-2.5 animate-pulse rounded-sm bg-secondary-foreground/10"
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-1">
-        {activityData.map((day, i) => (
+        {fullYearData.map((day, i) => (
           <TooltipProvider key={i}>
             <Tooltip>
               <TooltipTrigger>
-                <div className={`size-2.5 rounded-sm ${getColor(day.count)}`} />
+                <div className={`size-2.5 rounded-sm ${getColor(day.level)}`} />
               </TooltipTrigger>
               <TooltipContent>
                 <p>
-                  {day.count} activities on{" "}
+                  {day.count} minutes on{" "}
                   {new Date(day.date).toLocaleDateString()}
                 </p>
               </TooltipContent>

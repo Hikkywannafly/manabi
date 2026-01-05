@@ -76,7 +76,10 @@ export function StatisticsView() {
           <h1 className="font-semibold text-2xl">Your Statistics</h1>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="h-10 rounded-xl px-4">
+              <Button
+                variant="outline"
+                className="mx-2 h-10 rounded-xl border-none px-4 shadow-none"
+              >
                 <span className="mr-2 text-muted-foreground">This Month</span>
                 <span className="opacity-60">▼</span>
               </Button>
@@ -193,7 +196,7 @@ export function StatisticsView() {
 
       {/* Study Efficiency */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-secondary">
           <Zap className="size-5 text-muted-foreground" />
           <h3 className="font-semibold text-lg">Study Efficiency</h3>
         </div>

@@ -1161,7 +1161,7 @@ export type Database = {
       };
       complete_user_mission: {
         Args: { p_mission_id: string; p_user_id: string; p_xp_reward: number };
-        Returns: undefined;
+        Returns: boolean;
       };
       get_alltime_xp_leaderboard: {
         Args: never;
@@ -1242,6 +1242,10 @@ export type Database = {
           metadata: Json;
           similarity: number;
         }[];
+      };
+      update_mission_progress: {
+        Args: { p_progress_value: number; p_user_mission_id: string };
+        Returns: undefined;
       };
     };
     Enums: {

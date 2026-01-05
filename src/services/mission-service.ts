@@ -158,12 +158,12 @@ export const MissionService = {
           }
         }
 
-        // Update progress_value if it changed
+        // Update progress_value if it changed (using RPC to avoid CORS)
         if (userMission && currentValue !== userMission.progress_value) {
-          await supabase
-            .from("user_missions")
-            .update({ progress_value: currentValue })
-            .eq("id", userMission.id);
+          await supabase.rpc("update_mission_progress", {
+            p_user_mission_id: userMission.id,
+            p_progress_value: currentValue,
+          });
         }
 
         const progressPercentage = Math.min(
@@ -211,13 +211,18 @@ export const MissionService = {
       if (mission.current_value >= mission.target_value) {
         try {
           // Call RPC function to complete mission and award XP
-          const { error } = await supabase.rpc("complete_user_mission", {
-            p_user_id: userId,
-            p_mission_id: mission.mission_id,
-            p_xp_reward: mission.mission.xp_reward || 0,
-          });
+          // RPC returns true only if mission was actually completed (not already completed)
+          const { data: wasCompleted, error } = await supabase.rpc(
+            "complete_user_mission",
+            {
+              p_user_id: userId,
+              p_mission_id: mission.mission_id,
+              p_xp_reward: mission.mission.xp_reward || 0,
+            },
+          );
 
-          if (!error) {
+          // Only add to completed list if RPC returned true (actually completed)
+          if (!error && wasCompleted) {
             completed.push({
               ...mission,
               status: "COMPLETED",

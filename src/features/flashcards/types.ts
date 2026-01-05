@@ -4,10 +4,12 @@ export type Deck = Database["public"]["Tables"]["decks"]["Row"];
 export type Flashcard = Database["public"]["Tables"]["flashcards"]["Row"];
 
 export type FlashcardGenerationParams = {
-  difficulty: "Easy" | "Medium" | "Hard";
+  difficulty: "Easy" | "Medium" | "Hard" | "easy" | "medium" | "hard";
   numberOfCards: number;
   language: string;
-  parsingMode: "fast" | "balanced";
+  flashcardType: "QUESTIONS" | "VOCABULARY";
+  parsingMode: "fast" | "balanced" | "premium";
+  task: "generate" | "extract";
   customInstructions?: string;
 };
 

@@ -47,7 +47,6 @@ export function FlashcardSettingsSidebar({
                   <SelectContent>
                     <SelectItem value="private">Private</SelectItem>
                     <SelectItem value="public">Public</SelectItem>
-                    <SelectItem value="shared">Shared</SelectItem>
                   </SelectContent>
                 </Select>
               </FormItem>
@@ -120,6 +119,31 @@ export function FlashcardSettingsSidebar({
                     <SelectItem value="easy">Easy</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="hard">Hard</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+
+          {/* Flashcard Type */}
+          <FormField
+            control={form.control}
+            name="flashcardType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Flashcard Type</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full bg-secondary">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="QUESTIONS">Q&A</SelectItem>
+                    <SelectItem value="VOCABULARY">Vocabulary</SelectItem>
                   </SelectContent>
                 </Select>
               </FormItem>

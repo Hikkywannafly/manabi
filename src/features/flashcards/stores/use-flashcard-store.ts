@@ -19,8 +19,19 @@ export interface VocabularyFlashcard {
   explanation: string;
 }
 
-// Union type for both flashcard types
-export type GeneratedFlashcard = QuestionFlashcard | VocabularyFlashcard;
+// Simple type flashcard (front/back)
+export interface SimpleFlashcard {
+  id: string | number;
+  front: string;
+  back: string;
+  explanation?: string;
+}
+
+// Union type for all flashcard types
+export type GeneratedFlashcard =
+  | QuestionFlashcard
+  | VocabularyFlashcard
+  | SimpleFlashcard;
 
 export interface FlashcardMetadata {
   flashcardType?: "QUESTIONS" | "VOCABULARY";

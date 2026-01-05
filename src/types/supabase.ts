@@ -179,6 +179,27 @@ export type Database = {
           },
         ];
       };
+      documents: {
+        Row: {
+          content: string | null;
+          embedding: string | null;
+          id: string;
+          metadata: Json | null;
+        };
+        Insert: {
+          content?: string | null;
+          embedding?: string | null;
+          id?: string;
+          metadata?: Json | null;
+        };
+        Update: {
+          content?: string | null;
+          embedding?: string | null;
+          id?: string;
+          metadata?: Json | null;
+        };
+        Relationships: [];
+      };
       flashcard_reviews: {
         Row: {
           ease_factor: number | null;
@@ -1131,6 +1152,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      calculate_study_streak: {
+        Args: { p_user_id: string };
+        Returns: {
+          current_streak: number;
+          longest_streak: number;
+        }[];
+      };
       complete_user_mission: {
         Args: { p_mission_id: string; p_user_id: string; p_xp_reward: number };
         Returns: undefined;
@@ -1201,6 +1229,19 @@ export type Database = {
           p_user_id: string;
         };
         Returns: undefined;
+      };
+      match_documents: {
+        Args: {
+          match_count: number;
+          match_threshold: number;
+          query_embedding: string;
+        };
+        Returns: {
+          content: string;
+          id: string;
+          metadata: Json;
+          similarity: number;
+        }[];
       };
     };
     Enums: {

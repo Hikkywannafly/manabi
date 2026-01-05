@@ -60,6 +60,7 @@ export function CreateFlashcardForm({
       language: "auto",
       numberOfCards: "5-10",
       difficulty: "medium",
+      flashcardType: "QUESTIONS",
       parsingMode: "fast",
       customInstructions: "",
     },
@@ -154,7 +155,9 @@ export function CreateFlashcardForm({
             values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
           numberOfCards,
           language: values.language,
+          flashcardType: values.flashcardType,
           parsingMode: values.parsingMode,
+          task: "generate",
           customInstructions: values.customInstructions,
         },
       );
@@ -222,10 +225,12 @@ export function CreateFlashcardForm({
           deck.id,
           {
             difficulty: (values.difficulty.charAt(0).toUpperCase() +
-              values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
+              values.difficulty.slice(1)) as "easy" | "medium" | "hard",
             numberOfCards,
             language: values.language,
+            flashcardType: values.flashcardType,
             parsingMode: values.parsingMode,
+            task: "generate",
             customInstructions: values.customInstructions,
           },
         );

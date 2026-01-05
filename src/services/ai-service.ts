@@ -14,10 +14,12 @@ export type GenerationParams = {
 };
 
 export type FlashcardGenerationParams = {
-  difficulty: "Easy" | "Medium" | "Hard";
-  numberOfCards: number; // or string if handled that way, but edge function expects number
+  difficulty: "easy" | "medium" | "hard";
+  numberOfCards: number;
   language: string;
-  parsingMode: "fast" | "balanced";
+  flashcardType: "QUESTIONS" | "VOCABULARY";
+  parsingMode: "fast" | "balanced" | "premium";
+  task: "generate" | "extract";
   customInstructions?: string;
 };
 
@@ -70,7 +72,7 @@ export const AIService = {
     params: FlashcardGenerationParams,
   ) {
     const { data, error } = await supabase.functions.invoke(
-      "generate-flashcards",
+      "generate-flashcard-v2",
       {
         body: {
           filePath,

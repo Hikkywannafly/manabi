@@ -69,10 +69,10 @@ export const PROMPT_TEMPLATES = {
   // System message for consistent AI behavior
   system: () =>
     `You are Manabi AI, an expert educational tutor specializing in personalized learning. Your role is to:
-- Provide clear, accurate, and encouraging explanations
+- Provide clear, accurate, and concise explanations
+- Focus on the core concept without being overly verbose
 - Adapt your teaching style to the student's level
-- Use examples and analogies to clarify concepts
-- Encourage critical thinking and deeper understanding
+- Use examples only when necessary to clarify
 - Always respond in valid JSON format without markdown code blocks`,
 
   quiz: (context: {
@@ -123,19 +123,31 @@ ${
 4. **Encourage:** Be supportive and constructive`
     }
 
-4. **Suggest Follow-ups:** Provide 2-3 thoughtful questions to deepen understanding
+## Your Task
+${
+      wasCorrect
+        ? `1. **Briefly explain** why "${context.correctAnswer}" is correct
+2. **Add context** if helpful for deeper understanding`
+        : `1. **Explain why** "${context.correctAnswer}" is the right choice
+2. **Address the error** ${
+          hasUserAnswer
+            ? `in choosing "${context.userAnswer}"`
+            : "and common mistakes"
+        }`
+    }
+3. **Suggest 2-3 follow-up questions** to deepen understanding
 
 ## Output Format (JSON ONLY)
 {
-  "explanation": "Your detailed, structured explanation here. Use clear paragraphs and examples.",
+  "explanation": "Your concise, focused explanation (2-3 sentences max). Be direct and clear.",
   "suggested_questions": [
-    "A deeper question about the concept?",
-    "A related application question?",
-    "An extension or edge case?"
+    "First follow-up question?",
+    "Second follow-up question?",
+    "Third follow-up question?"
   ]
 }
 
-**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks, no extra text.`;
+**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks, no extra text. Keep explanation brief and focused.`;
   },
 
   flashcard: (context: {
@@ -155,19 +167,23 @@ ${
 2. **Provide Examples:** Give 1-2 concrete examples or use cases
 3. **Memory Aid:** Suggest a mnemonic, analogy, or visualization technique
 4. **Context:** Explain why this concept is important or how it connects to broader topics
-5. **Suggest Follow-ups:** Provide 2-3 questions to test understanding
+
+## Your Task
+1. **Explain the concept** clearly and concisely
+2. **Give 1 example** if it helps understanding
+3. **Suggest 2-3 follow-up questions**
 
 ## Output Format (JSON ONLY)
 {
-  "explanation": "Your comprehensive explanation with examples and memory techniques.",
+  "explanation": "Your concise explanation (2-3 sentences max). Focus on clarity.",
   "suggested_questions": [
-    "A question to test basic understanding?",
-    "A question about practical application?",
-    "A question connecting to related concepts?"
+    "First follow-up question?",
+    "Second follow-up question?",
+    "Third follow-up question?"
   ]
 }
 
-**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks, no extra text.`,
+**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks. Keep it brief and clear.`,
 
   followUp: (question: string) =>
     `The student has asked a follow-up question based on the previous explanation.
@@ -180,18 +196,22 @@ ${
 2. **Connect to Previous:** Reference the earlier explanation if relevant
 3. **Expand Understanding:** Provide additional insights or examples
 4. **Encourage Curiosity:** Acknowledge their good question
-5. **Suggest Next Steps:** Provide 1-2 related questions to continue learning
+
+## Your Task
+1. **Answer directly** and concisely
+2. **Connect to previous context** if relevant
+3. **Suggest 1-2 related questions**
 
 ## Output Format (JSON ONLY)
 {
-  "explanation": "Your clear, contextual answer to their follow-up question.",
+  "explanation": "Your concise answer (2-3 sentences max).",
   "suggested_questions": [
-    "A related follow-up question?",
-    "A deeper exploration question?"
+    "Related follow-up question?",
+    "Deeper exploration question?"
   ]
 }
 
-**CRITICAL:** Return ONLY the JSON object. No markdown, no code blocks, no extra text.`,
+**CRITICAL:** Return ONLY the JSON object. Be brief and direct.`,
 } as const;
 
 // ============================================================================

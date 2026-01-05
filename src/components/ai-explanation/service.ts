@@ -60,8 +60,19 @@ export const AIExplanationService = {
       }),
     });
 
+    // Check if we're actually getting SSE
+    const contentType = response.headers.get("content-type");
+    if (contentType?.includes("application/json")) {
+      // Fallback to non-streaming
+      const jsonResponse = await response.json();
+      // Return the response as if it was streamed
+      yield jsonResponse.explanation || "";
+      return jsonResponse.suggestedQuestions || [];
+    }
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}: ${errorText}`);
     }
 
     if (!response.body) {
@@ -75,9 +86,13 @@ export const AIExplanationService = {
 
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) {
+        break;
+      }
 
-      buffer += decoder.decode(value, { stream: true });
+      const decoded = decoder.decode(value, { stream: true });
+
+      buffer += decoded;
       const lines = buffer.split("\n");
       buffer = lines.pop() || "";
 

@@ -96,46 +96,77 @@ export function AIExplanationPanel({
           <ScrollArea ref={scrollAreaRef} className="h-full">
             <div className="space-y-4 p-4">
               {/* Messages */}
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "rounded-lg p-3",
-                    message.role === "assistant"
-                      ? "bg-muted"
-                      : "ml-8 bg-primary text-primary-foreground",
-                  )}
-                >
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <ReactMarkdown>{message.content}</ReactMarkdown>
+              {messages.map((message, index) => {
+                // Don't show empty messages
+                if (!message.content.trim()) return null;
+
+                return (
+                  <div
+                    key={index}
+                    className={cn(
+                      "rounded-lg p-3",
+                      message.role === "assistant"
+                        ? "bg-muted"
+                        : "ml-8 bg-primary text-primary-foreground",
+                    )}
+                  >
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {/* Loading State */}
               {isLoading && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Thinking...</span>
+                <div className="flex items-center gap-2 rounded-lg bg-muted p-3">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  <div className="flex gap-1">
+                    <span
+                      className="animate-bounce text-muted-foreground"
+                      style={{ animationDelay: "0ms" }}
+                    >
+                      .
+                    </span>
+                    <span
+                      className="animate-bounce text-muted-foreground"
+                      style={{ animationDelay: "150ms" }}
+                    >
+                      .
+                    </span>
+                    <span
+                      className="animate-bounce text-muted-foreground"
+                      style={{ animationDelay: "300ms" }}
+                    >
+                      .
+                    </span>
+                  </div>
                 </div>
               )}
 
               {/* Suggested Questions */}
               {explanation?.suggestedQuestions &&
                 explanation.suggestedQuestions.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    {explanation.suggestedQuestions.map((question, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => handleSuggestedQuestion(question)}
-                        disabled={isLoading}
-                        className="flex w-full items-start gap-1 text-left text-xs hover:underline disabled:opacity-50"
-                      >
-                        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" />
-                        <p>{question}</p>
-                      </button>
-                    ))}
+                  <div className="space-y-2 rounded-lg border border-border/50 bg-muted/30 p-4">
+                    <h4 className="font-semibold text-foreground/80 text-sm">
+                      Suggested Questions
+                    </h4>
+                    <div className="space-y-2">
+                      {explanation.suggestedQuestions.map((question, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleSuggestedQuestion(question)}
+                          disabled={isLoading}
+                          className="group flex w-full items-start gap-2 rounded-md p-2 text-left text-sm transition-colors hover:bg-muted disabled:opacity-50"
+                        >
+                          <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                          <span className="text-foreground/70 group-hover:text-foreground">
+                            {question}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
             </div>

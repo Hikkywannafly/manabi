@@ -24,12 +24,16 @@ interface QuizTakeContentProps {
   quiz: QuizWithQuestions;
   mode?: QuizTakeMode;
   userId?: string;
+  disableSettings?: boolean;
+  saveAttempt?: boolean;
 }
 
 export function QuizTakeContent({
   quiz,
   mode = "test",
   userId,
+  disableSettings = false,
+  saveAttempt = true,
 }: QuizTakeContentProps) {
   const router = useRouter();
   const { checkAchievements } = useAchievementNotifier();
@@ -258,6 +262,148 @@ export function QuizTakeContent({
   const handleSubmit = useCallback(async () => {
     try {
       const totalTimeSpent = getTotalTimeSpent();
+
+      // Calculate local result for both scenarios
+      const _correctAnswersCount = answers.filter(
+        (a) =>
+          questions.find((q) => q.id === a.questionId)?.correct_answer ===
+          a.selectedOptionId, // NOTE: Use improved local comparison logic from onAnswerSelect if possible, but for now simple check
+      ).length;
+
+      // Using basic check here might be flawed for normalization ("option-0" vs "0").
+      // Ideally we reuse the robust logic. Let's rely on what we have or accept basic check for non-save mode.
+      // Actually, let's implement the robust check locally to be safe.
+      let _robustCorrectCount = 0;
+      const _robustAnswers = answers.map((a) => {
+        const q = questions.find((qu) => qu.id === a.questionId);
+        if (!q) return { ...a, isCorrect: false, options: [] };
+
+        const correctId = q.correct_answer || "";
+        let isCorrect = false;
+        if (
+          q.question_type === "fill_in_blank" ||
+          q.question_type === "short_answer"
+        ) {
+          isCorrect =
+            a.selectedOptionId.trim().toLowerCase() ===
+            correctId.trim().toLowerCase();
+        } else {
+          const normCorrect = correctId.startsWith("option-")
+            ? correctId
+            : `option-${correctId}`;
+          const normSelected = a.selectedOptionId.startsWith("option-")
+            ? a.selectedOptionId
+            : a.selectedOptionId; // assume selected is already option-X for non-text
+          isCorrect = normCorrect === normSelected;
+        }
+        if (isCorrect) _robustCorrectCount++;
+
+        // Parse options for display
+        let options: any[] = [];
+        try {
+          const raw =
+            typeof q.options === "string" ? JSON.parse(q.options) : q.options;
+          if (Array.isArray(raw))
+            options =
+              typeof raw[0] === "string"
+                ? raw.map((t, i) => ({ id: `option-${i}`, text: t }))
+                : raw;
+        } catch (_e) {}
+
+        return {
+          questionText: q.question_text,
+          questionId: a.questionId,
+          selectedOptionId: a.selectedOptionId,
+          correctOptionId: correctId,
+          isCorrect,
+          timeSpent: a.timeSpent,
+          options,
+        };
+      });
+
+      if (!saveAttempt) {
+        // Practice mode: Local calculation only
+        const robustAnswers = answers.map((a) => {
+          const q = questions.find((qu) => qu.id === a.questionId);
+          if (!q) {
+            return {
+              questionId: a.questionId,
+              questionText: "",
+              selectedOptionId: a.selectedOptionId,
+              correctOptionId: "",
+              isCorrect: false,
+              timeSpent: a.timeSpent,
+              options: [],
+            };
+          }
+
+          const correctId = q.correct_answer || "";
+          let isCorrect = false;
+          if (
+            q.question_type === "fill_in_blank" ||
+            q.question_type === "short_answer"
+          ) {
+            isCorrect =
+              a.selectedOptionId.trim().toLowerCase() ===
+              correctId.trim().toLowerCase();
+          } else {
+            const normCorrect = correctId.startsWith("option-")
+              ? correctId
+              : `option-${correctId}`;
+            const normSelected = a.selectedOptionId.startsWith("option-")
+              ? a.selectedOptionId
+              : a.selectedOptionId;
+            isCorrect = normCorrect === normSelected;
+          }
+
+          // Parse options for display
+          let options: any[] = [];
+          try {
+            const raw =
+              typeof q.options === "string" ? JSON.parse(q.options) : q.options;
+            if (Array.isArray(raw)) {
+              options =
+                typeof raw[0] === "string"
+                  ? raw.map((t: string, i: number) => ({
+                      id: `option-${i}`,
+                      text: t,
+                    }))
+                  : raw;
+            }
+          } catch (_e) {}
+
+          return {
+            questionText: q.question_text || "",
+            questionId: a.questionId,
+            selectedOptionId: a.selectedOptionId,
+            correctOptionId: correctId,
+            isCorrect,
+            timeSpent: a.timeSpent,
+            options,
+          };
+        });
+
+        const correctCount = robustAnswers.filter((a) => a.isCorrect).length;
+
+        const localResult: QuizResult = {
+          score: (correctCount / questions.length) * 100,
+          totalQuestions: questions.length,
+          correctAnswers: correctCount,
+          incorrectAnswers: questions.length - correctCount,
+          timeSpent: totalTimeSpent,
+          performanceLevel: getQuizPerformance(
+            (correctCount / questions.length) * 100,
+          ).level,
+          personalizedFeedback: "",
+          answers: robustAnswers,
+        };
+
+        setServerResult(localResult);
+        setIsCompleted(true);
+        toast.success("Quiz completed! (Practice Mode)");
+        return;
+      }
+
       const submitData = answers.map((a) => ({
         questionId: a.questionId,
         selectedOptionIds: [a.selectedOptionId],
@@ -290,7 +436,9 @@ export function QuizTakeContent({
     }
   }, [
     answers,
+    questions,
     quiz.id,
+    saveAttempt,
     submitAttempt,
     setIsCompleted,
     getTotalTimeSpent,
@@ -393,6 +541,11 @@ export function QuizTakeContent({
             onSubmit={handleBackToQuizzes}
             onRestartQuiz={handleRetake}
             mode="exam"
+            creatorName={
+              quiz.profiles?.nickname || quiz.profiles?.full_name || "Unknown"
+            }
+            creatorAvatar={quiz.profiles?.avatar_url}
+            createdAt={quiz.created_at}
           />
         </div>
       </div>
@@ -440,10 +593,11 @@ export function QuizTakeContent({
           correctAnswer={currentQuestionResult?.correctAnswer}
           onRetry={handleRetry}
           onAskAI={() => setIsAIPanelOpen(true)}
-          isOwner={userId === quiz.owner_id}
+          isOwner={!disableSettings && userId === quiz.owner_id}
           creatorName={
             quiz.profiles?.nickname || quiz.profiles?.full_name || "Unknown"
           }
+          creatorAvatar={quiz.profiles?.avatar_url}
           createdAt={quiz.created_at}
         />
       </div>

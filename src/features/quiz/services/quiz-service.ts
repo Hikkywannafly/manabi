@@ -7,16 +7,19 @@ export const QuizService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("quizzes")
-      .select(
-        "id, title, status, generation_params, created_at, slug, owner_id",
-      )
+      .select(`
+        id, title, status, generation_params, created_at, slug, owner_id,
+        quiz_attempts (
+          score
+        )
+      `)
       .order("created_at", { ascending: false });
 
     if (error) {
       throw error;
     }
 
-    return data as Quiz[];
+    return data as unknown as (Quiz & { quiz_attempts: { score: number }[] })[];
   },
 
   async getPublicQuizzes() {

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Header } from "@/components/layouts/header";
 import { QuizTakeContent } from "@/features/quiz/components/take/quiz-take-content";
 import { QuizService } from "@/features/quiz/services/quiz-service";
 import { createClient } from "@/lib/supabase/server";
@@ -32,7 +33,14 @@ export default async function PublicQuizPage({ params }: PublicQuizPageProps) {
 
     return (
       <div className="flex h-screen w-full flex-col bg-background">
-        <QuizTakeContent quiz={quiz} mode="test" userId={user?.id} />
+        <Header />
+        <QuizTakeContent
+          quiz={quiz}
+          mode="test"
+          userId={user?.id}
+          disableSettings={true}
+          saveAttempt={false}
+        />
       </div>
     );
   } catch (error) {

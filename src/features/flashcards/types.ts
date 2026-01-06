@@ -23,3 +23,11 @@ export type FlashcardReview =
 export type FlashcardWithReview = Flashcard & {
   flashcard_reviews?: FlashcardReview[];
 };
+
+export interface PublicDeck extends Deck {
+  profiles?: {
+    full_name: string | null;
+    nickname: string | null;
+    avatar_url: string | null;
+  } | null;
+}

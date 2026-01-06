@@ -17,6 +17,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { QuizService } from "../../services/quiz-service";
 import type { Quiz, QuizQuestion } from "../../types";
 import { QuestionEditor } from "./question-editor";
@@ -32,6 +39,11 @@ export function QuizEditContainer({
 }: QuizEditContainerProps) {
   const router = useRouter();
   const [title, setTitle] = useState(quiz.title);
+  const [visibility, setVisibility] = useState<"public" | "private">(
+    (quiz.visibility === "public" || quiz.visibility === "private"
+      ? quiz.visibility
+      : "private") as "public" | "private",
+  );
   const [questions, setQuestions] = useState(initialQuestions);
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteQuizDialog, setShowDeleteQuizDialog] = useState(false);
@@ -82,10 +94,43 @@ export function QuizEditContainer({
     });
   }, []);
 
+  const handleVisibilityChange = async (
+    newVisibility: "public" | "private",
+  ) => {
+    const previousVisibility = visibility;
+    setVisibility(newVisibility);
+
+    try {
+      await QuizService.updateQuiz(quiz.id, {
+        visibility: newVisibility,
+      });
+
+      toast.success(`Quiz is now ${newVisibility}`);
+    } catch (error: any) {
+      console.error("Error updating visibility:", error);
+      console.error("Error details:", {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code,
+      });
+
+      toast.error(
+        error?.message || "Failed to update visibility. Please try again.",
+      );
+
+      // Revert on error
+      setVisibility(previousVisibility);
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await QuizService.updateQuiz(quiz.id, { title, questions });
+      await QuizService.updateQuiz(quiz.id, {
+        title,
+        questions,
+      });
       toast.success("Quiz saved successfully");
       router.push(`/dashboard/quiz/${quiz.id}/${quiz.slug}/take?mode=test`);
     } catch (error) {
@@ -100,58 +145,73 @@ export function QuizEditContainer({
     <div className="flex w-full flex-col">
       <div className="relative min-h-screen bg-background">
         {/* Sticky Action Bar - Full Width */}
-        <div className="sticky top-0 z-20 flex w-full items-center justify-end gap-2 border-b bg-background/95 px-3 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:gap-3 md:px-8">
-          <Link href={`/dashboard/quiz/${quiz.id}/${quiz.slug}/take?mode=test`}>
-            <Button
-              variant="outline"
-              className="h-10 min-h-10 min-w-10 rounded-2xl px-4 py-2"
-              type="button"
+        <div className="sticky top-0 z-20 flex w-full items-center justify-between gap-2 border-b bg-background/95 px-3 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:gap-3 md:px-8">
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/dashboard/quiz/${quiz.id}/${quiz.slug}/take?mode=test`}
             >
-              <ArrowLeft className="size-4 md:mr-2" />
-              <span className="hidden md:inline">Back to Quiz</span>
+              <Button
+                variant="outline"
+                className="h-10 min-h-10 min-w-10 rounded-2xl px-4 py-2"
+                type="button"
+              >
+                <ArrowLeft className="size-4 md:mr-2" />
+                <span className="hidden md:inline">Back to Quiz</span>
+              </Button>
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Select value={visibility} onValueChange={handleVisibilityChange}>
+              <SelectTrigger className="h-10 w-[120px] rounded-2xl">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="public">Public</SelectItem>
+                <SelectItem value="private">Private</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="destructive"
+              className="h-9 rounded-2xl px-3"
+              onClick={() => setShowDeleteQuizDialog(true)}
+            >
+              <Trash className="size-4 md:mr-2" />
+              <span className="hidden md:block">Delete Quiz</span>
             </Button>
-          </Link>
 
-          <Button
-            variant="destructive"
-            className="h-9 rounded-2xl px-3"
-            onClick={() => setShowDeleteQuizDialog(true)}
-          >
-            <Trash className="size-4 md:mr-2" />
-            <span className="hidden md:block">Delete Quiz</span>
-          </Button>
+            <Button
+              variant="secondary"
+              className="h-10 min-h-10 min-w-10 rounded-2xl px-4 py-2"
+              onClick={handleAddQuestion}
+            >
+              <Plus className="size-4 md:mr-2" />
+              <span className="hidden md:inline">Add Question</span>
+            </Button>
 
-          <Button
-            variant="secondary"
-            className="h-10 min-h-10 min-w-10 rounded-2xl px-4 py-2"
-            onClick={handleAddQuestion}
-          >
-            <Plus className="size-4 md:mr-2" />
-            <span className="hidden md:inline">Add Question</span>
-          </Button>
-
-          <Button
-            className="h-10 min-h-10 min-w-10 rounded-2xl px-4 py-2"
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            <Save className="size-4 md:mr-2" />
-            <p className="hidden md:inline">
-              {isSaving ? "Saving..." : "Save changes"}
-            </p>
-          </Button>
+            <Button
+              className="h-10 min-h-10 min-w-10 rounded-2xl px-4 py-2"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              <Save className="size-4 md:mr-2" />
+              <p className="hidden md:inline">
+                {isSaving ? "Saving..." : "Save changes"}
+              </p>
+            </Button>
+          </div>
         </div>
 
         {/* Content Container - Centered */}
         <div className="container mx-auto max-w-7xl py-8 md:px-0">
-          {/* Quiz Title Editor */}
+          {/* Quiz Title */}
           <div className="rounded-xl bg-secondary/50 p-4">
-            <div className="mb-4 block font-semibold text-lg">Quiz title</div>
+            <div className="b mb-2 font-semibold text-lg">Quiz Title</div>
             <RichTextEditor
               content={title}
               onUpdate={setTitle}
               placeholder="Enter quiz title..."
-              className="rounded-md border border-input bg-secondary/80"
+              className="rounded-md border border-input bg-background"
             />
           </div>
 

@@ -1,10 +1,17 @@
 "use client";
 
-import { ArrowRightLeft, GripVertical, Plus, Trash } from "lucide-react";
+import { GripVertical, Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { RichTextEditor } from "@/components/editor";
 import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { QuizQuestion } from "../../types";
 import { AnswerOptionEditor } from "./answer-option-editor";
 
@@ -110,8 +117,6 @@ export const QuestionEditor = memo(function QuestionEditor({
     setOptions((current) => {
       const newOption = { id: `option-${current.length}`, text: "" };
       const updated = [...current, newOption];
-      // onUpdate({ options: JSON.stringify(updated) }); // Immediate
-      // Actually, standard setState pattern
       debouncedOnUpdate({ options: JSON.stringify(updated) });
       return updated;
     });
@@ -119,6 +124,30 @@ export const QuestionEditor = memo(function QuestionEditor({
 
   const handleCorrectAnswerChange = (value: string) => {
     handleParentUpdate({ correct_answer: value });
+  };
+
+  const handleQuestionTypeChange = (type: string) => {
+    handleParentUpdate({ question_type: type as any });
+
+    // Adjust options based on question type
+    if (type === "true_false") {
+      const trueFalseOptions = [
+        { id: "option-0", text: "True" },
+        { id: "option-1", text: "False" },
+      ];
+      setOptions(trueFalseOptions);
+      handleParentUpdate({
+        options: JSON.stringify(trueFalseOptions),
+        correct_answer: "option-0",
+      });
+    }
+  };
+
+  const _questionTypeLabels: Record<string, string> = {
+    multiple_choice: "Multiple Choice",
+    true_false: "True/False",
+    fill_in_blank: "Fill in Blank",
+    short_answer: "Short Answer",
   };
 
   return (
@@ -155,14 +184,20 @@ export const QuestionEditor = memo(function QuestionEditor({
 
       {/* Action Buttons */}
       <div className="flex w-full flex-wrap items-center justify-end gap-2 pt-4">
-        <Button
-          variant="outline"
-          className="h-9 shrink-0 whitespace-nowrap rounded-2xl px-3"
-          type="button"
+        <Select
+          value={question.question_type || "multiple_choice"}
+          onValueChange={handleQuestionTypeChange}
         >
-          <ArrowRightLeft className="mr-2 size-4" />
-          Free Response
-        </Button>
+          <SelectTrigger className="h-9 w-[160px] rounded-2xl">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="multiple_choice">Multiple Choice</SelectItem>
+            <SelectItem value="true_false">True/False</SelectItem>
+            <SelectItem value="fill_in_blank">Fill in Blank</SelectItem>
+            <SelectItem value="short_answer">Short Answer</SelectItem>
+          </SelectContent>
+        </Select>
 
         <Button
           variant="secondary"

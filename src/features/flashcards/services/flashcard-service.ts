@@ -4,6 +4,7 @@ import type {
   DeckInsert,
   FlashcardGenerationParams,
   FlashcardWithReview,
+  PublicDeck,
 } from "../types";
 
 export const FlashcardService = {
@@ -63,14 +64,46 @@ export const FlashcardService = {
   },
 
   /**
+   * Get all public decks
+   */
+  async getPublicDecks() {
+    const supabase = createClient();
+
+    const { data: decks, error } = await supabase
+      .from("decks")
+      .select(`
+        *,
+        profiles:owner_id (
+          full_name,
+          nickname,
+          avatar_url
+        ),
+        flashcards (count)
+      `)
+      .eq("visibility", "public")
+      .eq("status", "ready")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return decks;
+  },
+
+  /**
    * Get a single deck by ID
    */
-  async getDeck(deckId: string): Promise<Deck | null> {
+  async getDeck(deckId: string): Promise<PublicDeck | null> {
     const supabase = createClient();
 
     const { data, error } = await supabase
       .from("decks")
-      .select("*")
+      .select(`
+        *,
+        profiles:owner_id (
+          full_name,
+          nickname,
+          avatar_url
+        )
+      `)
       .eq("id", deckId)
       .single();
 

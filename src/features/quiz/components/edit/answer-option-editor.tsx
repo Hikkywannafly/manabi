@@ -40,13 +40,13 @@ export const AnswerOptionEditor = memo(function AnswerOptionEditor({
         value={option.id}
         id={option.id}
         aria-label={`Select ${option.text || "answer"} as correct`}
-        className="size-4 shrink-0 border-input ring-2 ring-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        className="size-5 shrink-0 border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
       />
       <RichTextEditor
         content={option.text}
         onUpdate={handleUpdate}
         placeholder="Enter answer option..."
-        className="flex-1 rounded-md border border-input bg-tertiary"
+        className="flex-1 rounded-md border border-input bg-background"
       />
       <Button
         variant="ghost"

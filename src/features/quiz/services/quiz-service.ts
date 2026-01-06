@@ -19,13 +19,43 @@ export const QuizService = {
     return data as Quiz[];
   },
 
+  async getPublicQuizzes() {
+    const supabase = createClient();
+    const { data: quizzes, error } = await supabase
+      .from("quizzes")
+      .select(`
+        *,
+        profiles:owner_id (
+          full_name,
+          nickname,
+          avatar_url
+        )
+      `)
+      .eq("visibility", "public")
+      .eq("status", "ready")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    return quizzes;
+  },
+
   async getQuizWithQuestions(quizId: string): Promise<QuizWithQuestions> {
     const supabase = createClient();
 
-    // Fetch quiz
+    // Fetch quiz with profile info
     const { data: quiz, error: quizError } = await supabase
       .from("quizzes")
-      .select("*")
+      .select(`
+        *,
+        profiles:owner_id (
+          full_name,
+          nickname,
+          avatar_url
+        )
+      `)
       .eq("id", quizId)
       .single();
 
@@ -251,18 +281,47 @@ export const QuizService = {
 
   async updateQuiz(
     quizId: string,
-    data: { title?: string; questions?: QuizQuestion[] },
+    data: {
+      title?: string;
+      questions?: QuizQuestion[];
+      visibility?: "public" | "private";
+    },
   ) {
     const supabase = createClient();
 
-    // Update quiz title if provided
-    if (data.title !== undefined) {
-      const { error: titleError } = await supabase
-        .from("quizzes")
-        .update({ title: data.title })
-        .eq("id", quizId);
+    // Prepare update object
+    const updateData: Record<string, any> = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.visibility !== undefined) updateData.visibility = data.visibility;
 
-      if (titleError) throw titleError;
+    // Update quiz fields if provided
+    if (Object.keys(updateData).length > 0) {
+      // First, fetch the current quiz to get all required fields
+      const { data: currentQuiz, error: fetchError } = await supabase
+        .from("quizzes")
+        .select("*")
+        .eq("id", quizId)
+        .single();
+
+      if (fetchError || !currentQuiz) {
+        console.error("QuizService: Failed to fetch current quiz:", fetchError);
+        throw fetchError || new Error("Quiz not found");
+      }
+
+      // Use upsert instead of update to avoid CORS PATCH issues
+      // Upsert uses POST which is allowed by CORS
+      const { data: _result, error: updateError } = await supabase
+        .from("quizzes")
+        .upsert(
+          { ...currentQuiz, ...updateData },
+          { onConflict: "id", ignoreDuplicates: false },
+        )
+        .select();
+
+      if (updateError) {
+        console.error("QuizService: Update failed:", updateError);
+        throw updateError;
+      }
     }
 
     // Update questions if provided

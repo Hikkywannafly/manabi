@@ -2,8 +2,9 @@
 
 import { BarChart2, Clock, Globe, Settings2, Video } from "lucide-react";
 import { useEffect, useState } from "react";
+import { UserDropdown } from "@/components/layouts/user-dropdown";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/contexts/auth-provider";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { useRoomStore } from "@/stores/use-room-store";
 import { usePomodoroTimer } from "../hooks";
@@ -21,14 +22,11 @@ export function PomodoroHeader() {
   const [currentStreakCount, setCurrentStreakCount] = useState(0);
   const [isPublicModalOpen, setIsPublicModalOpen] = useState(false);
 
+  const { user } = useUser();
+
   // Fetch streak on mount
   useEffect(() => {
     const fetchStreak = async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
       if (user) {
         const streak = await getCurrentStreak(user.id);
         setCurrentStreakCount(streak);
@@ -36,7 +34,7 @@ export function PomodoroHeader() {
     };
 
     fetchStreak();
-  }, []);
+  }, [user]);
 
   return (
     <>
@@ -117,9 +115,10 @@ export function PomodoroHeader() {
 
         {/* User Profile */}
         <div className="relative ml-2">
-          <Button className="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-white/50 bg-gradient-to-br from-black to-gray-600 font-bold text-sm text-white hover:from-black hover:to-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            N
-          </Button>
+          <UserDropdown
+            variant="header"
+            className="size-10 border border-white/50 bg-gradient-to-br from-black to-gray-600 hover:from-black hover:to-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          />
         </div>
       </header>
 

@@ -14,7 +14,7 @@ export function useUpdateAccount() {
       return AccountService.updateProfile(user.id, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["profiles", user?.id] });
       toast.success("Profile updated successfully");
     },
     onError: (error) => {

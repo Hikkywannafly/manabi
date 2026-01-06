@@ -29,12 +29,7 @@ export const pomodoroService = {
       .insert({
         user_id: user.id,
         ...session,
-        mode:
-          session.mode === "shortBreak"
-            ? "short_break"
-            : session.mode === "longBreak"
-              ? "long_break"
-              : session.mode,
+        mode: session.mode,
       })
       .select()
       .single();

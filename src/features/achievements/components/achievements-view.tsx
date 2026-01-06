@@ -123,7 +123,7 @@ export function AchievementsView() {
         </div>
       </div>
 
-      <AchievementStats achievements={achievements} />
+      <AchievementStats achievements={achievements} isLoading={isLoading} />
 
       <div className="flex flex-col gap-4">
         {/* Controls */}

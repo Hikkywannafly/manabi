@@ -80,7 +80,7 @@ export function ExploreView({ quizzes, decks }: ExploreViewProps) {
   };
 
   const Pagination = () => {
-    if (totalPages <= 1) return null;
+    if (totalPages < 1) return null;
 
     return (
       <div className="flex items-center justify-center gap-2 py-8">
@@ -242,7 +242,6 @@ export function ExploreView({ quizzes, decks }: ExploreViewProps) {
                   </div>
                 )}
               </div>
-              <Pagination />
             </TabsContent>
 
             <TabsContent value="flashcards" className="m-0 space-y-4">
@@ -276,7 +275,6 @@ export function ExploreView({ quizzes, decks }: ExploreViewProps) {
                   </div>
                 )}
               </div>
-              <Pagination />
             </TabsContent>
           </div>
         </Tabs>

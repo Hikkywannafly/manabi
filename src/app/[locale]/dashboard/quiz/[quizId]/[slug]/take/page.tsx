@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { DashboardPage } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/auth-provider";
 import { QuizTakeContent } from "@/features/quiz/components/take/quiz-take-content";
 import { useQuizDetail } from "@/features/quiz/hooks/use-quiz-detail";
 import type { QuizTakeMode } from "@/features/quiz/types";
@@ -29,6 +30,8 @@ export default function QuizTakeWithSlugPage() {
   const handleBack = () => {
     router.back();
   };
+
+  const { user } = useAuth();
 
   if (isLoading) {
     return (
@@ -63,5 +66,5 @@ export default function QuizTakeWithSlugPage() {
     );
   }
 
-  return <QuizTakeContent quiz={quiz} mode={mode} />;
+  return <QuizTakeContent quiz={quiz} mode={mode} userId={user?.id} />;
 }

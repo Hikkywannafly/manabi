@@ -1,0 +1,449 @@
+src\features\quiz\components\quiz-card.tsx:51:24 lint/nursery/useSortedClasses  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! These CSS classes should be sorted.
+  
+    49 Γöé       {/* Placeholder for stats - To be implemented when backend supports aggregation */}
+    50 Γöé       {attemptCount > 0 && (
+  > 51 Γöé         <div className="mt-2 flex items-center gap-2 text-sm text-primary">
+       Γöé                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 Γöé 
+    53 Γöé           <BarChart2 className="h-4 w-4" />
+  
+  i Safe fix: Sort the classes.
+  
+    49 49 Γöé         {/* Placeholder for stats - To be implemented when backend supports aggregation */}
+    50 50 Γöé         {attemptCount > 0 && (
+    51    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<div┬╖className="mt-2┬╖flex┬╖items-center┬╖gap-2┬╖text-sm┬╖text-primary">
+       51 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<div┬╖className="mt-2┬╖flex┬╖items-center┬╖gap-2┬╖text-primary┬╖text-sm">
+    52 52 Γöé   
+    53 53 Γöé             <BarChart2 className="h-4 w-4" />
+  
+
+src\features\quiz\components\quiz-list.tsx:81:23 lint/nursery/useSortedClasses  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! These CSS classes should be sorted.
+  
+    79 Γöé                     variant={currentPage === page ? "default" : "outline"}
+    80 Γöé                     className={cn(
+  > 81 Γöé                       "size-10 cursor-pointer rounded-md border text-sm font-medium transition hover:bg-accent hover:text-accent-foreground",
+       Γöé                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    82 Γöé                       currentPage === page &&
+    83 Γöé                         "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+  
+  i Safe fix: Sort the classes.
+  
+     79  79 Γöé                       variant={currentPage === page ? "default" : "outline"}
+     80  80 Γöé                       className={cn(
+     81     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"size-10┬╖cursor-pointer┬╖rounded-md┬╖border┬╖text-sm┬╖font-medium┬╖transition┬╖hover:bg-accent┬╖hover:text-accent-foreground",
+         81 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"size-10┬╖cursor-pointer┬╖rounded-md┬╖border┬╖font-medium┬╖text-sm┬╖transition┬╖hover:bg-accent┬╖hover:text-accent-foreground",
+     82  82 Γöé                         currentPage === page &&
+     83  83 Γöé                           "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+  
+
+src\features\quiz\components\quiz-list.tsx:155:23 lint/nursery/useSortedClasses  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! These CSS classes should be sorted.
+  
+    153 Γöé             type="search"
+    154 Γöé             placeholder="Search quizzes..."
+  > 155 Γöé             className="pl-9 bg-secondary"
+        Γöé                       ^^^^^^^^^^^^^^^^^^^
+    156 Γöé             value={search}
+    157 Γöé             onChange={(e) => setSearch(e.target.value)}
+  
+  i Safe fix: Sort the classes.
+  
+    153 153 Γöé               type="search"
+    154 154 Γöé               placeholder="Search quizzes..."
+    155     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="pl-9┬╖bg-secondary"
+        155 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="bg-secondary┬╖pl-9"
+    156 156 Γöé               value={search}
+    157 157 Γöé               onChange={(e) => setSearch(e.target.value)}
+  
+
+src\features\quiz\components\quiz-list.tsx:163:23 lint/nursery/useSortedClasses  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! These CSS classes should be sorted.
+  
+    161 Γöé           <Button
+    162 Γöé             variant="outline"
+  > 163 Γöé             className="w-[180px] rounded-md justify-between bg-secondary"
+        Γöé                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    164 Γöé           >
+    165 Γöé             Most Recent
+  
+  i Safe fix: Sort the classes.
+  
+    161 161 Γöé             <Button
+    162 162 Γöé               variant="outline"
+    163     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="w-[180px]┬╖rounded-md┬╖justify-between┬╖bg-secondary"
+        163 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="w-[180px]┬╖justify-between┬╖rounded-md┬╖bg-secondary"
+    164 164 Γöé             >
+    165 165 Γöé               Most Recent
+  
+
+src\app\[locale]\page.tsx:3:1 assist/source/organizeImports  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù The imports and exports are not sorted.
+  
+    1 Γöé "use client";
+    2 Γöé 
+  > 3 Γöé import { useAuth } from "@/contexts/auth-provider";
+      Γöé ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    4 Γöé import { Benefits } from "@/components/benefits";
+    5 Γöé import { Hero } from "@/components/hero/hero";
+  
+  i Safe fix: Organize Imports (Biome)
+  
+     1  1 Γöé   "use client";
+     2  2 Γöé   
+     3    Γöé - import┬╖{┬╖useAuth┬╖}┬╖from┬╖"@/contexts/auth-provider";
+     4    Γöé - import┬╖{┬╖Benefits┬╖}┬╖from┬╖"@/components/benefits";
+     5    Γöé - import┬╖{┬╖Hero┬╖}┬╖from┬╖"@/components/hero/hero";
+     6    Γöé - import┬╖{┬╖PageLayout┬╖}┬╖from┬╖"@/components/layouts";
+     7    Γöé - import┬╖{┬╖Pricing┬╖}┬╖from┬╖"@/components/pricing/pricing";
+        3 Γöé + import┬╖{┬╖Benefits┬╖}┬╖from┬╖"@/components/benefits";
+        4 Γöé + import┬╖{┬╖Hero┬╖}┬╖from┬╖"@/components/hero/hero";
+        5 Γöé + import┬╖{┬╖PageLayout┬╖}┬╖from┬╖"@/components/layouts";
+        6 Γöé + import┬╖{┬╖Pricing┬╖}┬╖from┬╖"@/components/pricing/pricing";
+        7 Γöé + import┬╖{┬╖useAuth┬╖}┬╖from┬╖"@/contexts/auth-provider";
+     8  8 Γöé   
+     9  9 Γöé   export default function HomePage() {
+  
+
+src\app\[locale]\page.tsx:10:11 lint/correctness/noUnusedVariables ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù This variable user is unused.
+  
+     9 Γöé export default function HomePage() {
+  > 10 Γöé   const { user, isLoading } = useAuth();
+       Γöé           ^^^^
+    11 Γöé 
+  
+  i Unused variables are often the result of an incomplete refactoring, typos, or other sources of bugs.
+  
+
+src\app\[locale]\page.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+    10 10 Γöé     const { user, isLoading } = useAuth();
+    11 11 Γöé   
+    12    Γöé - 
+    13 12 Γöé     if (isLoading) {
+    14    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖//┬╖Optional:┬╖returns┬╖null┬╖or┬╖a┬╖spinner┬╖while┬╖checking┬╖auth┬╖to┬╖prevent┬╖flash┬╖of┬╖content
+    15    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖return┬╖null;
+       13 Γöé + ┬╖┬╖┬╖┬╖//┬╖Optional:┬╖returns┬╖null┬╖or┬╖a┬╖spinner┬╖while┬╖checking┬╖auth┬╖to┬╖prevent┬╖flash┬╖of┬╖content
+       14 Γöé + ┬╖┬╖┬╖┬╖return┬╖null;
+    16 15 Γöé     }
+    17 16 Γöé   
+  
+
+src\features\quiz\components\quiz-card.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+    50 50 Γöé         {attemptCount > 0 && (
+    51 51 Γöé           <div className="mt-2 flex items-center gap-2 text-sm text-primary">
+    52    Γöé - 
+    53 52 Γöé             <BarChart2 className="h-4 w-4" />
+    54 53 Γöé             Best: {Math.round(bestScore)}% ({attemptCount} attempts)
+  
+
+src\features\quiz\components\quiz-list.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+     68  68 Γöé             </li>
+     69  69 Γöé   
+     70     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{Array.from({┬╖length:┬╖effectiveTotalPages┬╖},┬╖(_,┬╖i)┬╖=>┬╖i┬╖+┬╖1).map((page)┬╖=>┬╖{
+     71     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(
+     72     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖page┬╖===┬╖1┬╖||
+     73     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖page┬╖===┬╖effectiveTotalPages┬╖||
+     74     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖(page┬╖>=┬╖currentPage┬╖-┬╖1┬╖&&┬╖page┬╖<=┬╖currentPage┬╖+┬╖1)
+     75     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖)┬╖{
+     76     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖(
+     77     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<li┬╖key={page}>
+     78     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<Button
+     79     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖variant={currentPage┬╖===┬╖page┬╖?┬╖"default"┬╖:┬╖"outline"}
+     80     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className={cn(
+     81     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"size-10┬╖cursor-pointer┬╖rounded-md┬╖border┬╖text-sm┬╖font-medium┬╖transition┬╖hover:bg-accent┬╖hover:text-accent-foreground",
+     82     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖currentPage┬╖===┬╖page┬╖&&
+     83     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"bg-primary┬╖text-primary-foreground┬╖hover:bg-primary/90┬╖hover:text-primary-foreground",
+     84     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖)}
+     85     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onClick={()┬╖=>┬╖handlePageChange(page)}
+     86     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖aria-current={currentPage┬╖===┬╖page┬╖?┬╖"page"┬╖:┬╖undefined}
+     87     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>
+     88     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{page}
+     89     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</Button>
+     90     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</li>
+     91     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖);
+     92     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+     93     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(
+     94     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖(page┬╖===┬╖2┬╖&&┬╖currentPage┬╖>┬╖3)┬╖||
+     95     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖(page┬╖===┬╖effectiveTotalPages┬╖-┬╖1┬╖&&┬╖currentPage┬╖<┬╖effectiveTotalPages┬╖-┬╖2)
+     96     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖)┬╖{
+     97     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖(
+     98     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<li┬╖key={`ellipsis-${page}`}>
+     99     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<span┬╖className="flex┬╖size-10┬╖items-center┬╖justify-center┬╖text-muted-foreground">
+    100     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖...
+    101     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</span>
+    102     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</li>
+    103     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖);
+    104     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+    105     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖null;
+    106     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖})}
+         70 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{Array.from({┬╖length:┬╖effectiveTotalPages┬╖},┬╖(_,┬╖i)┬╖=>┬╖i┬╖+┬╖1).map(
+         71 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖(page)┬╖=>┬╖{
+         72 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(
+         73 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖page┬╖===┬╖1┬╖||
+         74 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖page┬╖===┬╖effectiveTotalPages┬╖||
+         75 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖(page┬╖>=┬╖currentPage┬╖-┬╖1┬╖&&┬╖page┬╖<=┬╖currentPage┬╖+┬╖1)
+         76 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖)┬╖{
+         77 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖(
+         78 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<li┬╖key={page}>
+         79 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<Button
+         80 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖variant={currentPage┬╖===┬╖page┬╖?┬╖"default"┬╖:┬╖"outline"}
+         81 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className={cn(
+         82 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"size-10┬╖cursor-pointer┬╖rounded-md┬╖border┬╖text-sm┬╖font-medium┬╖transition┬╖hover:bg-accent┬╖hover:text-accent-foreground",
+         83 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖currentPage┬╖===┬╖page┬╖&&
+         84 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"bg-primary┬╖text-primary-foreground┬╖hover:bg-primary/90┬╖hover:text-primary-foreground",
+         85 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖)}
+         86 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onClick={()┬╖=>┬╖handlePageChange(page)}
+         87 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖aria-current={currentPage┬╖===┬╖page┬╖?┬╖"page"┬╖:┬╖undefined}
+         88 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>
+         89 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{page}
+         90 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</Button>
+         91 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</li>
+         92 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖);
+         93 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+         94 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(
+         95 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖(page┬╖===┬╖2┬╖&&┬╖currentPage┬╖>┬╖3)┬╖||
+         96 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖(page┬╖===┬╖effectiveTotalPages┬╖-┬╖1┬╖&&
+         97 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖currentPage┬╖<┬╖effectiveTotalPages┬╖-┬╖2)
+         98 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖)┬╖{
+         99 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖(
+        100 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<li┬╖key={`ellipsis-${page}`}>
+        101 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<span┬╖className="flex┬╖size-10┬╖items-center┬╖justify-center┬╖text-muted-foreground">
+        102 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖...
+        103 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</span>
+        104 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</li>
+        105 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖);
+        106 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+        107 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖null;
+        108 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖},
+        109 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖)}
+    107 110 Γöé   
+    108 111 Γöé             <li>
+    ┬╖┬╖┬╖┬╖┬╖┬╖┬╖ Γöé 
+    111 114 Γöé                 className={cn(
+    112 115 Γöé                   "h-10 gap-1 rounded-2xl px-4 py-2 pr-2.5 font-medium transition hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50",
+    113     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖currentPage┬╖===┬╖effectiveTotalPages┬╖&&┬╖"pointer-events-none┬╖opacity-50",
+        116 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖currentPage┬╖===┬╖effectiveTotalPages┬╖&&
+        117 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"pointer-events-none┬╖opacity-50",
+    114 118 Γöé                 )}
+    115 119 Γöé                 onClick={() =>
+  
+
+src\features\quiz\components\take\quiz-navigation.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+     79  79 Γöé     createdAt,
+     80  80 Γöé   }: QuizNavigationProps) {
+     81     Γöé - 
+     82  81 Γöé     const router = useRouter();
+     83  82 Γöé     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    ┬╖┬╖┬╖┬╖┬╖┬╖┬╖ Γöé 
+    213 212 Γöé                   <Avatar className="h-8 w-8">
+    214 213 Γöé                     <AvatarImage src={creatorAvatar || undefined} />
+    215     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<AvatarFallback>{creatorName?.charAt(0)┬╖||┬╖"?"}</AvatarFallback>
+        214 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<AvatarFallback>
+        215 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{creatorName?.charAt(0)┬╖||┬╖"?"}
+        216 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</AvatarFallback>
+    216 217 Γöé                   </Avatar>
+    217 218 Γöé                   <div className="flex flex-col gap-0.5 text-muted-foreground">
+  
+
+src\features\quiz\components\take\quiz-take-content.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+    275 275 Γöé         // Actually, let's implement the robust check locally to be safe.
+    276 276 Γöé         let _robustCorrectCount = 0;
+    277     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖_robustAnswers┬╖=┬╖answers.map(a┬╖=>┬╖{
+    278     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖q┬╖=┬╖questions.find(qu┬╖=>┬╖qu.id┬╖===┬╖a.questionId);
+    279     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if(!q)┬╖return┬╖{┬╖...a,┬╖isCorrect:┬╖false,┬╖options:┬╖[]┬╖};
+        277 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖_robustAnswers┬╖=┬╖answers.map((a)┬╖=>┬╖{
+        278 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖q┬╖=┬╖questions.find((qu)┬╖=>┬╖qu.id┬╖===┬╖a.questionId);
+        279 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(!q)┬╖return┬╖{┬╖...a,┬╖isCorrect:┬╖false,┬╖options:┬╖[]┬╖};
+    280 280 Γöé   
+    281 281 Γöé           const correctId = q.correct_answer || "";
+    282     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖let┬╖isCorrect┬╖=┬╖false;
+    283     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(q.question_type┬╖===┬╖"fill_in_blank"┬╖||┬╖q.question_type┬╖===┬╖"short_answer")┬╖{
+    284     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect┬╖=┬╖a.selectedOptionId.trim().toLowerCase()┬╖===┬╖correctId.trim().toLowerCase();
+    285     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}┬╖else┬╖{
+    286     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖normCorrect┬╖=┬╖correctId.startsWith("option-")┬╖?┬╖correctId┬╖:┬╖`option-${correctId}`;
+    287     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖normSelected┬╖=┬╖a.selectedOptionId.startsWith("option-")┬╖?┬╖a.selectedOptionId┬╖:┬╖a.selectedOptionId;┬╖//┬╖assume┬╖selected┬╖is┬╖already┬╖option-X┬╖for┬╖non-text
+    288     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect┬╖=┬╖normCorrect┬╖===┬╖normSelected;
+    289     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+    290     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if(isCorrect)┬╖_robustCorrectCount++;
+        282 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖let┬╖isCorrect┬╖=┬╖false;
+        283 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(
+        284 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖q.question_type┬╖===┬╖"fill_in_blank"┬╖||
+        285 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖q.question_type┬╖===┬╖"short_answer"
+        286 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖)┬╖{
+        287 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect┬╖=
+        288 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖a.selectedOptionId.trim().toLowerCase()┬╖===
+        289 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖correctId.trim().toLowerCase();
+        290 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}┬╖else┬╖{
+        291 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖normCorrect┬╖=┬╖correctId.startsWith("option-")
+        292 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖?┬╖correctId
+        293 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖:┬╖`option-${correctId}`;
+        294 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖normSelected┬╖=┬╖a.selectedOptionId.startsWith("option-")
+        295 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖?┬╖a.selectedOptionId
+        296 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖:┬╖a.selectedOptionId;┬╖//┬╖assume┬╖selected┬╖is┬╖already┬╖option-X┬╖for┬╖non-text
+        297 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect┬╖=┬╖normCorrect┬╖===┬╖normSelected;
+        298 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+        299 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(isCorrect)┬╖_robustCorrectCount++;
+    291 300 Γöé   
+    292     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖//┬╖Parse┬╖options┬╖for┬╖display
+    293     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖let┬╖options:┬╖any[]┬╖=┬╖[];
+    294     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖try┬╖{
+    295     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖raw┬╖=┬╖typeof┬╖q.options┬╖===┬╖"string"┬╖?┬╖JSON.parse(q.options)┬╖:┬╖q.options;
+    296     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if(Array.isArray(raw))┬╖options┬╖=┬╖typeof┬╖raw[0]┬╖===┬╖'string'┬╖?┬╖raw.map((t,i)=>({id:`option-${i}`,┬╖text:t}))┬╖:┬╖raw;
+    297     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}┬╖catch(_e)┬╖{}
+        301 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖//┬╖Parse┬╖options┬╖for┬╖display
+        302 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖let┬╖options:┬╖any[]┬╖=┬╖[];
+        303 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖try┬╖{
+        304 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖raw┬╖=
+        305 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖typeof┬╖q.options┬╖===┬╖"string"┬╖?┬╖JSON.parse(q.options)┬╖:┬╖q.options;
+        306 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(Array.isArray(raw))
+        307 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖options┬╖=
+        308 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖typeof┬╖raw[0]┬╖===┬╖"string"
+        309 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖?┬╖raw.map((t,┬╖i)┬╖=>┬╖({┬╖id:┬╖`option-${i}`,┬╖text:┬╖t┬╖}))
+        310 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖:┬╖raw;
+        311 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}┬╖catch┬╖(_e)┬╖{}
+    298 312 Γöé   
+    299     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖{
+    300     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖questionText:┬╖q.question_text,
+    301     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖questionId:┬╖a.questionId,
+    302     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖selectedOptionId:┬╖a.selectedOptionId,
+    303     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖correctOptionId:┬╖correctId,
+    304     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect,
+    305     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖timeSpent:┬╖a.timeSpent,
+    306     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖options
+    307     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+        313 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖{
+        314 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖questionText:┬╖q.question_text,
+        315 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖questionId:┬╖a.questionId,
+        316 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖selectedOptionId:┬╖a.selectedOptionId,
+        317 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖correctOptionId:┬╖correctId,
+        318 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect,
+        319 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖timeSpent:┬╖a.timeSpent,
+        320 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖options,
+        321 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖};
+    308 322 Γöé         });
+    309     Γöé - 
+    310 323 Γöé   
+    311 324 Γöé         if (!saveAttempt) {
+    312 325 Γöé           // Practice mode: Local calculation only
+    313     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖robustAnswers┬╖=┬╖answers.map(a┬╖=>┬╖{
+    314     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖q┬╖=┬╖questions.find(qu┬╖=>┬╖qu.id┬╖===┬╖a.questionId);
+    315     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if(!q)┬╖{
+    316     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖{
+    317     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖questionId:┬╖a.questionId,
+    318     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖questionText:┬╖"",
+    319     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖selectedOptionId:┬╖a.selectedOptionId,
+    320     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖correctOptionId:┬╖"",
+    321     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect:┬╖false,
+    322     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖timeSpent:┬╖a.timeSpent,
+    323     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖options:┬╖[]
+    324     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖};
+    325     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+        326 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖robustAnswers┬╖=┬╖answers.map((a)┬╖=>┬╖{
+        327 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖q┬╖=┬╖questions.find((qu)┬╖=>┬╖qu.id┬╖===┬╖a.questionId);
+        328 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(!q)┬╖{
+        329 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖{
+        330 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖questionId:┬╖a.questionId,
+        331 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖questionText:┬╖"",
+        332 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖selectedOptionId:┬╖a.selectedOptionId,
+        333 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖correctOptionId:┬╖"",
+        334 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect:┬╖false,
+        335 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖timeSpent:┬╖a.timeSpent,
+        336 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖options:┬╖[],
+        337 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖};
+        338 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+    326 339 Γöé   
+    327     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖correctId┬╖=┬╖q.correct_answer┬╖||┬╖"";
+    328     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖let┬╖isCorrect┬╖=┬╖false;
+    329     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(q.question_type┬╖===┬╖"fill_in_blank"┬╖||┬╖q.question_type┬╖===┬╖"short_answer")┬╖{
+    330     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect┬╖=┬╖a.selectedOptionId.trim().toLowerCase()┬╖===┬╖correctId.trim().toLowerCase();
+    331     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}┬╖else┬╖{
+    332     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖normCorrect┬╖=┬╖correctId.startsWith("option-")┬╖?┬╖correctId┬╖:┬╖`option-${correctId}`;
+    333     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖normSelected┬╖=┬╖a.selectedOptionId.startsWith("option-")┬╖?┬╖a.selectedOptionId┬╖:┬╖a.selectedOptionId;
+        340 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖correctId┬╖=┬╖q.correct_answer┬╖||┬╖"";
+        341 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖let┬╖isCorrect┬╖=┬╖false;
+        342 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(
+        343 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖q.question_type┬╖===┬╖"fill_in_blank"┬╖||
+        344 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖q.question_type┬╖===┬╖"short_answer"
+        345 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖)┬╖{
+        346 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖isCorrect┬╖=
+        347 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖a.selectedOptionId.trim().toLowerCase()┬╖===
+        348 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖correctId.trim().toLowerCase();
+        349 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}┬╖else┬╖{
+        350 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖normCorrect┬╖=┬╖correctId.startsWith("option-")
+        351 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖?┬╖correctId
+        352 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖:┬╖`option-${correctId}`;
+        353 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖normSelected┬╖=┬╖a.selectedOptionId.startsWith("option-")
+        354 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖?┬╖a.selectedOptionId
+        355 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖:┬╖a.selectedOptionId;
+    334 356 Γöé               isCorrect = normCorrect === normSelected;
+    335     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+        357 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+    336 358 Γöé   
+    337     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖//┬╖Parse┬╖options┬╖for┬╖display
+    338     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖let┬╖options:┬╖any[]┬╖=┬╖[];
+    339     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖try┬╖{
+    340     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖raw┬╖=┬╖typeof┬╖q.options┬╖===┬╖"string"┬╖?┬╖JSON.parse(q.options)┬╖:┬╖q.options;
+    341     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if(Array.isArray(raw))┬╖{
+    342     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖options┬╖=┬╖typeof┬╖raw[0]┬╖===┬╖'string'
+    343     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖?┬╖raw.map((t:┬╖string,┬╖i:┬╖number)┬╖=>┬╖({id:`option-${i}`,┬╖text:t}))
+    344     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖:┬╖raw;
+    345     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+    346     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}┬╖catch(_e)┬╖{}
+        359 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖//┬╖Parse┬╖options┬╖for┬╖display
+        360 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖let┬╖options:┬╖any[]┬╖=┬╖[];
+        361 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖try┬╖{
+        362 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖raw┬╖=
+        363 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖typeof┬╖q.options┬╖===┬╖"string"┬╖?┬╖JSON.parse(q.options)┬╖:┬╖q.options;
+        364 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(Array.isArray(raw))┬╖{
+        365 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖options┬╖=
+  44 more lines truncated
+  
+
+src\features\quiz\services\quiz-service.ts format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+    178 178 Γöé         let options: any[] = [];
+    179 179 Γöé         try {
+    180     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖rawOptions┬╖=┬╖typeof┬╖question.options┬╖===┬╖"string"
+    181     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖?┬╖JSON.parse(question.options)
+    182     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖:┬╖question.options;
+        180 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖rawOptions┬╖=
+        181 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖typeof┬╖question.options┬╖===┬╖"string"
+        182 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖?┬╖JSON.parse(question.options)
+        183 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖:┬╖question.options;
+    183 184 Γöé   
+    184 185 Γöé           if (Array.isArray(rawOptions)) {
+  
+
+Checked 458 files in 256ms. No fixes applied.
+Found 8 errors.
+Found 4 warnings.
+check ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Some errors were emitted while running checks.
+  
+

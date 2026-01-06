@@ -24,6 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -53,6 +54,7 @@ interface QuizNavigationProps {
   onAskAI?: () => void;
   isOwner?: boolean;
   creatorName?: string;
+  creatorAvatar?: string | null;
   createdAt?: string | null;
 }
 
@@ -73,6 +75,7 @@ export function QuizNavigation({
   onAskAI,
   isOwner = false,
   creatorName,
+  creatorAvatar,
   createdAt,
 }: QuizNavigationProps) {
   const router = useRouter();
@@ -205,15 +208,23 @@ export function QuizNavigation({
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex flex-col gap-1 text-muted-foreground">
-                <div className="font-medium text-foreground">
-                  Created by {creatorName}
-                </div>
-                {createdAt && (
-                  <div className="text-xs">
-                    {new Date(createdAt).toLocaleDateString()}
+              <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={creatorAvatar || undefined} />
+                  <AvatarFallback>
+                    {creatorName?.charAt(0) || "?"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col gap-0.5 text-muted-foreground">
+                  <div className="font-medium text-foreground text-sm">
+                    Created by {creatorName}
                   </div>
-                )}
+                  {createdAt && (
+                    <div className="text-[10px]">
+                      {new Date(createdAt).toLocaleDateString()}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

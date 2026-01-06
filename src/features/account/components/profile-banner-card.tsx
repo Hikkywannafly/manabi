@@ -6,18 +6,28 @@ import { useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useProfile } from "@/features/profile/hooks";
 import { useUploadBanner } from "../hooks";
 
-export function ProfileBannerCard() {
+interface ProfileBannerCardProps {
+  currentUrl?: string | null;
+  onChange: (url: string) => void;
+}
+
+export function ProfileBannerCard({
+  currentUrl,
+  onChange,
+}: ProfileBannerCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { data: profile } = useProfile();
   const { mutate: uploadBanner, isPending } = useUploadBanner();
 
   const handleBannerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      uploadBanner(file);
+      uploadBanner(file, {
+        onSuccess: (url) => {
+          onChange(url);
+        },
+      });
     }
   };
 
@@ -28,9 +38,9 @@ export function ProfileBannerCard() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="relative h-48 w-full overflow-hidden rounded-md border bg-muted">
-          {profile?.banner_url ? (
+          {currentUrl ? (
             <Image
-              src={profile.banner_url}
+              src={currentUrl}
               alt="Profile banner"
               fill
               className="object-cover"
@@ -59,11 +69,11 @@ export function ProfileBannerCard() {
           disabled={isPending}
         >
           {isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 key="banner-loader" className="h-4 w-4 animate-spin" />
           ) : (
-            <Camera className="h-4 w-4" />
+            <Camera key="banner-camera" className="h-4 w-4" />
           )}
-          Choose Banner
+          <span>Choose Banner</span>
         </Button>
       </CardContent>
     </Card>

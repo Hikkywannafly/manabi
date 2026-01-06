@@ -3,7 +3,7 @@ import { ProfileView } from "@/features/profile/components";
 
 export default function ProfilePage() {
   return (
-    <DashboardPage title="Profile">
+    <DashboardPage>
       <ProfileView />
     </DashboardPage>
   );

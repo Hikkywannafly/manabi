@@ -49,9 +49,10 @@ export function ActivityCalendar() {
     calendarDays.push(day);
   }
 
-  // Get activity data for current month
+  // Get activity data for current month (using local timezone)
   const getActivityForDay = (day: number) => {
-    const dateStr = new Date(year, month, day).toISOString().split("T")[0];
+    const date = new Date(year, month, day);
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     return activityData.find((d) => d.date === dateStr);
   };
 

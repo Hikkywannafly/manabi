@@ -6,6 +6,7 @@ export type DashboardStats = {
   flashcardsCount: number; // mapping to 'decks' or 'flashcards' count? The UI says "Flashcard sets", so decks.
   collectionsCount: number;
   streak: number;
+  longestStreak: number;
   xp: number;
   level: number;
 };
@@ -59,7 +60,7 @@ export const DashboardService = {
         .eq("owner_id", userId),
       supabase
         .from("profiles")
-        .select("current_streak, xp, level")
+        .select("current_streak, longest_streak, xp, level")
         .eq("id", userId)
         .maybeSingle(),
     ]);
@@ -69,6 +70,7 @@ export const DashboardService = {
       flashcardsCount: decksCount || 0,
       collectionsCount: collectionsCount || 0,
       streak: profile?.current_streak || 0,
+      longestStreak: profile?.longest_streak || 0,
       xp: profile?.xp || 0,
       level: profile?.level || 1,
     };

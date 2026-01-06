@@ -260,6 +260,15 @@ export const StatisticsService = {
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
+    // Helper to get local date string (YYYY-MM-DD format)
+    const toLocalDateString = (dateInput: Date | string): string => {
+      const date = new Date(dateInput);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
     // Get all activity types
     const { data: pomodoroSessions } = await supabase
       .from("pomodoro_sessions")
@@ -281,12 +290,12 @@ export const StatisticsService = {
       .not("last_reviewed", "is", null)
       .gte("last_reviewed", ninetyDaysAgo.toISOString());
 
-    // Group by date
+    // Group by date (using local timezone)
     const dailyActivity: Record<string, number> = {};
 
     pomodoroSessions?.forEach((session) => {
       if (session.start_time) {
-        const date = new Date(session.start_time).toISOString().split("T")[0];
+        const date = toLocalDateString(session.start_time);
         dailyActivity[date] =
           (dailyActivity[date] || 0) + session.duration_minutes;
       }
@@ -294,14 +303,14 @@ export const StatisticsService = {
 
     quizAttempts?.forEach((attempt) => {
       if (attempt.completed_at) {
-        const date = new Date(attempt.completed_at).toISOString().split("T")[0];
+        const date = toLocalDateString(attempt.completed_at);
         dailyActivity[date] = (dailyActivity[date] || 0) + 5; // Count quiz as 5 min activity
       }
     });
 
     flashcardReviews?.forEach((review) => {
       if (review.last_reviewed) {
-        const date = new Date(review.last_reviewed).toISOString().split("T")[0];
+        const date = toLocalDateString(review.last_reviewed);
         dailyActivity[date] = (dailyActivity[date] || 0) + 2; // Count flashcard as 2 min activity
       }
     });

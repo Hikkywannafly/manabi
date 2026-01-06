@@ -47,6 +47,7 @@ export function DashboardContent() {
     flashcardsCount: 0,
     collectionsCount: 0,
     streak: 0,
+    longestStreak: 0,
     xp: 0,
     level: 1,
   };
@@ -77,6 +78,7 @@ export function DashboardContent() {
               flashcardsCount={statsData.flashcardsCount}
               collectionsCount={statsData.collectionsCount}
               streak={statsData.streak}
+              longestStreak={statsData.longestStreak}
             />
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

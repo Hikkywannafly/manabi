@@ -8,6 +8,7 @@ interface StatsGridProps {
   flashcardsCount: number;
   collectionsCount: number;
   streak: number;
+  longestStreak: number;
 }
 
 export function StatsGrid({
@@ -15,6 +16,7 @@ export function StatsGrid({
   flashcardsCount,
   collectionsCount,
   streak,
+  longestStreak,
 }: StatsGridProps) {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -106,7 +108,7 @@ export function StatsGrid({
         </div>
         <div className="space-y-1">
           <p className="text-muted-foreground text-xs">
-            Longest: {streak} days
+            Longest: {longestStreak} days
           </p>
           {/* Mock percentile for now */}
           <p className="font-semibold text-green-600 text-xs dark:text-green-400">

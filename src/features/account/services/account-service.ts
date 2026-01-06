@@ -7,9 +7,18 @@ export const AccountService = {
     updates: Partial<Profile>,
   ): Promise<Profile> {
     const supabase = createClient();
+
+    // Remove virtual or read-only fields that aren't columns in the profiles table
+    const validUpdates = { ...updates } as any;
+    delete validUpdates.quizzes_count;
+    delete validUpdates.decks_count;
+    delete validUpdates.created_at;
+    delete validUpdates.updated_at;
+    delete validUpdates.xp; // 'xp' might be an alias for 'total_xp' or similar
+
     const { data, error } = await supabase
       .from("profiles")
-      .update(updates)
+      .update(validUpdates)
       .eq("id", userId)
       .select()
       .single();

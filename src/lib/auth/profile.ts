@@ -26,7 +26,7 @@ export async function fetchProfile(
     let query = supabase
       .from("profiles")
       .select(
-        "id, nickname, full_name, avatar_url, banner_url, onboarding_completed, status, timezone, is_public",
+        "id, nickname, full_name, avatar_url, banner_url, onboarding_completed, status, timezone, is_public, total_xp, level, current_streak, longest_streak, total_study_minutes, created_at",
       )
       .eq("id", userId);
 

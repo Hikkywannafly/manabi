@@ -1,9 +1,5 @@
 import { z } from "zod";
 
-// ============================================================================
-// Constants & Enums
-// ============================================================================
-
 export const ACCOUNT_TYPES = {
   FREE: "free",
   PRO: "pro",
@@ -56,10 +52,6 @@ const jsonValueSchema: z.ZodType<JSONValue> = z.lazy(() =>
 );
 const datetimeString = () => z.string().datetime().or(z.string());
 
-// ============================================================================
-// Zod Schemas
-// ============================================================================
-
 export const ProfileSchema = z.object({
   id: z.string().uuid(),
   nickname: z.string().min(1),
@@ -93,6 +85,11 @@ export const ProfileSchema = z.object({
   linkedin_url: optionalUrl(),
 
   // Stats
+  total_xp: z.number().int().min(0).default(0),
+  level: z.number().int().min(1).default(1),
+  current_streak: z.number().int().min(0).default(0),
+  longest_streak: z.number().int().min(0).default(0),
+  total_study_minutes: z.number().int().min(0).default(0),
   total_posts: z.number().int().min(0),
   total_followers: z.number().int().min(0),
   total_following: z.number().int().min(0),
@@ -117,6 +114,14 @@ export const PartialProfileSchema = z.object({
   status: z.enum(PROFILE_STATUS_VALUES),
   timezone: z.string().optional().nullable(),
   is_public: z.boolean().optional().nullable(),
+  total_xp: z.number().int().optional().nullable(),
+  level: z.number().int().optional().nullable(),
+  current_streak: z.number().int().optional().nullable(),
+  longest_streak: z.number().int().optional().nullable(),
+  total_study_minutes: z.number().int().optional().nullable(),
+  created_at: datetimeString().optional().nullable(),
+  quizzes_count: z.number().int().optional().default(0),
+  decks_count: z.number().int().optional().default(0),
 });
 
 export const FullProfileSchema = ProfileSchema.extend({

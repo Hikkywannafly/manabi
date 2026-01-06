@@ -9,7 +9,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProfile } from "@/features/profile/hooks";
 import { useUploadAvatar } from "../hooks";
 
-export function ProfilePictureCard() {
+interface ProfilePictureCardProps {
+  currentUrl?: string | null;
+  onChange: (url: string) => void;
+}
+
+export function ProfilePictureCard({
+  currentUrl,
+  onChange,
+}: ProfilePictureCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { data: profile } = useProfile();
   const { mutate: uploadAvatar, isPending } = useUploadAvatar();
@@ -17,7 +25,11 @@ export function ProfilePictureCard() {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      uploadAvatar(file);
+      uploadAvatar(file, {
+        onSuccess: (url) => {
+          onChange(url);
+        },
+      });
     }
   };
 
@@ -28,9 +40,9 @@ export function ProfilePictureCard() {
       </CardHeader>
       <CardContent className="flex items-center gap-6">
         <div className="relative h-24 w-24 overflow-hidden rounded-full border bg-muted">
-          {profile?.avatar_url ? (
+          {currentUrl ? (
             <Image
-              src={profile.avatar_url}
+              src={currentUrl}
               alt="Profile picture"
               fill
               className="object-cover"
@@ -61,11 +73,11 @@ export function ProfilePictureCard() {
           disabled={isPending}
         >
           {isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 key="picture-loader" className="h-4 w-4 animate-spin" />
           ) : (
-            <Camera className="h-4 w-4" />
+            <Camera key="picture-camera" className="h-4 w-4" />
           )}
-          Change Photo
+          <span>Change Photo</span>
         </Button>
       </CardContent>
     </Card>

@@ -26,13 +26,11 @@ export function useUpdateAccount() {
 
 export function useUploadAvatar() {
   const { user } = useAuth();
-  const { mutateAsync: updateProfile } = useUpdateAccount();
 
   return useMutation({
     mutationFn: async (file: File) => {
       if (!user?.id) throw new Error("User not authenticated");
       const url = await AccountService.uploadAvatar(user.id, file);
-      await updateProfile({ avatar_url: url });
       return url;
     },
     onSuccess: () => {
@@ -47,13 +45,11 @@ export function useUploadAvatar() {
 
 export function useUploadBanner() {
   const { user } = useAuth();
-  const { mutateAsync: updateProfile } = useUpdateAccount();
 
   return useMutation({
     mutationFn: async (file: File) => {
       if (!user?.id) throw new Error("User not authenticated");
       const url = await AccountService.uploadBanner(user.id, file);
-      await updateProfile({ banner_url: url });
       return url;
     },
     onSuccess: () => {

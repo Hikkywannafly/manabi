@@ -23,12 +23,17 @@ import {
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { UserAvatarProfile } from "@/components/user-avatar-profile";
 import { useUser } from "@/contexts/auth-provider";
+import { cn } from "@/lib/utils";
 
 interface UserDropdownProps {
   variant?: "sidebar" | "header";
+  className?: string;
 }
 
-export function UserDropdown({ variant = "sidebar" }: UserDropdownProps) {
+export function UserDropdown({
+  variant = "sidebar",
+  className,
+}: UserDropdownProps) {
   const { user, profile } = useUser();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -61,7 +66,7 @@ export function UserDropdown({ variant = "sidebar" }: UserDropdownProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {variant === "header" ? (
-          <Button size="icon" className="rounded-full">
+          <Button size="icon" className={cn("rounded-full", className)}>
             <UserAvatarProfile
               className="h-8 w-8 rounded-full"
               showInfo={false}

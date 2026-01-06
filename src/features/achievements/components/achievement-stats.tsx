@@ -4,9 +4,32 @@ import type { AchievementWithProgress } from "@/services/achievement-service";
 
 interface AchievementStatsProps {
   achievements: AchievementWithProgress[];
+  isLoading?: boolean;
 }
 
-export function AchievementStats({ achievements }: AchievementStatsProps) {
+export function AchievementStats({
+  achievements,
+  isLoading,
+}: AchievementStatsProps) {
+  if (isLoading) {
+    return (
+      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i} className="bg-secondary/50">
+            <CardContent className="flex h-32 animate-pulse items-center justify-between p-6">
+              <div className="space-y-3">
+                <div className="h-4 w-24 rounded bg-muted-foreground/20" />
+                <div className="h-8 w-16 rounded bg-muted-foreground/20" />
+                <div className="h-3 w-32 rounded bg-muted-foreground/20" />
+              </div>
+              <div className="size-8 rounded-full bg-muted-foreground/20" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   const unlocked = achievements.filter((a) => a.unlocked);
   const total = achievements.length;
   const percentage =

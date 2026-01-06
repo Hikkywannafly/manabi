@@ -51,6 +51,9 @@ interface QuizNavigationProps {
   correctAnswer?: string;
   onRetry?: () => void;
   onAskAI?: () => void;
+  isOwner?: boolean;
+  creatorName?: string;
+  createdAt?: string | null;
 }
 
 export function QuizNavigation({
@@ -68,9 +71,14 @@ export function QuizNavigation({
   correctAnswer,
   onRetry,
   onAskAI,
+  isOwner = false,
+  creatorName,
+  createdAt,
 }: QuizNavigationProps) {
   const router = useRouter();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  // ... (rest of the state/handlers)
 
   const hasNextQuestion = currentQuestion < totalQuestions - 1;
   const hasPreviousQuestion = currentQuestion > 0;
@@ -165,36 +173,49 @@ export function QuizNavigation({
         ) : (
           /* Settings/Share Section (EXAM mode or no feedback) */
           <div className="flex grow items-center md:w-3/5">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex-1 rounded-2xl md:flex-initial"
-                  type="button"
-                >
-                  <Settings className="mr-2 size-4" />
-                  Settings
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuItem onClick={handleEditQuiz}>
-                  <Edit className="mr-2 size-4" />
-                  Edit Quiz
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleShareQuiz}>
-                  <Share className="mr-2 size-4" />
-                  Share Quiz
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => setShowDeleteDialog(true)}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <Trash className="mr-2 size-4" />
-                  Delete Quiz
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {isOwner ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="flex-1 rounded-2xl md:flex-initial"
+                    type="button"
+                  >
+                    <Settings className="mr-2 size-4" />
+                    Settings
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={handleEditQuiz}>
+                    <Edit className="mr-2 size-4" />
+                    Edit Quiz
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareQuiz}>
+                    <Share className="mr-2 size-4" />
+                    Share Quiz
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => setShowDeleteDialog(true)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash className="mr-2 size-4" />
+                    Delete Quiz
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex flex-col gap-1 text-muted-foreground">
+                <div className="font-medium text-foreground">
+                  Created by {creatorName}
+                </div>
+                {createdAt && (
+                  <div className="text-xs">
+                    {new Date(createdAt).toLocaleDateString()}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

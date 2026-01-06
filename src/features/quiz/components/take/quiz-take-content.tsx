@@ -23,9 +23,14 @@ import { QuizResultComponent } from "./quiz-result";
 interface QuizTakeContentProps {
   quiz: QuizWithQuestions;
   mode?: QuizTakeMode;
+  userId?: string;
 }
 
-export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
+export function QuizTakeContent({
+  quiz,
+  mode = "test",
+  userId,
+}: QuizTakeContentProps) {
   const router = useRouter();
   const { checkAchievements } = useAchievementNotifier();
   const { checkMissions } = useMissionNotifier();
@@ -435,6 +440,11 @@ export function QuizTakeContent({ quiz, mode = "test" }: QuizTakeContentProps) {
           correctAnswer={currentQuestionResult?.correctAnswer}
           onRetry={handleRetry}
           onAskAI={() => setIsAIPanelOpen(true)}
+          isOwner={userId === quiz.owner_id}
+          creatorName={
+            quiz.profiles?.nickname || quiz.profiles?.full_name || "Unknown"
+          }
+          createdAt={quiz.created_at}
         />
       </div>
       {isSubmitting && (

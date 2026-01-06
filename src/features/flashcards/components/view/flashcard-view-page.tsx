@@ -30,9 +30,10 @@ import { FlashcardViewer } from "./flashcard-viewer";
 
 interface FlashcardViewPageProps {
   deckId: string;
+  userId?: string;
 }
 
-export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
+export function FlashcardViewPage({ deckId, userId }: FlashcardViewPageProps) {
   const { data: deck, isLoading: isDeckLoading } = useQuery({
     queryKey: ["deck", deckId],
     queryFn: () => FlashcardService.getDeck(deckId),
@@ -40,6 +41,7 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
 
   const { data: originalCards, isLoading: isCardsLoading } =
     useFlashcards(deckId);
+  const isOwner = userId === deck?.owner_id;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cardOrder, setCardOrder] = useState<number[]>([]);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -208,8 +210,16 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
         <div className="flex flex-col items-center">
           {/* Header Section matching QuizHeader */}
           <div className="w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-            <div className="prose prose-sm md:prose-lg mx-auto max-w-none text-center font-medium text-base text-muted-foreground sm:text-lg">
-              <p>{deck.title}</p>
+            <div className="flex flex-col items-center gap-2 text-center">
+              <h1 className="font-bold text-2xl sm:text-3xl">{deck.title}</h1>
+              {!isOwner && deck.profiles && (
+                <p className="text-muted-foreground">
+                  Created by{" "}
+                  {deck.profiles.nickname ||
+                    deck.profiles.full_name ||
+                    "Unknown"}
+                </p>
+              )}
             </div>
 
             {/* Progress Bar */}
@@ -259,23 +269,25 @@ export function FlashcardViewPage({ deckId }: FlashcardViewPageProps) {
                     <p>Randomize questions</p>
                   </TooltipContent>
                 </Tooltip>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="size-10 rounded-2xl"
-                    >
-                      <MoreVertical className="size-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Edit Details</DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">
-                      Delete Deck
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {isOwner && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="size-10 rounded-2xl"
+                      >
+                        <MoreVertical className="size-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Edit Details</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive">
+                        Delete Deck
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
             </div>
           </div>

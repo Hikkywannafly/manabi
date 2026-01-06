@@ -54,6 +54,11 @@ export interface QuestionFeedback {
 // Extended types for quiz taking with joined data
 export interface QuizWithQuestions extends Quiz {
   questions: QuizQuestion[];
+  profiles?: {
+    full_name: string | null;
+    nickname: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 export interface QuizQuestionWithOptions extends QuizQuestion {

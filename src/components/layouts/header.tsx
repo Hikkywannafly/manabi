@@ -27,25 +27,41 @@ export function Header() {
             <Logo size="sm" />
 
             {/* Desktop Navigation */}
+            {/* Desktop Navigation */}
             <nav className="hidden items-center gap-8 md:flex">
-              <Link
-                href="/features"
+              <button
+                type="button"
+                onClick={() =>
+                  document
+                    .getElementById("features")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
                 className="font-medium text-muted-foreground transition-colors hover:text-primary"
               >
                 {t("features")}
-              </Link>
-              <Link
-                href="/pricing"
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  document
+                    .getElementById("pricing")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
                 className="font-medium text-muted-foreground transition-colors hover:text-primary"
               >
                 {t("pricing")}
-              </Link>
-              <Link
-                href="/faq"
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  document
+                    .getElementById("faqs")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
                 className="font-medium text-muted-foreground transition-colors hover:text-primary"
               >
                 {t("faq")}
-              </Link>
+              </button>
               <Link
                 href="/blog"
                 className="font-medium text-muted-foreground transition-colors hover:text-primary"
@@ -123,27 +139,42 @@ export function Header() {
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
             <div className="mt-2 space-y-4 border-border border-t py-4 md:hidden">
-              <Link
-                href="/features"
-                className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                type="button"
+                onClick={() => {
+                  document
+                    .getElementById("features")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                  setMobileMenuOpen(false);
+                }}
+                className="block w-full py-2 text-left font-medium text-muted-foreground transition-colors hover:text-primary"
               >
                 {t("features")}
-              </Link>
-              <Link
-                href="/pricing"
-                className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  document
+                    .getElementById("pricing")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                  setMobileMenuOpen(false);
+                }}
+                className="block w-full py-2 text-left font-medium text-muted-foreground transition-colors hover:text-primary"
               >
                 {t("pricing")}
-              </Link>
-              <Link
-                href="/faq"
-                className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  document
+                    .getElementById("faqs")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                  setMobileMenuOpen(false);
+                }}
+                className="block w-full py-2 text-left font-medium text-muted-foreground transition-colors hover:text-primary"
               >
                 {t("faq")}
-              </Link>
+              </button>
               <Link
                 href="/blog"
                 className="block py-2 font-medium text-muted-foreground transition-colors hover:text-primary"

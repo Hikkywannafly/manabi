@@ -1,10 +1,15 @@
 "use client";
 
-import { Benefits } from "@/components/benefits";
-import { Hero } from "@/components/hero/hero";
+import {
+  FAQSection,
+  FeaturesSection,
+  PricingSection,
+  QuizMarquee,
+  TestimonialsSection,
+} from "@/components/landing";
 import { PageLayout } from "@/components/layouts";
-import { Pricing } from "@/components/pricing/pricing";
 import { useAuth } from "@/contexts/auth-provider";
+import { Hero } from "../../components/hero/hero";
 
 export default function HomePage() {
   const { isLoading } = useAuth();
@@ -17,8 +22,13 @@ export default function HomePage() {
   return (
     <PageLayout showFooter>
       <Hero />
-      <Benefits />
-      <Pricing />
+      {/* <PainSection/> */}
+      <FeaturesSection />
+      {/* <StatsSection /> */}
+      <TestimonialsSection />
+      <FAQSection />
+      <QuizMarquee />
+      <PricingSection />
     </PageLayout>
   );
 }

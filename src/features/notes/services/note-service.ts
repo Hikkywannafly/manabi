@@ -59,13 +59,28 @@ export const noteService = {
 
   async updateNote(id: string, updates: UpdateNoteInput) {
     const supabase = createClient();
+
+    // First get the existing note to merge with updates
+    const { data: existingNote, error: fetchError } = await supabase
+      .from("notes")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Use upsert with POST method to avoid CORS issues with PATCH
     const { data, error } = await supabase
       .from("notes")
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", id)
+      .upsert(
+        {
+          ...existingNote,
+          ...updates,
+          id, // Ensure ID is kept
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" },
+      )
       .select()
       .single();
 

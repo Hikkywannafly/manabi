@@ -1,6 +1,6 @@
 "use client";
 
-import { CloudRain } from "lucide-react";
+import { CloudRain, Coffee, Flame, Wind } from "lucide-react";
 import { useState } from "react";
 import {
   Popover,
@@ -11,6 +11,13 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useAudioStore } from "@/stores/use-audio-store";
+
+const ICON_MAP: Record<string, any> = {
+  rain: CloudRain,
+  fire: Flame,
+  cafe: Coffee,
+  wind: Wind,
+};
 
 export function WhiteNoiseMixer() {
   const { soundscapes, toggleSoundscape, setSoundscapeVolume } =
@@ -67,9 +74,10 @@ export function WhiteNoiseMixer() {
                       sound.isActive && "opacity-100",
                     )}
                   >
-                    {/* Map icons to emojis for this specific UI design if needed, or use Lucide icons */}
-                    {/* For now using the icon from store but styled differently */}
-                    <sound.icon className="size-8" />
+                    {(() => {
+                      const IconComponent = ICON_MAP[sound.id] || CloudRain;
+                      return <IconComponent className="size-8" />;
+                    })()}
                   </div>
                   <div className="relative w-full">
                     <Slider

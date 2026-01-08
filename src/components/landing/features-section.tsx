@@ -11,11 +11,11 @@ import {
   Plus,
   Rss,
   Settings,
+  Shell,
   SkipForward,
   Sparkles,
   Trophy,
   User,
-  WandSparkles,
   Zap,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -214,38 +214,38 @@ function FeatureAITutor() {
               {/* Line from User to Center */}
               <path
                 d="M80 150 L160 150"
-                stroke="#3B82F6"
+                stroke="#df5240ff"
                 strokeWidth="2"
                 fill="none"
               />
               {/* Lines from Center to Apps */}
               <path
                 d="M200 150 Q 260 50, 320 50"
-                stroke="#3B82F6"
+                stroke="#df5240ff"
                 strokeWidth="2"
                 fill="none"
               />
               <path
                 d="M200 150 Q 260 100, 320 100"
-                stroke="#3B82F6"
+                stroke="#df5240ff"
                 strokeWidth="2"
                 fill="none"
               />
               <path
                 d="M200 150 L 320 150"
-                stroke="#3B82F6"
+                stroke="#df5240ff"
                 strokeWidth="2"
                 fill="none"
               />
               <path
                 d="M200 150 Q 260 200, 320 200"
-                stroke="#3B82F6"
+                stroke="#df5240ff"
                 strokeWidth="2"
                 fill="none"
               />
               <path
                 d="M200 150 Q 260 250, 320 250"
-                stroke="#3B82F6"
+                stroke="#df5240ff"
                 strokeWidth="2"
                 fill="none"
               />
@@ -262,7 +262,7 @@ function FeatureAITutor() {
               {/* Center - Share/Transform Icon */}
               <div className="flex flex-col justify-center">
                 <div className="flex size-14 items-center justify-center rounded-full border-2 border-muted bg-background text-foreground shadow-sm">
-                  <WandSparkles className="size-6" />
+                  <Shell className="size-8 text-primary" />
                 </div>
               </div>
 

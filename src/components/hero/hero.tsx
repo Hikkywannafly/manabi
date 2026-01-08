@@ -74,7 +74,7 @@ export function Hero() {
   const [activeCard, setActiveCard] = useState<number | null>(null);
 
   return (
-    <section className="relative flex min-h-[90vh] w-full items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-[98vh] w-full items-center justify-center overflow-hidden">
       {/* Subtle vignette background */}
       <div className="absolute inset-0 bg-gradient-radial from-background via-secondary to-muted opacity-80" />
 

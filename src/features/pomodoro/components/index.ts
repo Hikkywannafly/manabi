@@ -12,6 +12,7 @@ export { MusicSelector } from "./music-selector";
 export { NightSwitch } from "./night-switch";
 export { NotesButton } from "./notes-button";
 export { PomodoroHeader } from "./pomodoro-header";
+export { PomodoroMiniTimer } from "./pomodoro-mini-timer";
 export { PomodoroTimer } from "./pomodoro-timer";
 export { SceneSelector } from "./scene-selector";
 export { SettingsPanel } from "./settings-panel";

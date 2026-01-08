@@ -41,7 +41,7 @@ export function LanguageSwitcher() {
           size="icon"
           className="rounded-full hover:bg-[#B35832]/10"
         >
-          <Globe className="h-5 w-5 text-[#39241A]/60 hover:text-[#B35832]" />
+          <Globe className="h-5 w-5 text-[#39241A]/60 transition-colors hover:text-[#B35832] dark:text-white/60" />
           <span className="sr-only">Change language</span>
         </Button>
       </DropdownMenuTrigger>

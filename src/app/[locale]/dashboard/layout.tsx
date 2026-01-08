@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { DashboardHeader } from "@/components/layouts";
 import AppSidebar from "@/components/layouts/app-sidebar";
+import { PomodoroMiniTimer } from "@/features/pomodoro/components";
+import { useTimerStore } from "@/stores/use-timer-store";
 
 export default function DashboardLayout({
   children,
@@ -14,6 +16,10 @@ export default function DashboardLayout({
   const isPomodoroPage = pathname?.includes("/pomodoro");
   const isQuizTakePage =
     pathname?.includes("/quiz/") && pathname?.includes("/take");
+  const timerStatus = useTimerStore((s) => s.status);
+
+  // Show mini timer when user is not on pomodoro page and timer is active
+  const showMiniTimer = !isPomodoroPage && timerStatus !== "idle";
 
   return (
     <ErrorBoundary>
@@ -37,6 +43,9 @@ export default function DashboardLayout({
             {children}
           </main>
         </div>
+
+        {/* Pomodoro Mini Timer - Floating PiP */}
+        {showMiniTimer && <PomodoroMiniTimer />}
       </div>
     </ErrorBoundary>
   );

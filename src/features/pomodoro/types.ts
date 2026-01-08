@@ -92,7 +92,7 @@ export interface Scene {
 export interface Soundscape {
   id: string;
   name: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: string;
   audioUrl: string;
   volume: number; // 0-100
   isActive: boolean;

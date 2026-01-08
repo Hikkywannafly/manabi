@@ -1,4 +1,3 @@
-import { CloudRain, Coffee, Flame, Wind } from "lucide-react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Soundscape } from "@/features/pomodoro/types";
@@ -24,7 +23,7 @@ const INITIAL_SOUNDSCAPES: Soundscape[] = [
   {
     id: "rain",
     name: "Rain",
-    icon: CloudRain,
+    icon: "rain",
     audioUrl: "",
     volume: 50,
     isActive: false,
@@ -32,7 +31,7 @@ const INITIAL_SOUNDSCAPES: Soundscape[] = [
   {
     id: "fire",
     name: "Fire",
-    icon: Flame,
+    icon: "fire",
     audioUrl: "",
     volume: 50,
     isActive: false,
@@ -40,7 +39,7 @@ const INITIAL_SOUNDSCAPES: Soundscape[] = [
   {
     id: "cafe",
     name: "Cafe",
-    icon: Coffee,
+    icon: "cafe",
     audioUrl: "",
     volume: 50,
     isActive: false,
@@ -48,7 +47,7 @@ const INITIAL_SOUNDSCAPES: Soundscape[] = [
   {
     id: "wind",
     name: "Wind",
-    icon: Wind,
+    icon: "wind",
     audioUrl: "",
     volume: 50,
     isActive: false,
@@ -84,6 +83,7 @@ export const useAudioStore = create<AudioState>()(
     }),
     {
       name: "audio-storage",
+      version: 1, // Bump version to clear stale data (icon objects)
       partialize: (state) => ({
         masterVolume: state.masterVolume,
         soundscapes: state.soundscapes,

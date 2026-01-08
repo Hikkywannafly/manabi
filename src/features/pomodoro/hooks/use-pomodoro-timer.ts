@@ -2,8 +2,14 @@ import { useCallback, useEffect, useRef } from "react";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { useTaskStore } from "@/stores/use-task-store";
 import { useTimerStore } from "@/stores/use-timer-store";
-import { TimerEngine } from "../engines/timer-engine";
 import { playCompletionSound } from "../services/audio-service";
+import {
+  pauseGlobalTimer,
+  resumeGlobalTimer,
+  startGlobalTimer,
+  stopGlobalTimer,
+  subscribeToGlobalTimer,
+} from "../services/global-timer";
 import type { TimerMode } from "../types";
 import { getModeConfig } from "../utils";
 
@@ -22,7 +28,6 @@ export function usePomodoroTimer() {
   } = useTimerStore();
 
   const { saveSession } = usePomodoroStore();
-  const engineRef = useRef<TimerEngine | null>(null);
   const sessionStartTimeRef = useRef<number | null>(null);
 
   const minutes = Math.floor(timeLeft / 60);
@@ -30,9 +35,7 @@ export function usePomodoroTimer() {
 
   const changeMode = useCallback(
     (newMode: TimerMode) => {
-      if (!engineRef.current) return;
-
-      engineRef.current.stop();
+      stopGlobalTimer();
       const config = getModeConfig(newMode);
 
       setTimerMode(newMode);
@@ -103,11 +106,9 @@ export function usePomodoroTimer() {
     changeMode,
   ]);
 
-  // Initialize Timer Engine
+  // Subscribe to global timer events
   useEffect(() => {
-    engineRef.current = new TimerEngine();
-
-    const unsubscribe = engineRef.current.on((event) => {
+    const unsubscribe = subscribeToGlobalTimer((event) => {
       if (event.type === "tick") {
         setTimeLeft(event.timeLeft);
       } else if (event.type === "complete") {
@@ -117,9 +118,8 @@ export function usePomodoroTimer() {
 
     return () => {
       unsubscribe();
-      engineRef.current?.destroy();
     };
-  }, [handleTimerComplete, setTimeLeft]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [handleTimerComplete, setTimeLeft]);
 
   // Request Notification Permission
   useEffect(() => {
@@ -129,31 +129,23 @@ export function usePomodoroTimer() {
   }, []);
 
   const start = useCallback(() => {
-    if (!engineRef.current) return;
-
     sessionStartTimeRef.current = Date.now();
     setStatus("running");
-    engineRef.current.start(timeLeft);
+    startGlobalTimer(timeLeft);
   }, [timeLeft, setStatus]);
 
   const pause = useCallback(() => {
-    if (!engineRef.current) return;
-
     setStatus("paused");
-    engineRef.current.pause();
+    pauseGlobalTimer();
   }, [setStatus]);
 
   const resume = useCallback(() => {
-    if (!engineRef.current) return;
-
     setStatus("running");
-    engineRef.current.resume();
+    resumeGlobalTimer();
   }, [setStatus]);
 
   const reset = useCallback(() => {
-    if (!engineRef.current) return;
-
-    engineRef.current.stop();
+    stopGlobalTimer();
     const config = getModeConfig(mode);
     setTimeLeft(config.duration);
     setDuration(config.duration);
@@ -162,9 +154,7 @@ export function usePomodoroTimer() {
   }, [mode, setTimeLeft, setDuration, setStatus]);
 
   const skip = useCallback(() => {
-    if (!engineRef.current) return;
-
-    engineRef.current.stop();
+    stopGlobalTimer();
     handleTimerComplete();
   }, [handleTimerComplete]);
 

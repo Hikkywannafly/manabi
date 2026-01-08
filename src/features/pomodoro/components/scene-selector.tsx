@@ -24,7 +24,7 @@ export function SceneSelector() {
         </div>
       </DialogTrigger>
 
-      <DialogContent className="flex h-[90vh] w-[95vw] max-w-[95vw] flex-col overflow-hidden rounded-2xl border-none bg-black/90 p-0 text-white shadow-2xl backdrop-blur-xl sm:max-w-6xl">
+      <DialogContent className="flex h-[90vh] w-[95vw] max-w-[95vw] flex-col overflow-hidden rounded-2xl border-none bg-black/90 p-0 text-white shadow-2xl backdrop-blur-xl sm:max-w-6xl [&>button]:hidden">
         <ScenePicker />
       </DialogContent>
     </Dialog>

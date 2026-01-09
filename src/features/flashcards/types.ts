@@ -7,6 +7,7 @@ export type FlashcardGenerationParams = {
   difficulty: "Easy" | "Medium" | "Hard" | "easy" | "medium" | "hard";
   numberOfCards: number;
   language: string;
+  targetLanguage?: string; // For VOCABULARY: translation target language
   flashcardType: "QUESTIONS" | "VOCABULARY";
   parsingMode: "fast" | "balanced" | "premium";
   task: "generate" | "extract";

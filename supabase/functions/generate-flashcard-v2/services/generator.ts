@@ -75,12 +75,32 @@ export class GeneratorService {
       AI_CONFIG.defaults.numberOfCards;
     const flashcardType = params.flashcardType || "QUESTIONS";
     const language = params.language || AI_CONFIG.defaults.language;
+    const targetLanguage = params.targetLanguage || "Vietnamese";
 
     const typeGuide = flashcardType === "VOCABULARY"
-      ? `Create VOCABULARY flashcards:
-- Front: Word or term
-- Back: Definition, translation, or explanation
-- Focus on key terminology and concepts`
+      ? `Create VOCABULARY flashcards for language learning:
+
+WORD EXTRACTION RULES:
+1. adj+noun → extract the adjective: "coastal city" → "coastal (adj.)"
+2. noun+noun / X of Y → extract the core noun: "holiday destination" → "destination (n.)"
+3. phrasal verb → extract the verb headword: "stroll along" → "stroll (v.)" (note particle in explanation)
+
+PRIORITY: adjectives > vivid verbs > key nouns
+EXCLUDE: proper nouns, very basic words (the, a, is, have, etc.)
+
+FRONT FORMAT: <word> (<pos>) where pos ∈ {adj., v., n., adv.}
+- Front: Single word with part of speech tag
+- Back: Translation to ${targetLanguage} with pronunciation hints and usage examples from the original context
+
+EXAMPLES for English→${targetLanguage}:
+Front: "sustainable (adj.)"
+Back: "bền vững - Có khả năng duy trì lâu dài. Ví dụ: sustainable development = phát triển bền vững"
+
+Front: "stroll (v.)"
+Back: "đi dạo, tản bộ - Đi bộ chậm rãi, thư thái. Ví dụ: stroll along the beach = đi dạo dọc bãi biển"
+
+Front: "destination (n.)"
+Back: "điểm đến - Nơi mà người ta hướng tới. Ví dụ: holiday destination = điểm đến du lịch"`
       : `Create Q&A flashcards:
 - Front: Question that tests understanding
 - Back: Clear, concise answer
@@ -107,6 +127,11 @@ Settings:
 - Number of Cards: ${numberOfCards}
 - Language: ${language}
 ${
+      flashcardType === "VOCABULARY"
+        ? `- Target Language for Translation: ${targetLanguage}`
+        : ""
+    }
+${
       params.customInstructions
         ? `- Custom Instructions: ${params.customInstructions}`
         : ""
@@ -131,7 +156,12 @@ IMPORTANT:
 - No markdown code blocks
 - All flashcards must be based on the context
 - Create exactly ${numberOfCards} flashcards
-- If language is specified, translate everything to that language
+${
+      flashcardType === "VOCABULARY"
+        ? `- For VOCABULARY: Front MUST be in source language, Back MUST be translation to ${targetLanguage}
+- Include part of speech, pronunciation hints, and usage examples in the back`
+        : `- If language is specified, translate everything to that language`
+    }
 - Keep front/back concise and clear`;
   }
 

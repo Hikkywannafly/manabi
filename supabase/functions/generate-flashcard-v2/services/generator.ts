@@ -90,17 +90,30 @@ EXCLUDE: proper nouns, very basic words (the, a, is, have, etc.)
 
 FRONT FORMAT: <word> (<pos>) where pos ∈ {adj., v., n., adv.}
 - Front: Single word with part of speech tag
-- Back: Translation to ${targetLanguage} with pronunciation hints and usage examples from the original context
 
-EXAMPLES for English→${targetLanguage}:
-Front: "sustainable (adj.)"
-Back: "bền vững - Có khả năng duy trì lâu dài. Ví dụ: sustainable development = phát triển bền vững"
+BACK FORMAT - Use markdown with ACTUAL LINE BREAKS (newline characters):
+Structure each back with 3 lines separated by real newlines:
+- Line 1: **<Vietnamese translation>** (bold markdown)
+- Line 2: *<Vietnamese definition/explanation>* (italic markdown)
+- Line 3: *Ví dụ:* **<English phrase from context>** : <Vietnamese translation of phrase>
 
-Front: "stroll (v.)"
-Back: "đi dạo, tản bộ - Đi bộ chậm rãi, thư thái. Ví dụ: stroll along the beach = đi dạo dọc bãi biển"
+CRITICAL: In your JSON output, use actual newline characters (not the escaped string "\\n") to separate the 3 lines.
 
-Front: "destination (n.)"
-Back: "điểm đến - Nơi mà người ta hướng tới. Ví dụ: holiday destination = điểm đến du lịch"`
+EXAMPLE OUTPUTS:
+{
+  "front": "destination (n.)",
+  "back": "**điểm đến**\n*Nơi mà người ta hướng tới hoặc muốn đến.*\n*Ví dụ:* **holiday destination** : điểm đến du lịch"
+}
+
+{
+  "front": "sustainable (adj.)",
+  "back": "**bền vững**\n*Có khả năng duy trì lâu dài, không gây hại cho môi trường.*\n*Ví dụ:* **sustainable development** : phát triển bền vững"
+}
+
+{
+  "front": "stroll (v.)",
+  "back": "**đi dạo, tản bộ**\n*Đi bộ chậm rãi, thư thái để thư giãn.*\n*Ví dụ:* **stroll along the beach** : đi dạo dọc bãi biển"
+}`
       : `Create Q&A flashcards:
 - Front: Question that tests understanding
 - Back: Clear, concise answer

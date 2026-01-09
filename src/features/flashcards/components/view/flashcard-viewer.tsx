@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Edit3, Maximize2, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -212,7 +213,9 @@ export function FlashcardViewer({
                     fontSizeClasses[fontSize],
                   )}
                 >
-                  <ReactMarkdown>{frontContent}</ReactMarkdown>
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                    {frontContent}
+                  </ReactMarkdown>
                 </div>
               </div>
               <div className="text-center text-muted-foreground text-sm uppercase tracking-wider">
@@ -307,7 +310,9 @@ export function FlashcardViewer({
                     fontSizeClasses[fontSize],
                   )}
                 >
-                  <ReactMarkdown>{backContent}</ReactMarkdown>
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                    {backContent}
+                  </ReactMarkdown>
                 </div>
               </div>
               <div className="text-center text-muted-foreground text-sm uppercase tracking-wider">

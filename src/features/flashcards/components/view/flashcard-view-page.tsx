@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { MoreVertical, Shuffle, SlidersHorizontal } from "lucide-react";
+import { MoreVertical, Shuffle, SlidersHorizontal, ZoomIn } from "lucide-react";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -45,6 +45,9 @@ export function FlashcardViewPage({ deckId, userId }: FlashcardViewPageProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cardOrder, setCardOrder] = useState<number[]>([]);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [fontSize, setFontSize] = useState<
+    "xs" | "normal" | "large" | "xlarge" | "xxlarge"
+  >("normal");
 
   // View session tracking
   const [viewedCards, setViewedCards] = useState<Set<string>>(new Set());
@@ -136,6 +139,16 @@ export function FlashcardViewPage({ deckId, userId }: FlashcardViewPageProps) {
   const handleFlipOrder = () => {
     setIsFlipped((prev) => !prev);
   };
+
+  const handleToggleFontSize = useCallback(() => {
+    setFontSize((prev) => {
+      if (prev === "xs") return "normal";
+      if (prev === "normal") return "large";
+      if (prev === "large") return "xlarge";
+      if (prev === "xlarge") return "xxlarge";
+      return "xs";
+    });
+  }, []);
 
   const handleRestart = useCallback(() => {
     setCurrentIndex(0);
@@ -269,6 +282,29 @@ export function FlashcardViewPage({ deckId, userId }: FlashcardViewPageProps) {
                     <p>Randomize questions</p>
                   </TooltipContent>
                 </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="size-10 rounded-2xl"
+                      onClick={handleToggleFontSize}
+                    >
+                      <ZoomIn className="size-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      Zoom (
+                      {fontSize === "normal"
+                        ? "Normal"
+                        : fontSize === "large"
+                          ? "Large"
+                          : "Extra Large"}
+                      )
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
                 {isOwner && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -296,7 +332,12 @@ export function FlashcardViewPage({ deckId, userId }: FlashcardViewPageProps) {
           <div className="flex w-full justify-center px-4">
             {currentCard ? (
               <div className="w-full max-w-3xl">
-                <FlashcardViewer card={currentCard} isFlipped={isFlipped} />
+                <FlashcardViewer
+                  card={currentCard}
+                  isFlipped={isFlipped}
+                  fontSize={fontSize}
+                  onToggleFontSize={handleToggleFontSize}
+                />
               </div>
             ) : (
               <div className="flex h-64 w-full items-center justify-center rounded-xl border bg-muted/20">

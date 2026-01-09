@@ -34,7 +34,7 @@ export const navItems: NavItem[] = [
 export const contentNavItems: NavItem[] = [
   {
     title: "Materials",
-    url: "/dashboard/material",
+    url: "",
     icon: "page", // Using 'page' (IconFile) for file icon
     isActive: false,
     items: [],
@@ -73,7 +73,7 @@ export const studyToolsNavItems: NavItem[] = [
   },
   {
     title: "Reader",
-    url: "/dashboard/reader",
+    url: "",
     icon: "book",
     isActive: false,
     items: [],
@@ -148,7 +148,7 @@ export const accountNavItems: NavItem[] = [
   },
   {
     title: "Settings",
-    url: "/dashboard/settings",
+    url: "",
     icon: "settings", // IconSettings
     isActive: false,
     items: [],

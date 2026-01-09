@@ -213,4 +213,15 @@ export const FlashcardService = {
 
     if (error) throw error;
   },
+
+  /**
+   * Delete a deck and all its flashcards (cascading)
+   */
+  async deleteDeck(deckId: string): Promise<void> {
+    const supabase = createClient();
+
+    const { error } = await supabase.from("decks").delete().eq("id", deckId);
+
+    if (error) throw error;
+  },
 };

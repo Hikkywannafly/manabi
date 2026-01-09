@@ -58,6 +58,7 @@ export function CreateFlashcardForm({
     defaultValues: {
       visibility: "private",
       language: "auto",
+      targetLanguage: "vi", // Default: translate to Vietnamese
       numberOfCards: "5-10",
       difficulty: "medium",
       flashcardType: "QUESTIONS",
@@ -155,6 +156,7 @@ export function CreateFlashcardForm({
             values.difficulty.slice(1)) as "Easy" | "Medium" | "Hard",
           numberOfCards,
           language: values.language,
+          targetLanguage: values.targetLanguage,
           flashcardType: values.flashcardType,
           parsingMode: values.parsingMode,
           task: "generate",
@@ -228,6 +230,7 @@ export function CreateFlashcardForm({
               values.difficulty.slice(1)) as "easy" | "medium" | "hard",
             numberOfCards,
             language: values.language,
+            targetLanguage: values.targetLanguage,
             flashcardType: values.flashcardType,
             parsingMode: values.parsingMode,
             task: "generate",

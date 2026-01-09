@@ -12,6 +12,7 @@ export interface FlashcardGenerationParams {
   numberOfCards?: number;
   flashcardType?: "QUESTIONS" | "VOCABULARY";
   language?: string;
+  targetLanguage?: string; // For VOCABULARY: translation target language
   customInstructions?: string;
   task?: "generate" | "extract";
   parsingMode?: "fast" | "balanced" | "premium";

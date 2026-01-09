@@ -24,6 +24,9 @@ interface FlashcardSettingsSidebarProps {
 export function FlashcardSettingsSidebar({
   form,
 }: FlashcardSettingsSidebarProps) {
+  // Watch flashcardType to conditionally show targetLanguage
+  const flashcardType = form.watch("flashcardType");
+
   return (
     <div className="sticky top-20 h-fit space-y-5">
       <Card className="border-none bg-transparent shadow-none">
@@ -149,6 +152,28 @@ export function FlashcardSettingsSidebar({
               </FormItem>
             )}
           />
+
+          {/* Target Language - Only show for VOCABULARY mode */}
+          {flashcardType === "VOCABULARY" && (
+            <FormField
+              control={form.control}
+              name="targetLanguage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Translate To</FormLabel>
+                  <FormControl>
+                    <LanguageCombobox
+                      value={field.value || "vi"}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <p className="text-muted-foreground text-xs">
+                    Front: Source language → Back: Translation
+                  </p>
+                </FormItem>
+              )}
+            />
+          )}
 
           {/* Parsing Mode */}
           <FormField

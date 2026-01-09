@@ -1,6 +1,12 @@
 "use client";
 
-import { BookOpen, ChartColumn, Eye, RotateCcw, Timer } from "lucide-react";
+import {
+  BookOpen,
+  ChartColumn,
+  CircleCheck,
+  RotateCcw,
+  Timer,
+} from "lucide-react";
 import Link from "next/link";
 import {
   Accordion,
@@ -104,7 +110,7 @@ export function FlashcardViewSummary({
               value="viewed"
               className="flex flex-1 items-center justify-center gap-2 text-sm"
             >
-              <Eye className="size-4 text-green-500" />
+              <CircleCheck className="size-4 text-green-500" />
               <span className="whitespace-nowrap">Viewed ({stats.viewed})</span>
             </TabsTrigger>
             <TabsTrigger
@@ -189,7 +195,7 @@ function CardList({
             <AccordionTrigger className="bg-secondary/50 px-4 py-4 hover:no-underline [&[data-state=open]>svg]:rotate-180">
               <div className="flex w-full items-center gap-4 text-left">
                 {wasViewed ? (
-                  <Eye className="size-5 shrink-0 text-green-500" />
+                  <CircleCheck className="size-5 shrink-0 text-green-500" />
                 ) : (
                   <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted">
                     <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />

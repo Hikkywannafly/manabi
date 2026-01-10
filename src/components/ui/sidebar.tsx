@@ -36,10 +36,17 @@ function useSidebar() {
   // Derived state for convenience
   const state = store.open ? "expanded" : "collapsed";
 
+  const toggleSidebar = React.useCallback(() => {
+    return isMobile
+      ? store.setOpenMobile((open) => !open)
+      : store.setOpen((open) => !open);
+  }, [isMobile, store.setOpen, store.setOpenMobile]);
+
   return {
     ...store,
     isMobile,
     state,
+    toggleSidebar,
   };
 }
 

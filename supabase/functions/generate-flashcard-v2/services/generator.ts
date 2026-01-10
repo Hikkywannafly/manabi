@@ -226,10 +226,25 @@ IMPORTANT:
     Logger.info("Parsing AI response...");
 
     // Clean markdown code blocks
-    const cleanedText = text
+    let cleanedText = text
       .replace(/```json\s*/g, "")
       .replace(/```\s*/g, "")
       .trim();
+
+    // Fix: Replace actual newlines inside JSON string values with escaped \\n
+    // This handles the case where AI outputs actual newlines instead of escaped ones
+    cleanedText = cleanedText.replace(
+      /"([^"]*?)"/g,
+      (_match, content) => {
+        // Replace actual newlines and carriage returns with escaped versions
+        const fixed = content
+          .replace(/\r\n/g, "\\n")
+          .replace(/\n/g, "\\n")
+          .replace(/\r/g, "\\n")
+          .replace(/\t/g, "\\t");
+        return `"${fixed}"`;
+      },
+    );
 
     try {
       const parsed = JSON.parse(cleanedText);

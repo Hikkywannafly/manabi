@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Save, Settings, Users, X } from "lucide-react";
+import { LogOut, Settings, Users, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -270,29 +270,31 @@ export function RoomSettingsSidebar() {
                 id="room-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="border-white/10 bg-white/5 text-white focus:border-yellow-500/50 focus:ring-yellow-500/50"
-                placeholder="e.g. Nyanko's Study Space"
+                className="border-white/10 bg-white/5 text-white placeholder:text-white/40 focus:border-yellow-500/50 focus:ring-yellow-500/50"
+                placeholder="e.g. Nyanko's Study Room"
               />
             </div>
 
             {/* Slug (Handle) */}
             <div className="space-y-2">
               <Label htmlFor="room-slug" className="text-white/80">
-                Room Handle (Slug)
+                Room Link
               </Label>
               <div className="relative">
-                <span className="-translate-y-1/2 absolute top-1/2 left-3 text-sm text-white/30">
+                <span className="-translate-y-1/2 absolute top-1/2 left-3 text-sm text-white/50">
                   manabi.io/room/
                 </span>
                 <Input
                   id="room-slug"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  className="border-white/10 bg-white/5 pl-32 text-white focus:border-yellow-500/50 focus:ring-yellow-500/50"
-                  placeholder="my-room"
+                  className="border-white/10 bg-white/5 pl-32 text-white placeholder:text-white/40 focus:border-yellow-500/50 focus:ring-yellow-500/50"
+                  placeholder="nyanko-study"
                 />
               </div>
-              <p className="text-white/40 text-xs">Unique URL for your room.</p>
+              <p className="text-white/40 text-xs">
+                Share this link so others can join your room.
+              </p>
             </div>
 
             {/* About */}
@@ -304,8 +306,8 @@ export function RoomSettingsSidebar() {
                 id="room-about"
                 value={about}
                 onChange={(e) => setAbout(e.target.value)}
-                className="min-h-[100px] border-white/10 bg-white/5 text-white focus:border-yellow-500/50 focus:ring-yellow-500/50"
-                placeholder="What are you studying today?"
+                className="min-h-[100px] border-white/10 bg-white/5 text-white placeholder:text-white/40 focus:border-yellow-500/50 focus:ring-yellow-500/50"
+                placeholder="Let's study together! 📚"
               />
             </div>
 
@@ -363,7 +365,6 @@ export function RoomSettingsSidebar() {
                 className="h-12 w-full rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 font-bold text-black text-md shadow-lg shadow-orange-500/20 hover:from-yellow-400 hover:to-orange-400"
               >
                 {isLoading ? "Saving..." : "Save Settings"}
-                {!isLoading && <Save className="ml-2 h-5 w-5" />}
               </Button>
             </div>
           </div>

@@ -46,20 +46,38 @@ export const roomService = {
     if (!user) throw new Error("User not authenticated");
 
     // Check if user already has a personal room (rooms they own)
-    const { data: existingRoom } = await supabase
+    const { data: existingRoom, error: checkError } = await supabase
       .from("study_rooms")
       .select("*")
       .eq("owner_id", user.id)
-      .single();
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("Error checking existing room:", checkError);
+    }
 
     if (existingRoom) {
       return existingRoom;
     }
 
+    // Get user's nickname for personalized room name
+    let roomName = name;
+    if (name === "My Room") {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("nickname")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.nickname) {
+        roomName = `${profile.nickname}'s Room`;
+      }
+    }
+
     const { data, error } = await supabase
       .from("study_rooms")
       .insert({
-        name,
+        name: roomName,
         owner_id: user.id,
         is_public: true, // Default to true
         discoverable: true, // Default to true

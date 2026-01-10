@@ -1,11 +1,11 @@
 "use client";
 
-import { BarChart2, Clock, Globe, Settings2 } from "lucide-react";
+import { BarChart2, Clock, Globe } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UserDropdown } from "@/components/layouts/user-dropdown";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/auth-provider";
-import { statsService } from "@/services/stats-service";
+import { roomService } from "@/services/room-service";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { useRoomStore } from "@/stores/use-room-store";
 import { useTimerStore } from "@/stores/use-timer-store";
@@ -21,36 +21,44 @@ export function PomodoroHeader() {
   const { status } = useTimerStore();
   const [, setCurrentStreakCount] = useState(0);
   const [isPublicModalOpen, setIsPublicModalOpen] = useState(false);
-  const [todayFocusMinutes, setTodayFocusMinutes] = useState(0);
+  const [roomFocusMinutes, setRoomFocusMinutes] = useState(0);
 
   const { user } = useUser();
 
-  // Fetch streak and today's focus time on mount
+  // Fetch streak on mount
   useEffect(() => {
     const fetchStats = async () => {
       if (user) {
         const streak = await getCurrentStreak(user.id);
         setCurrentStreakCount(streak);
-
-        // Fetch today's focus time
-        const today = new Date().toISOString().split("T")[0];
-        const stats = await statsService.getDailyStats(user.id, today);
-        setTodayFocusMinutes(stats.focus_minutes || 0);
       }
     };
 
     fetchStats();
   }, [user]);
 
-  // Refetch when timer stops (session completed)
+  // Fetch room focus time when room changes
   useEffect(() => {
-    if (status === "idle" && user) {
-      const today = new Date().toISOString().split("T")[0];
-      statsService.getDailyStats(user.id, today).then((stats) => {
-        setTodayFocusMinutes(stats.focus_minutes || 0);
+    const fetchRoomFocusTime = async () => {
+      if (currentRoom?.id) {
+        const focusTime = await roomService.getRoomFocusTime(currentRoom.id);
+        setRoomFocusMinutes(focusTime);
+      } else {
+        setRoomFocusMinutes(0);
+      }
+    };
+
+    fetchRoomFocusTime();
+  }, [currentRoom?.id]);
+
+  // Refetch room focus time when timer stops (session completed)
+  useEffect(() => {
+    if (status === "idle" && currentRoom?.id) {
+      roomService.getRoomFocusTime(currentRoom.id).then((focusTime) => {
+        setRoomFocusMinutes(focusTime);
       });
     }
-  }, [status, user]);
+  }, [status, currentRoom?.id]);
 
   // Format focus time as Xh Xm
   const formatFocusTime = (minutes: number) => {
@@ -72,14 +80,14 @@ export function PomodoroHeader() {
             <StreakCard />
           </div>
 
-          {/* Today's Focus Time Widget */}
+          {/* Room Focus Time Widget */}
           <Button
             className="flex h-10 cursor-pointer items-center gap-1.5 rounded-xl bg-black/20 px-3 hover:bg-black/50"
-            aria-label="Today's focus time"
+            aria-label="Room focus time"
           >
             <Clock className="size-4 text-white" />
             <div className="font-bold text-sm text-white">
-              {formatFocusTime(todayFocusMinutes)}
+              {formatFocusTime(roomFocusMinutes)}
             </div>
           </Button>
 
@@ -111,7 +119,6 @@ export function PomodoroHeader() {
             <span className="truncate font-bold text-sm text-white">
               {currentRoom?.name || "My Room"}
             </span>
-            <Settings2 className="ml-1 size-4 text-white/50" />
           </Button>
         </div>
 

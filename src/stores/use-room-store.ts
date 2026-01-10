@@ -9,6 +9,7 @@ interface RoomState {
   currentRoom: StudyRoom | null;
   roomUsers: RoomUser[];
   isLoading: boolean;
+  isInitializing: boolean;
   error: string | null;
 
   createRoom: (name: string, settings?: Partial<StudyRoom>) => Promise<void>;
@@ -24,6 +25,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
   currentRoom: null,
   roomUsers: [],
   isLoading: false,
+  isInitializing: false,
   error: null,
 
   createRoom: async (name, settings) => {
@@ -86,7 +88,11 @@ export const useRoomStore = create<RoomState>((set, get) => ({
   },
 
   restoreCurrentRoom: async () => {
-    set({ isLoading: true, error: null });
+    const { isInitializing, currentRoom } = get();
+    // Guard: prevent concurrent calls or if already has a room
+    if (isInitializing || currentRoom) return;
+
+    set({ isInitializing: true, isLoading: true, error: null });
     try {
       // Check if user is currently in any room
       const currentRoomData = await roomService.getCurrentUserRoom();
@@ -94,14 +100,16 @@ export const useRoomStore = create<RoomState>((set, get) => ({
       if (currentRoomData) {
         // User is in a room, restore it
         const fullRoom = await roomService.getRoom(currentRoomData.room_id);
-        set({ currentRoom: fullRoom, isLoading: false });
+        set({ currentRoom: fullRoom, isLoading: false, isInitializing: false });
       } else {
         // User not in any room, initialize personal room
         await get().initializePersonalRoom();
+        set({ isInitializing: false });
       }
     } catch (_error: any) {
       // Fallback to personal room
       await get().initializePersonalRoom();
+      set({ isInitializing: false });
     }
   },
 

@@ -24,14 +24,26 @@ export function SoundManager() {
       }
     });
 
-    // Initialize ticking sound
+    // Initialize ticking sound (optional - only if file exists)
+    // Ticking sound is disabled until a proper audio file is provided
+    // To enable: add a ticking.mp3 file to public/sounds/ and uncomment below
+    /*
     if (!tickingRef.current) {
-      tickingRef.current = new Howl({
-        src: ["/sounds/ticking.mp3"], // Make sure this file exists or update path
-        loop: true,
-        volume: 0.5,
-      });
+      try {
+        tickingRef.current = new Howl({
+          src: ["/sounds/ticking.mp3"],
+          loop: true,
+          volume: 0.5,
+          onloaderror: () => {
+            console.warn("Ticking sound not available");
+            tickingRef.current = null;
+          },
+        });
+      } catch (e) {
+        console.warn("Could not initialize ticking sound:", e);
+      }
     }
+    */
   }, [soundscapes]);
 
   // Update volumes and play/pause based on state

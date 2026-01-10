@@ -1,10 +1,8 @@
 "use client";
 
-import { Globe, Search, X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { roomService, type StudyRoom } from "@/services/room-service";
 import { useRoomStore } from "@/stores/use-room-store";
@@ -18,7 +16,6 @@ export function PublicRoomModal({ isOpen, onClose }: PublicRoomModalProps) {
   const { joinRoom, currentRoom } = useRoomStore();
   const [rooms, setRooms] = useState<StudyRoom[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const loadRooms = useCallback(async () => {
     setLoading(true);
@@ -48,165 +45,151 @@ export function PublicRoomModal({ isOpen, onClose }: PublicRoomModalProps) {
     }
   };
 
-  const filteredRooms = rooms.filter(
-    (room) =>
-      room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      room.about?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      room.owner?.nickname.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
   if (!isOpen) return null;
 
   return (
-    <div className="fade-in fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-md duration-200">
-      <div
-        className="flex h-[600px] max-h-[90vh] w-[800px] max-w-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-2xl"
-        style={{
-          boxShadow: "0 0 50px -12px rgba(0, 0, 0, 0.5)",
-        }}
-      >
+    <div className="fade-in fixed inset-0 z-[999999] flex animate-in items-center justify-center bg-black/70 p-4 backdrop-blur-sm duration-200">
+      <div className="relative flex max-h-[80%] w-[900px] max-w-5xl flex-col overflow-hidden rounded-2xl bg-black/90 p-4 text-white shadow-2xl sm:p-8">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-white/5 border-b p-6">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 p-2 text-white">
-              <Globe className="h-6 w-6" />
-            </div>
-            <div>
-              <h2 className="font-bold text-white text-xl tracking-tight">
-                Focus Together Rooms
-              </h2>
-              <p className="text-sm text-white/50">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex w-full items-center justify-between">
+            <h2 className="font-bold text-lg sm:text-2xl">
+              📚 Focus Together Rooms
+            </h2>
+          </div>
+        </div>
+
+        {/* Close Button */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-5 right-5 cursor-pointer text-white/60 text-xl hover:text-white"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        {/* Content */}
+        <div className="hide-scrollbar flex flex-1 flex-col overflow-y-auto">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-white/80">
                 Jump into a public room and focus together.
               </p>
             </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="rounded-full text-white/50 hover:bg-white/10 hover:text-white"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
 
-        {/* Toolbar */}
-        <div className="flex shrink-0 gap-3 border-white/5 border-b bg-white/[0.02] p-4">
-          <div className="relative flex-1">
-            <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-white/30" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by room name, host, or description..."
-              className="rounded-xl border-white/10 bg-[#0a0a0a] pl-9 text-white focus:border-white/20"
-            />
-          </div>
-        </div>
+            {/* Table Container */}
+            <div className="hide-scrollbar max-h-[500px] overflow-x-auto">
+              {loading ? (
+                <div className="flex h-40 items-center justify-center text-white/30">
+                  Loading rooms...
+                </div>
+              ) : rooms.length === 0 ? (
+                <div className="flex h-40 flex-col items-center justify-center text-white/30">
+                  <span className="mb-2 text-3xl">🌐</span>
+                  <p>No public rooms available</p>
+                </div>
+              ) : (
+                <table className="min-w-full border-separate border-spacing-y-2 text-left text-sm">
+                  <thead>
+                    <tr className="border-white/10 border-b text-white/70">
+                      <th className="px-4 py-2">Name</th>
+                      <th className="hidden px-4 py-2 sm:table-cell">About</th>
+                      <th className="px-4 py-2">Members</th>
+                      <th className="hidden px-4 py-2 sm:table-cell">Host</th>
+                      <th className="px-4 py-2 text-center" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rooms.map((room) => {
+                      const isCurrentRoom = currentRoom?.id === room.id;
 
-        {/* Room List */}
-        <div className="scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent flex-1 overflow-y-auto p-2">
-          {loading ? (
-            <div className="flex h-40 items-center justify-center text-white/30">
-              Loading rooms...
-            </div>
-          ) : filteredRooms.length === 0 ? (
-            <div className="flex h-40 flex-col items-center justify-center text-white/30">
-              <Globe className="mb-2 h-8 w-8 opacity-50" />
-              <p>No rooms found matching your search</p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-1">
-              {/* Header Row */}
-              <div className="grid grid-cols-[2fr,2fr,1fr,100px] px-6 py-2 font-semibold text-white/30 text-xs uppercase tracking-wider">
-                <div>Name</div>
-                <div>About</div>
-                <div className="text-center">Members</div>
-                <div className="text-right">Host</div>
-              </div>
-
-              {/* Rows */}
-              {filteredRooms.map((room) => {
-                const isCurrentRoom = currentRoom?.id === room.id;
-
-                return (
-                  <div
-                    key={room.id}
-                    className={cn(
-                      "group grid grid-cols-[2fr,2fr,1fr,100px] items-center rounded-xl border border-transparent px-6 py-4 transition-all duration-200",
-                      isCurrentRoom
-                        ? "border-white/10 bg-white/5"
-                        : "hover:border-white/5 hover:bg-white/5",
-                    )}
-                  >
-                    {/* Name */}
-                    <div className="flex flex-col">
-                      <span className="font-bold text-white transition-colors group-hover:text-blue-200">
-                        {room.name}
-                      </span>
-                      {room.slug && (
-                        <span className="truncate text-white/30 text-xs">
-                          /{room.slug}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* About */}
-                    <div className="truncate pr-4 text-sm text-white/50">
-                      {room.about || "—"}
-                    </div>
-
-                    {/* Members */}
-                    <div className="-space-x-2 flex justify-center">
-                      {room.room_users?.slice(0, 3).map((u, i) => (
-                        <div
-                          key={i}
-                          className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#0f0f0f] bg-neutral-800 text-white text-xs"
-                        >
-                          {u.profile?.avatar_url ? (
-                            <Image
-                              src={u.profile.avatar_url}
-                              alt=""
-                              fill
-                              sizes="32px"
-                              className="object-cover"
-                            />
-                          ) : (
-                            u.profile?.nickname?.[0] || "?"
+                      return (
+                        <tr
+                          key={room.id}
+                          className={cn(
+                            "rounded-xl bg-white/5 transition-colors hover:bg-white/10",
+                            isCurrentRoom &&
+                              "bg-green-500/10 hover:bg-green-500/15",
                           )}
-                        </div>
-                      ))}
-                      {(room.room_users?.length || 0) > 3 && (
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-[#0f0f0f] bg-neutral-800 text-white/50 text-xs">
-                          +{(room.room_users?.length || 0) - 3}
-                        </div>
-                      )}
-                    </div>
+                        >
+                          {/* Name */}
+                          <td className="px-4 py-3 font-semibold text-white">
+                            {room.name || "Unnamed Room"}
+                          </td>
 
-                    {/* Host & Action */}
-                    <div className="flex items-center justify-end gap-3">
-                      <span className="hidden max-w-[80px] truncate text-right text-white/50 text-xs sm:inline-block">
-                        {room.owner?.nickname || "Unknown"}
-                      </span>
+                          {/* About */}
+                          <td className="hidden max-w-[250px] truncate px-4 py-3 text-white/60 sm:table-cell">
+                            {room.about || "—"}
+                          </td>
 
-                      <Button
-                        size="sm"
-                        disabled={isCurrentRoom}
-                        onClick={() => handleJoin(room.id)}
-                        className={cn(
-                          "h-8 rounded-lg px-4 font-semibold shadow-none transition-all",
-                          isCurrentRoom
-                            ? "bg-green-500/20 text-green-500 hover:bg-green-500/20"
-                            : "bg-white/10 text-white hover:bg-white hover:text-black",
-                        )}
-                      >
-                        {isCurrentRoom ? "Joined" : "Join"}
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
+                          {/* Members */}
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <div className="-space-x-2 flex">
+                                {room.room_users?.slice(0, 3).map((u, i) => (
+                                  <div
+                                    key={u.user_id || i}
+                                    className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/40 bg-black font-bold text-sm text-white sm:text-base"
+                                  >
+                                    {u.profile?.avatar_url ? (
+                                      <Image
+                                        src={u.profile.avatar_url}
+                                        alt=""
+                                        fill
+                                        sizes="40px"
+                                        className="rounded-full object-cover"
+                                      />
+                                    ) : (
+                                      <span className="uppercase">
+                                        {u.profile?.nickname?.slice(0, 2) ||
+                                          u.profile?.nickname?.[0] ||
+                                          "?"}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                                {(!room.room_users ||
+                                  room.room_users.length === 0) && (
+                                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black font-bold text-sm text-white/50">
+                                    0
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Host */}
+                          <td className="hidden px-4 py-3 text-white/70 sm:table-cell">
+                            {room.owner?.nickname || "Unknown"}
+                          </td>
+
+                          {/* Join Button */}
+                          <td className="px-4 py-3 text-center">
+                            <button
+                              type="button"
+                              disabled={isCurrentRoom}
+                              onClick={() => handleJoin(room.id)}
+                              className={cn(
+                                "mx-auto flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-1.5 font-medium text-sm text-white transition-colors",
+                                isCurrentRoom
+                                  ? "bg-green-500/20 text-green-400"
+                                  : "bg-white/10 hover:bg-white/20",
+                              )}
+                            >
+                              {isCurrentRoom ? "Joined" : "Join"}
+                              {!isCurrentRoom && (
+                                <ArrowRight className="h-4 w-4" />
+                              )}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

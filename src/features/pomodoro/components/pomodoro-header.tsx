@@ -1,13 +1,14 @@
 "use client";
 
-import { BarChart2, Clock, Globe, Settings2, Video } from "lucide-react";
+import { BarChart2, Clock, Globe, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UserDropdown } from "@/components/layouts/user-dropdown";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/auth-provider";
+import { statsService } from "@/services/stats-service";
 import { usePomodoroStore } from "@/stores/use-pomodoro-store";
 import { useRoomStore } from "@/stores/use-room-store";
-import { usePomodoroTimer } from "../hooks";
+import { useTimerStore } from "@/stores/use-timer-store";
 import { getCurrentStreak } from "../services/timer-service";
 import { PublicRoomModal } from "./social/public-room-modal";
 import { RoomSettingsSidebar } from "./social/room-settings-sidebar";
@@ -15,26 +16,51 @@ import { RoomWidgets } from "./social/room-widgets";
 import { StreakCard } from "./streak-card";
 
 export function PomodoroHeader() {
-  const { toggleStreak, toggleLeaderboard, toggleRoomSettings } =
-    usePomodoroStore();
+  const { toggleLeaderboard, toggleRoomSettings } = usePomodoroStore();
   const { currentRoom } = useRoomStore();
-  const { minutes, seconds } = usePomodoroTimer();
-  const [currentStreakCount, setCurrentStreakCount] = useState(0);
+  const { status } = useTimerStore();
+  const [, setCurrentStreakCount] = useState(0);
   const [isPublicModalOpen, setIsPublicModalOpen] = useState(false);
+  const [todayFocusMinutes, setTodayFocusMinutes] = useState(0);
 
   const { user } = useUser();
 
-  // Fetch streak on mount
+  // Fetch streak and today's focus time on mount
   useEffect(() => {
-    const fetchStreak = async () => {
+    const fetchStats = async () => {
       if (user) {
         const streak = await getCurrentStreak(user.id);
         setCurrentStreakCount(streak);
+
+        // Fetch today's focus time
+        const today = new Date().toISOString().split("T")[0];
+        const stats = await statsService.getDailyStats(user.id, today);
+        setTodayFocusMinutes(stats.focus_minutes || 0);
       }
     };
 
-    fetchStreak();
+    fetchStats();
   }, [user]);
+
+  // Refetch when timer stops (session completed)
+  useEffect(() => {
+    if (status === "idle" && user) {
+      const today = new Date().toISOString().split("T")[0];
+      statsService.getDailyStats(user.id, today).then((stats) => {
+        setTodayFocusMinutes(stats.focus_minutes || 0);
+      });
+    }
+  }, [status, user]);
+
+  // Format focus time as Xh Xm
+  const formatFocusTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours > 0) {
+      return `${hours}h ${mins}m`;
+    }
+    return `${mins}m`;
+  };
 
   return (
     <>
@@ -44,32 +70,16 @@ export function PomodoroHeader() {
           {/* Streak Widget */}
           <div className="relative">
             <StreakCard />
-            <Button
-              type="button"
-              className="flex cursor-pointer items-center justify-between gap-2 rounded-xl bg-black/70 px-5 py-4 text-white shadow-xs backdrop-blur-xl transition-transform duration-400 hover:bg-black/80"
-              onClick={toggleStreak}
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex items-baseline gap-2 text-left">
-                  <span className="font-bold text-sm text-white/90 uppercase">
-                    Streak
-                  </span>
-                  <div className="font-black font-title text-sm text-white">
-                    {currentStreakCount}
-                  </div>
-                </div>
-              </div>
-            </Button>
           </div>
 
-          {/* Timer Widget */}
+          {/* Today's Focus Time Widget */}
           <Button
-            className="flex h-10 cursor-pointer items-center gap-1 rounded-xl bg-black/20 px-3 hover:bg-black/50"
-            aria-label="Timer widget"
+            className="flex h-10 cursor-pointer items-center gap-1.5 rounded-xl bg-black/20 px-3 hover:bg-black/50"
+            aria-label="Today's focus time"
           >
             <Clock className="size-4 text-white" />
             <div className="font-bold text-sm text-white">
-              {minutes}:{String(seconds).padStart(2, "0")}
+              {formatFocusTime(todayFocusMinutes)}
             </div>
           </Button>
 
@@ -89,14 +99,6 @@ export function PomodoroHeader() {
             onClick={toggleLeaderboard}
           >
             <BarChart2 className="size-5 text-white" />
-          </Button>
-
-          {/* Cam Widget */}
-          <Button
-            className="flex h-10 cursor-pointer items-center justify-center gap-1 rounded-xl bg-black/20 px-3 hover:bg-black/50"
-            aria-label="Camera widget"
-          >
-            <Video className="size-5 text-white" />
           </Button>
 
           {/* Room Settings (Current Room) */}

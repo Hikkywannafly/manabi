@@ -165,6 +165,7 @@ export const roomService = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error("User not authenticated");
 
+    // Leave the room
     const { error } = await supabase
       .from("room_users")
       .delete()
@@ -172,16 +173,100 @@ export const roomService = {
       .eq("user_id", user.id);
 
     if (error) throw error;
+
+    // Check if room is now empty
+    const { count, error: countError } = await supabase
+      .from("room_users")
+      .select("*", { count: "exact", head: true })
+      .eq("room_id", roomId);
+
+    if (countError) {
+      console.error("Error checking room members:", countError);
+      return;
+    }
+
+    // Delete room if empty
+    if (count === 0) {
+      const { error: deleteError } = await supabase
+        .from("study_rooms")
+        .delete()
+        .eq("id", roomId);
+
+      if (deleteError) {
+        console.error("Error deleting empty room:", deleteError);
+      } else {
+        console.log("Deleted empty room:", roomId);
+      }
+    }
+  },
+
+  /**
+   * Get total focus time for all users currently in a room (today)
+   */
+  async getRoomFocusTime(roomId: string): Promise<number> {
+    const supabase = createClient();
+
+    // Get all user IDs in the room
+    const { data: roomUsers, error: usersError } = await supabase
+      .from("room_users")
+      .select("user_id")
+      .eq("room_id", roomId);
+
+    if (usersError || !roomUsers || roomUsers.length === 0) {
+      return 0;
+    }
+
+    const userIds = roomUsers.map((u) => u.user_id);
+    const today = new Date().toISOString().split("T")[0];
+
+    // Get today's stats for all users in the room
+    const { data: stats, error: statsError } = await supabase
+      .from("user_stats")
+      .select("focus_minutes")
+      .in("user_id", userIds)
+      .eq("date", today);
+
+    if (statsError || !stats) {
+      return 0;
+    }
+
+    // Sum up all focus minutes
+    return stats.reduce((total, s) => total + (s.focus_minutes || 0), 0);
   },
 
   async leaveAllRooms(userId: string) {
     const supabase = createClient();
+
+    // First get the rooms the user is in
+    const { data: userRooms } = await supabase
+      .from("room_users")
+      .select("room_id")
+      .eq("user_id", userId);
+
+    // Leave all rooms
     const { error } = await supabase
       .from("room_users")
       .delete()
       .eq("user_id", userId);
 
-    if (error) console.error("Error leaving all rooms:", error);
+    if (error) {
+      console.error("Error leaving all rooms:", error);
+      return;
+    }
+
+    // Check each room and delete if empty
+    if (userRooms && userRooms.length > 0) {
+      for (const room of userRooms) {
+        const { count } = await supabase
+          .from("room_users")
+          .select("*", { count: "exact", head: true })
+          .eq("room_id", room.room_id);
+
+        if (count === 0) {
+          await supabase.from("study_rooms").delete().eq("id", room.room_id);
+        }
+      }
+    }
   },
 
   async getCurrentUserRoom() {
